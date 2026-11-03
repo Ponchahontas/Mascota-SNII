@@ -1,0 +1,9 @@
+{
+  "compilerOptions": {
+    "target": "ES2022", "module": "ESNext", "lib": ["ES2022", "DOM", "DOM.Iterable"],
+    "moduleResolution": "Bundler", "outDir": "dist/src", "rootDir": "src",
+    "strict": true, "skipLibCheck": true, "verbatimModuleSyntax": true,
+    "noUnusedLocals": true, "noUnusedParameters": true, "noFallthroughCasesInSwitch": true
+  },
+  "include": ["src/**/*.ts"]
+}
