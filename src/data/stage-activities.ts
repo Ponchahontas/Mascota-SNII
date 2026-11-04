@@ -24,7 +24,23 @@ export interface Activity {
  pa:number; pe:number; credits:number; energy:number; stress:number; focus:number;
  motivation?:number; type:string; flavor:string; performer:'mascota';
 }
+/**
+ * Formato de fila para edición del catálogo:
+ * [etapa, claveLocal, título, icono, costoPA, UPEBase, diferenciaCR,
+ *  diferenciaEnergía, diferenciaEstrés, diferenciaConcentración, categoría, explicación].
+ *
+ * IMPORTANTE:
+ * - Cada etapa contiene seis actividades EXCLUSIVAS; no acumular actividades previas.
+ * - La mascota realiza la acción; el jugador elige/cuido. El campo `flavor`
+ *   explica el contexto humano cuando requiere acompañamiento escolar.
+ * - CR positivos en Kínder son apoyos simbólicos, nunca salarios ni empleo infantil.
+ * - Estos valores son balance lúdico; no equivalen a criterios oficiales.
+ *
+ * Al modificar una fila: ejecutar `npm test` y revisar el texto de la UI.
+ */
 type ActivityRow = readonly [stage:number,id:string,label:string,icon:string,pa:number,pe:number,credits:number,energy:number,stress:number,focus:number,type:string,flavor:string];
+// El primer número (0..13) coincide con la posición del arreglo STAGES.
+// Mantener las filas agrupadas por etapa facilita auditar niveles y costes.
 const ACTIVITY_ROWS: readonly ActivityRow[] = [
   [0,"colores","Identificar colores y formas","🎨",3,10,0,-2,0,2,"juego","La mascota distingue figuras con tarjetas, guiada por su docente."],
   [0,"bloques","Construir con bloques","🧱",4,12,-1,-3,0,2,"juego","La mascota prueba tamaños y equilibrio con piezas seguras."],
@@ -117,4 +133,5 @@ export const ACTIVITIES: readonly Activity[] = ACTIVITY_ROWS.map(([stage,id,labe
  pa,pe,credits,energy,stress,focus,type,flavor,performer:'mascota'
 }));
 /** Permite mostrar solo las actividades vigentes, en lugar de acumular tareas de niveles anteriores. */
+/** Selecciona actividades jugables de una etapa; no modifica el catálogo maestro. */
 export const activitiesForStage=(stageIndex:number):Activity[]=>ACTIVITIES.filter(a=>stageIndex>=a.minStage && stageIndex<=a.maxStage);

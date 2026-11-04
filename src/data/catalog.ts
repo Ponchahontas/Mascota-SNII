@@ -1,5 +1,13 @@
-/** Datos de balance ficticios: no son disposiciones ni requisitos oficiales del SNII. */
+/**
+ * @module catalog
+ * Parámetros fijos de juego, NO requisitos normativos del SNII.
+ * El orden de STAGES es un contrato: stageIndex se guarda en partidas y sprites;
+ * mover/eliminar entradas requiere migraciones y cambio de esquema.
+ * Para modificar el balance, actualizar pruebas y documentar balanceVersion.
+ */
+/** Parámetros de economía: `target`=UPE para avanzar y `apPerHour`=recuperación/h. */
 export interface Stage { id: string; label: string; short: string; target: number; maxAP: number; apPerHour: number; cost: number; reward: number; automationSlots: number; emblem: string; }
+/** Etapas en orden de evolución de 0 (Kínder) a 13 (Emérito). */
 export const STAGES: readonly Stage[] = [
   ['kinder','Kínder','Kínder',30,20,4,.55,.35,0,'🧸'],
   ['primaria','Primaria','Primaria',60,24,4,.60,.45,0,'✏️'],
@@ -21,6 +29,7 @@ export const STAGES: readonly Stage[] = [
 export { ACTIVITIES, activitiesForStage, STAGE_GUIDES } from './stage-activities.js';
 export type { Activity, StageGuide } from './stage-activities.js';
 export interface Care { id: string; label: string; icon: string; credits: number; energy?:number; stress?:number; wellbeing?:number; motivation?:number; concentration?:number; socialization?:number; }
+/** Cuidados decididos por el jugador; el motor no descuenta PA por cuidarlos. */
 export const CARE: readonly Care[] = [
  {id:'comer',label:'Comer',icon:'🥪',credits:-3,energy:8,wellbeing:2,stress:-1},
  {id:'descansar',label:'Descansar',icon:'☕',credits:0,energy:8,stress:-4,concentration:3},
@@ -28,6 +37,7 @@ export const CARE: readonly Care[] = [
  {id:'socializar',label:'Socializar',icon:'💬',credits:-2,wellbeing:4,motivation:6,stress:-3,socialization:10},
  {id:'recrear',label:'Recreación',icon:'🎮',credits:-1,wellbeing:6,motivation:2,stress:-6},
 ];
+/** Catálogo de áreas visuales: cada ID debe corresponder a PET_KINDS y un SVG. */
 export const AREAS = [
  ['fisico','Ciencias físico-matemáticas y de la Tierra','🌌'],
  ['biologia','Biología y Química','🧬'],

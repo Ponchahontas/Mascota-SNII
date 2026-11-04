@@ -1,15 +1,44 @@
-/** Motor puro: ninguna función accede al DOM ni al almacenamiento. */
+/**
+ * @module engine-game
+ * Motor de dominio de Mascota-SNII.
+ *
+ * RESPONSABILIDAD: evaluar reglas y devolver un snapshot NUEVO de la partida.
+ * No utiliza DOM, IndexedDB ni red. La UI no debe modificar recursos por su cuenta.
+ *
+ * INVARIANTES:
+ * - Las actividades pertenecen exclusivamente a su etapa educativa.
+ * - PA y necesidades se mantienen dentro de sus límites; no se otorgan PA negativos.
+ * - Los créditos, evidencias y UPE son indicadores lúdicos, NO criterios oficiales SNII.
+ * - El tiempo sin conexión se limita a 8 h por procesamiento.
+ * - Un comando NO se vuelve idempotente aquí: la deduplicación vive en persistence.ts.
+ *
+ * Ruta de una acción: UI -> game-coordinator -> persistence -> applyGameAction.
+ * Ver docs/11_GUIA_DE_CODIGO.md antes de modificar fórmulas o progresión.
+ */
 import { ACTIVITIES, CARE, EVENTS, SCHOOL_EVENTS, STAGES, STAGE_GUIDES, AREAS } from '../data/catalog.js';
 import type { GameSave, NeedsState } from './state.js';
 import { applyNeedChanges } from './engine-needs.js';
+/** Resultado sin persistir. `next` debe guardarse junto al registro del comando. */
 export interface EngineOutcome { next:GameSave; changes:string[]; events:string[]; warnings:string[] }
+/** Vocabulario de operaciones que el motor implementa realmente (no el catálogo futuro). */
 export type ActionType = 'activity.execute'|'care.perform'|'career.confirmTransition'|'project.submit'|'event.resolve'|'automation.activate'|'automation.deactivate'|'time.processOffline'|'legacy.startGeneration'|'pet.rename'|'pet.changeArea';
+/** Limita números; usar especialmente en recursos y progreso para evitar valores fuera de rango. */
 export const clamp=(n:number,min:number,max:number)=>Math.max(min,Math.min(max,n));
+/** Evidencias lúdicas mínimas para transición; fórmula provisional, NO del DOF. */
 export const STAGE_GATE=(index:number)=>Math.min(4,1+Math.floor(index/3));
 function fail(msg:string):never { throw new Error(msg); }
+// Se trabaja sobre una copia profunda: un rechazo nunca debe mutar la partida recibida.
 const copy=(save:GameSave):GameSave=>structuredClone(save);
 const log=(next:GameSave,message:string)=>{next.history=[message,...next.history].slice(0,28)};
 const id=()=>typeof crypto !== 'undefined'&&'randomUUID' in crypto?crypto.randomUUID():`game-${Date.now()}-${Math.random().toString(36).slice(2)}`;
+/**
+ * Crea una partida completamente nueva con recursos iniciales de Kínder.
+ * @param name Nombre visible, limitado a 28 caracteres.
+ * @param areaId Área temática y especie visual (se mantiene entre etapas).
+ * @param difficultyId Reservado para dificultad; el MVP aún no modifica el balance.
+ * @param generation Generación a registrar para el modo legado.
+ * @returns Estado serializable con revisión cero, apto para initializeSave().
+ */
 export function newGame(name:string,areaId:string='biologia',difficultyId:string='normal',generation=1):GameSave {
  const stage=STAGES[0]; const now=new Date().toISOString();
  return {gameId:id(),schemaVersion:2,contentVersion:'2026.11-areas-stages',balanceVersion:'0.3-provisional',normativeVersionId:'unverified',revision:0,createdAt:now,lastProcessedSimTime:now,
@@ -19,19 +48,35 @@ export function newGame(name:string,areaId:string='biologia',difficultyId:string
  projectProgress:0,projectName:STAGE_GUIDES[0].project,actions:0,lastActivity:'',streak:0,automation:false,event:null,eventCursor:0,
  achievements:[],history:['La aventura científica acaba de comenzar.'],records:[],careTimes:{}};
 }
+/** Suma UPE de juego y actualiza el total histórico; NO concede evidencia por sí mismo. */
 function addXp(s:GameSave,pe:number){const value=Math.max(0,Math.round(pe));s.stageXp+=value;s.totalXp+=value; return value}
+/** Registra cada logro una sola vez; la interfaz solo lo visualiza. */
 function checkAchievements(s:GameSave){
  const targets:[string,boolean,string][]=[['primer-paso',s.actions>=1,'¡Primer paso académico!'],['constancia',s.actions>=20,'Ritmo académico: 20 acciones'],['proyecto',s.completedProjects>=1,'Primer proyecto completado'],['trayectoria',s.stageIndex>=4,'¡Ingresaste a la universidad!'],['snii',s.stageIndex>=9,'Llegaste a la etapa Candidato SNII'],['eterna',s.stageIndex>=13,'¡Carrera emérita!']];
  for(const [key,condition,label] of targets) if(condition&&!s.achievements.includes(key)){s.achievements.push(key);log(s,`🏅 ${label}`)}
 }
+/** Progreso de proyecto entre 0 y 100; solo project.submit genera su entrega. */
 function advanceProject(s:GameSave,delta:number){
  s.projectProgress=clamp(s.projectProgress+delta,0,100);
 }
-/** Resuelve un comando validado y retorna un nuevo snapshot para su commit atómico. */
+/**
+ * Aplica una acción a un snapshot sin alterarlo y calcula sus consecuencias.
+ *
+ * @param save Estado actual que se considera de solo lectura.
+ * @param type Nombre exacto de la operación.
+ * @param payload Datos de la acción; cada rama verifica sus precondiciones.
+ * @param now Marca de tiempo en milisegundos, inyectable para pruebas.
+ * @returns Snapshot nuevo, cambios legibles, eventos de dominio y advertencias.
+ * @throws Error ante falta de recursos, etapa incorrecta o comando no permitido.
+ *
+ * IMPORTANTE: No guardar desde este módulo ni asumir que una acción se confirmó.
+ * Solo commitCommand() valida la revisión y persiste atómicamente el resultado.
+ */
 export function applyGameAction(save:GameSave,type:ActionType,payload:Record<string,unknown>,now=Date.now()):EngineOutcome {
  const s=copy(save),changes:string[]=[], events:string[]=[], warnings:string[]=[];
  const stage=STAGES[s.stageIndex];
  switch(type){
+ // Actividad pedagógica propia de la etapa: Kínder no imparte tutorías ni publica artículos.
  case 'activity.execute': {
   const a=ACTIVITIES.find(item=>item.id===payload.activityId);
   if(!a||s.stageIndex<a.minStage||s.stageIndex>a.maxStage)fail('Actividad no disponible en esta etapa educativa.');
@@ -42,7 +87,9 @@ export function applyGameAction(save:GameSave,type:ActionType,payload:Record<str
   if(s.pet.needs.energy<6)fail('Tu mascota necesita descansar antes de continuar.');
   s.ap-=cost;s.credits+=a.credits;
   const n=s.pet.needs;
+  // Rendimiento provisional según cuatro necesidades; penaliza fatiga/estrés.
   const condition=clamp((n.energy+n.motivation+n.concentration+(100-n.stress))/400,.45,1.15);
+  // Rendimientos decrecientes al repetir una actividad; diversificar aporta un bono.
   const repeat=s.lastActivity===a.id?clamp(1-.09*s.streak,.55,1):1;
   const combo=s.lastActivity!==a.id && s.lastActivity!==''?1.12:1;
   const gained=addXp(s,a.pe*stage.reward*condition*repeat*combo);
@@ -55,6 +102,7 @@ export function applyGameAction(save:GameSave,type:ActionType,payload:Record<str
   log(s,`${a.icon} ${a.label}: +${gained} UPE, ${a.credits>=0?'+':''}${a.credits} CR`);
   changes.push(`-${cost} PA`, `+${gained} UPE`);break;
  }
+ // Cuidado hecho por la persona jugadora: no consume PA y tiene enfriamiento corto.
  case 'care.perform': {
   const c=CARE.find(item=>item.id===payload.careActionId); if(!c)fail('Cuidado desconocido.');
   if(s.credits+c.credits<0)fail('No hay créditos suficientes. Descansar y dormir son gratuitos.');
@@ -67,12 +115,14 @@ export function applyGameAction(save:GameSave,type:ActionType,payload:Record<str
   s.pet.needs=applyNeedChanges(s.pet.needs,effects);
   log(s,`${c.icon} ${c.label}: mascota cuidada`);changes.push('Bienestar actualizado');break;
  }
+ // Solo una entrega completada concede evidencias y créditos; reinicia el avance.
  case 'project.submit': {
   if(s.projectProgress<100)fail('El proyecto necesita llegar al 100 %.');
   s.projectProgress=0;s.completedProjects++;s.evidence+=2;s.credits+=12;
   const earned=addXp(s,Math.round(12*stage.reward));
   log(s,`📁 Proyecto finalizado: +2 evidencias, +12 CR, +${earned} UPE`);changes.push('Proyecto entregado');break;
  }
+ // Avance controlado por UPE, evidencias y competencia. Es ficción, no dictamen SNII.
  case 'career.confirmTransition': {
   if(s.stageIndex>=STAGES.length-1)fail('Ya alcanzaste la etapa Emérito. Puedes continuar jugando o iniciar un legado.');
   if(s.stageXp<stage.target)fail(`Necesitas ${stage.target} UPE para avanzar.`);
@@ -82,6 +132,7 @@ export function applyGameAction(save:GameSave,type:ActionType,payload:Record<str
   const nextStage=STAGES[s.stageIndex];s.pet.stageId=nextStage.id;s.projectName=STAGE_GUIDES[s.stageIndex].project;s.projectProgress=0;s.ap=clamp(s.ap+Math.round(nextStage.maxAP*.5),0,nextStage.maxAP);s.apRegenRemainder=0;s.credits+=20;
   log(s,`🎓 ${old} → ${nextStage.label}. Bono de 20 CR`);changes.push('Etapa avanzada');events.push('Nueva etapa desbloqueada');break;
  }
+ // Resolver el evento borra la elección pendiente; no se puede reclamar dos veces.
  case 'event.resolve': {
   if(!s.event)fail('No hay evento pendiente.');
   const option=s.event.options.find(o=>o.id===payload.optionId);if(!option)fail('Respuesta de evento inválida.');
@@ -90,6 +141,7 @@ export function applyGameAction(save:GameSave,type:ActionType,payload:Record<str
   const earned=addXp(s,Math.round(option.pe*stage.reward));s.event=null;
   log(s,`🎲 ${eventTitle}: +${earned} UPE`);changes.push('Evento resuelto');break;
  }
+ // Automatización disponible solo desde universidad, con costo de instalación.
  case 'automation.activate': {
   if(s.stageIndex<4)fail('La automatización se desbloquea en Universidad.');
   if(s.automation)fail('Ya tienes un asistente activo.');
@@ -100,6 +152,7 @@ export function applyGameAction(save:GameSave,type:ActionType,payload:Record<str
   if(!s.automation)fail('No hay automatización que desactivar.');
   s.automation=false;log(s,'🤖 Asistente bibliográfico desactivado.');changes.push('Automatización desactivada');break;
  }
+ // Marcador temporal + límite 8 h: evita bonificaciones por ausencias arbitrarias.
  case 'time.processOffline': {
   const marker=typeof payload.lastProcessedMarker==='string'?payload.lastProcessedMarker:'';
   if(marker!==s.lastProcessedSimTime)fail('El intervalo ya se procesó o la partida cambió.');
@@ -108,6 +161,8 @@ export function applyGameAction(save:GameSave,type:ActionType,payload:Record<str
   // Máximo ocho horas por ausencia; este comando es idempotente por ID y marcador temporal.
   const hours=Math.min(elapsed/3_600_000,8);
   // Conservamos la fracción de PA para que cada minuto cuente, incluso con la app abierta.
+  // Las fracciones se trasladan al siguiente ciclo; no truncarlas en cada minuto.
+  // Si PA alcanzan el máximo, se descarta el excedente para impedir acumulación oculta.
   const pooled=hours*stage.apPerHour+(s.apRegenRemainder??0);
   const regen=Math.floor(pooled);
   s.ap=clamp(s.ap+regen,0,stage.maxAP);
@@ -123,6 +178,7 @@ export function applyGameAction(save:GameSave,type:ActionType,payload:Record<str
   if(hours>=.05)log(s,`🕰️ Ausencia simulada ${hours.toFixed(1)} h (máx. 8 h): +${regen} PA`);
   changes.push(`+${regen} PA por tiempo`);break;
  }
+ // Personalización visual reversible: no reinicia edad, PA, créditos ni progreso.
  case 'pet.changeArea': {
   const nextArea=typeof payload.areaId==='string'?payload.areaId:'';
   if(!AREAS.some(([key])=>key===nextArea))fail('Esa área no está disponible.');
@@ -138,6 +194,7 @@ export function applyGameAction(save:GameSave,type:ActionType,payload:Record<str
   if(name.length<1||name.length>28)fail('El nombre debe tener entre 1 y 28 caracteres.');
   s.pet.name=name;changes.push('Nombre actualizado');break;
  }
+ // Reinicio VOLUNTARIO: conserva récords y legado, sin final automático del juego.
  case 'legacy.startGeneration': {
   if(s.stageIndex<9)fail('El modo legado se desbloquea desde Candidato SNII.');
   const name=typeof payload.newPetName==='string'?payload.newPetName.trim():'';

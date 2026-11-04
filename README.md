@@ -1,59 +1,67 @@
-# Tamagotchi Académico — MVP jugable 0.2
+# Mascota-SNII — Tamagotchi Académico (MVP v0.3)
 
-**Estado verificable:** compilación TypeScript correcta y pruebas del motor ejecutadas. Interfaz visual responsiva implementada, pero **no se ha validado en un navegador real** en esta sesión porque el navegador de pruebas bloqueó el acceso al servidor local. No se ha realizado despliegue remoto. No es una versión final.
+Juego satírico en español y **local-first** sobre una trayectoria académica ficticia de **14 etapas**, desde Kínder hasta Emérito. Tiene **84 actividades exclusivas por etapa** y **siete mascotas visualmente diferentes por área**, cada una con 14 cuadros de evolución. El jugador acompaña y cuida; la mascota realiza las actividades educativas apropiadas a su etapa.
 
-Un Tamagotchi satírico en español para vivir una carrera académica imaginaria a lo largo de 14 etapas, de Kínder a Emérito. Pixel art dibujado con CSS, sin imágenes propietarias. Todos los puntos, premios, requisitos y clasificaciones en pantalla **son ficticios**. No existe afiliación institucional ni equivalencia con normas oficiales.
+> **Aviso:** las puntuaciones, requisitos, evidencias y representaciones son **ficticios**. No equivalen a evaluaciones, dictámenes, niveles ni criterios oficiales del SNII. El proyecto no declara afiliación institucional.
 
-**Repositorio oficial de desarrollo:** https://github.com/Ponchahontas/Mascota-SNII
+## Estado verificable
 
-## Inicio rápido
+- Aplicación estática PWA programada en TypeScript, CSS y SVG.
+- Compilación local con `npm run build`, comprobación `npm run typecheck` y **19 pruebas automatizadas Node** del motor ejecutadas correctamente en la versión documentada.
+- Guardado en IndexedDB, exportación/importación JSON, eventos, cuidado, proyectos, tiempo offline limitado, logros, asistentes básicos y legado voluntario.
+- La validación automatizada **no cubre todavía** el juego completo en navegadores reales, accesibilidad exhaustiva ni instalación PWA móvil. No afirmar que Netlify está desplegado o verificado solo por la existencia de `netlify.toml`.
 
-Requiere Node.js 20 o posterior.
+**Repositorio de desarrollo:** https://github.com/Ponchahontas/Mascota-SNII
+
+## Ejecutar
+
+Requisitos: Node.js 20 o posterior y npm.
 
 ```bash
 npm install
+npm run typecheck
 npm test
 npm run dev
 ```
 
-Abre `http://localhost:4173`. El servidor sirve el directorio `dist/` construido por `npm run build`. También puedes desplegar los archivos **dentro de `dist`** directamente en Netlify Drop, sin ninguna fase de compilación.
+Abre `http://localhost:4173`. Para crear la distribución estática usa `npm run build`: publica **el contenido** de `dist/`. Netlify puede construir desde GitHub usando `npm run build` y el directorio `dist`, o recibir la carpeta compilada mediante Netlify Drop.
 
-## Funcionalidad del MVP
+## Mecánicas implementadas
 
-- Crear una mascota con nombre y un campo temático de conocimiento. Animación y expresiones del personaje.
-- Acciones de estudio y tutoría (la tutoría da créditos desde Kínder), actividades específicas desbloqueadas por etapa.
-- Cuidado sin coste de PA, necesidades y enfriamiento breve para acciones de recuperación.
-- 14 etapas, UPE, evidencias lúdicas y barreras mínimas para progresar.
-- Proyectos completables, eventos de decisiones, recompensas y bitácora.
-- Asistente bibliográfico básico desde Universidad, con mantenimiento y límites de producción.
-- Guardado local en IndexedDB con transacciones de estado y comandos idempotentes; control de revisión para pestañas concurrentes.
-- Regeneración limitada a 8 h offline, importación y exportación JSON, modo legado voluntario.
-- PWA preparada para instalación en navegador compatible, cache estática, controles de teclado y diseño responsive.
+- **Desarrollo por etapa:** seis actividades educativas propias de cada nivel; no hay tutorías impartidas por menores en Kínder.
+- **Rol del jugador:** selecciona actividades, brinda cuidados, toma decisiones y controla el expediente. La mascota actúa, con apoyo escolar cuando procede.
+- **Economía ficticia:** PA se regeneran con el tiempo; CR son recursos de juego; UPE son progreso lúdico; proyectos conceden evidencias ficticias.
+- **Área/especie:** siete tipos originales con identidad persistente y evolución a través de los catorce niveles.
+- **Guardado y seguridad:** IndexedDB con transacciones para resultado y snapshot, revisión de partida, importación JSON validada, exportación manual.
+- **Sin final obligatorio:** al alcanzar suficiente trayectoria se puede comenzar una nueva generación y mantener récords.
 
-## Despliegue en Netlify
+## Mapa de carpetas
 
-**Método A: Netlify Drop sin build.** Compila con `npm run build`. Descomprime `Tamagotchi_Academico_NETLIFY_DROP_v2.zip` si lo recibiste y arrastra la carpeta descomprimida con `index.html` en la raíz. En Netlify no debes ejecutar un comando de compilación para este método.
+| Carpeta o archivo | Responsabilidad |
+| --- | --- |
+| `src/data/` | Actividades por etapa, balance ficticio, nombres y metadatos de especie |
+| `src/core/engine-game.ts` | Reglas puras de actividades, recursos, carrera, offline y legado |
+| `src/core/state.ts` | Esquema de guardado y contratos de estado |
+| `src/core/persistence.ts` | IndexedDB, validaciones, idempotencia y conflictos de versión |
+| `src/core/game-coordinator.ts` | Canal de órdenes entre UI y persistencia |
+| `src/ui/app.ts` | Presentación y eventos de usuario; no entrega recompensas directamente |
+| `public/pets/` | Siete sprites SVG de 14 evoluciones |
+| `public/sw.js` | Caché de la aplicación PWA, separado de partidas privadas |
+| `tests/` | Pruebas de regresión del motor |
+| `docs/` | Diseño, decisiones, glosario y guías de mantenimiento |
 
-**Método B: repositorio GitHub.** Publica la carpeta fuente, conecta el repo a Netlify y usa `npm run build` como comando y `dist` como carpeta de publicación. El proyecto incorpora `netlify.toml` con estos valores. Si falla la instalación, verifica la versión de Node y la disponibilidad de `typescript` en npm.
+## Documentación para quien revise el código
 
-No pegues claves ni secretos dentro del repositorio. No se requiere backend ni API key para jugar.
+- **[CONTRIBUTING.md](CONTRIBUTING.md):** convención obligatoria de comentarios en español, JSDoc/TSDoc, revisión de cambios y pruebas.
+- **[docs/11_GUIA_DE_CODIGO.md](docs/11_GUIA_DE_CODIGO.md):** ruta de comandos, invariantes, campos del guardado, recuperación de PA, balances, sprites y puntos de extensión.
+- **[PROMPT_MAESTRO_ASTRA.md](PROMPT_MAESTRO_ASTRA.md):** visión de producto a largo plazo; distinguir planes futuros de funciones existentes.
 
-## Arquitectura
+La documentación en el código explica restricciones, fórmulas y decisiones; no se agregan comentarios a cada línea trivial. **Cuando una regla cambia, su explicación y sus pruebas deben actualizarse en el mismo cambio.**
 
-- `src/data/catalog.ts`: tablas ficticias de 14 etapas, actividades, cuidado, eventos y temáticas.
-- `src/core/engine-game.ts`: reglas puras de acciones, proyectos, carrera, tiempo y legado.
-- `src/core/persistence.ts`: IndexedDB transaccional, idempotencia y validación de importaciones.
-- `src/core/game-coordinator.ts`: mediación de comandos con UUID y revisión esperada.
-- `src/ui/app.ts`: vista y eventos del DOM, delegación hacia el coordinador.
-- `public/sw.js`: caché del shell. Los archivos de datos del usuario no se cachean.
-- `scripts/build.mjs`: distribución estática sin empaquetador externo (TypeScript local o instalado).
-- `docs/`: decisiones originales y documento de estado de MVP.
-- `PROMPT_MAESTRO_ASTRA.md`: especificación de producto mayor para continuar por fases.
+## Pendientes
 
-## Riesgos y pendientes
-
-Este MVP **no implementa aún el catálogo íntegro** de `docs/04_CATALOGO_COMANDOS.md`. Falta implementar a profundidad inventarios y compras, múltiples proyectos, subrutas especializadas, competencias específicas, sistemas de eventos extensos, revisiones normativas oficiales, balance a gran escala, accesibilidad auditada, migraciones de esquemas anteriores y pruebas reales de navegadores/PWA. La economía y el equilibrio del juego son provisionales. IndexedDB almacena partidas solamente en el navegador actual; exporta respaldos para proteger tu progreso. Las importaciones reemplazan la partida activa (con confirmación) y no admiten versiones antiguas.
+Pruebas end-to-end en navegador y móvil; ajustes de balance con simulación; auditoría WCAG; migración robusta de partidas antiguas; sistema avanzado de inventarios, proyectos, eventos y automatizaciones; verificación oficial de normas y áreas vigentes; validación de publicación y actualización PWA.
 
 ## Licencia
 
-**Pendiente de decisión del autor.** No se ha asignado una licencia abierta por cuenta del usuario. Antes de hacerlo público, selecciona expresamente una licencia adecuada.
+**Pendiente de elección expresa por la persona propietaria.** No se ha asignado licencia abierta por defecto.

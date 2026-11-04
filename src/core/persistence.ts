@@ -1,11 +1,24 @@
-/** Persistencia en IndexedDB: snapshots y bitácora comparten la misma transacción. */
+/**
+ * @module persistence
+ * Única puerta de entrada al guardado local en IndexedDB.
+ *
+ * Hay DOS almacenes en la MISMA transacción `readwrite`:
+ * 1) `saves`: snapshot actual bajo la clave `active`.
+ * 2) `commands`: huella y resultado de cada comando confirmado.
+ *
+ * Si la transacción falla, ni el recurso ni su recompensa deben aplicarse.
+ * No confundir persistencia local con una cuenta en la nube: hay que exportar JSON.
+ */
 import type { GameSave } from './state.js';
 import type { GameCommand, CommandResult, CommandError } from './commands.js';
 import { applyGameAction, type ActionType } from './engine-game.js';
+// Mantener este nombre/versionado estable evita perder partidas existentes.
 const DB='tamagotchi-academico-v2', SAVE='saves', COMMANDS='commands';
 const ACTIVE_KEY='active';
 interface SavedCommand { id:string; signature:string; result:CommandResult<null> }
+/** Convierte un IDBRequest a Promise; NO reemplaza el `tx.oncomplete` del commit. */
 const requestPromise=<T>(req:IDBRequest<T>)=>new Promise<T>((resolve,reject)=>{req.onsuccess=()=>resolve(req.result);req.onerror=()=>reject(req.error)});
+/** Abre/crea la base; alterar su estructura requiere una migración de IndexedDB. */
 function open():Promise<IDBDatabase>{
  return new Promise((resolve,reject)=>{
   const req=indexedDB.open(DB,1);
@@ -13,7 +26,14 @@ function open():Promise<IDBDatabase>{
   req.onsuccess=()=>resolve(req.result);req.onerror=()=>reject(req.error);
  });
 }
-/** Guardián de importaciones: verifica todos los campos que usa el motor, no solo una muestra. */
+/**
+ * Guardia de esquema para importaciones y partidas persistidas.
+ * Rechaza valores fuera de rango y tipos inesperados antes de entregarlos al motor.
+ *
+ * @param x Valor de origen no confiable (JSON o almacenamiento previo).
+ * @returns `true` cuando cumple la forma esperada de GameSave v2.
+ * NOTA: Validar forma no prueba procedencia ni veracidad científica de los datos.
+ */
 export function validateSave(x:unknown):x is GameSave {
  if(!x||typeof x!=='object')return false;
  const v=x as Partial<GameSave>;
@@ -42,7 +62,13 @@ export function validateSave(x:unknown):x is GameSave {
  }
  return true;
 }
+/** Lee la partida activa o `null` si todavía no se ha creado. */
 export async function getSave():Promise<GameSave|null>{const db=await open();try{const tx=db.transaction(SAVE,'readonly');return (await requestPromise(tx.objectStore(SAVE).get(ACTIVE_KEY)) as GameSave|undefined)??null;}finally{db.close()}}
+/**
+ * Instala una partida nueva o importada.
+ * IMPORTANTE: reemplaza la partida activa y limpia la bitácora de IDs previos;
+ * la UI debe pedir confirmación antes de invocar esta función al importar.
+ */
 export async function initializeSave(save:GameSave):Promise<void>{
  if(!validateSave(save))throw Error('La partida no tiene un esquema compatible.');
  const db=await open();try{await new Promise<void>((resolve,reject)=>{
@@ -52,8 +78,23 @@ export async function initializeSave(save:GameSave):Promise<void>{
   tx.objectStore(COMMANDS).clear();tx.oncomplete=()=>resolve();tx.onerror=()=>reject(tx.error);tx.onabort=()=>reject(tx.error);
  });}finally{db.close()}
 }
+/** Estructura uniforme de error; solo el conflicto de revisión es reintentable. */
 export const failure=(code:string,message:string,currentRevision?:number):CommandError=>({code,message,retryable:code==='STATE_CONFLICT',currentRevision});
-/** Ejecución transaccional serializada: evita duplicar recompensas en pestañas concurrentes. */
+/**
+ * Aplica exactamente una vez un comando (por ID y payload) dentro de IndexedDB.
+ *
+ * Pasos que deben mantener este orden:
+ * 1. Leer `commands[commandId]`: si coincide la huella, responder `replayed`.
+ * 2. Leer snapshot activo y verificar `gameId` + `expectedRevision`.
+ * 3. Evaluar el motor puro (puede rechazar sin escribir).
+ * 4. Escribir estado NUEVO y resultado en la misma transacción.
+ * 5. Resolver solo cuando `tx.oncomplete` confirma durabilidad.
+ *
+ * @param command Orden inmutable con identidad y revisión esperada.
+ * @returns Resultado confirmado/repetido o error tipado.
+ * PRECAUCIÓN: introducir `await` dentro de los callbacks IDB puede cerrar
+ * la transacción prematuramente; revisar tests de concurrencia al modificar.
+ */
 export async function commitCommand(command:GameCommand<Record<string,unknown>>):Promise<CommandResult<null>|CommandError>{
  if(!command.commandId||!command.gameId||command.commandSchemaVersion!==1||!Number.isInteger(command.expectedRevision))return failure('INVALID_COMMAND_SCHEMA','El comando no cumple el contrato.');
  const signature=JSON.stringify([command.type,command.gameId,command.payload]);
@@ -62,7 +103,8 @@ export async function commitCommand(command:GameCommand<Record<string,unknown>>)
   const tx=db.transaction([SAVE,COMMANDS],'readwrite');
   const saves=tx.objectStore(SAVE),commands=tx.objectStore(COMMANDS);
   let answer:CommandResult<null>|CommandError=failure('PERSISTENCE_ERROR','No se completó la transacción.');
-  // Primero se consulta la huella: los reintentos no vuelven a ejecutar el motor.
+  // La huella incluye tipo, partida y payload: reutilizar un ID con otro
+  // contenido se rechaza, en vez de aplicar accidentalmente una nueva acción.
   const lookup=commands.get(command.commandId) as IDBRequest<SavedCommand|undefined>;
   lookup.onsuccess=()=>{
     const prior=lookup.result;
@@ -82,13 +124,23 @@ export async function commitCommand(command:GameCommand<Record<string,unknown>>)
       } catch(error){answer=failure('OPERATION_NOT_ALLOWED',error instanceof Error?error.message:'Acción no válida.');}
     };
   };
+  // `oncomplete` es la confirmación de commit; `onsuccess` de un request NO basta.
   tx.oncomplete=()=>resolve(answer);
   tx.onerror=()=>reject(tx.error);
   tx.onabort=()=>reject(tx.error);
  });}finally{db.close()}
 }
-/** Exportaciones de datos verificadas antes de importación; tamaño máximo en UI. */
+/**
+ * Exportación de respaldo sin acceso al servidor: JSON descargable por la UI.
+ * El límite de 2 MB de importación se comprueba en src/ui/app.ts.
+ */
 export function exportSave(save:GameSave):string{return JSON.stringify({application:'tamagotchi-academico',formatVersion:1,exportedAt:new Date().toISOString(),save},null,2)}
+/**
+ * Interpreta un respaldo y rechaza archivos fuera del contrato de aplicación.
+ * @param text Texto JSON local seleccionado explícitamente por el jugador.
+ * @returns Copia de guardado validada; aún NO modifica la base de datos.
+ * @throws Error cuando el formato o la partida no son compatibles.
+ */
 export function parseImport(text:string):GameSave{
  const raw:unknown=JSON.parse(text);
  if(!raw||typeof raw!=='object'||(raw as {application?:string}).application!=='tamagotchi-academico')throw Error('Este archivo no es una exportación del juego.');

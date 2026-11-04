@@ -2,6 +2,11 @@
  * Cada SVG contiene 14 cuadros pixel art. La identidad de la mascota no se
  * decide a partir de una imagen arbitraria: se conserva el areaId de la partida.
  */
+/**
+ * Metadatos de las siete especies. Las claves deben coincidir con AREAS,
+ * los archivos de `public/pets/{clave}.svg` y el área serializada en GameSave.
+ * Cambiar una clave sin migración podría desasociar mascotas guardadas.
+ */
 export const PET_KINDS = {
  fisico:{name:'Ajolote astral',accent:'#79d9e5',traits:'Branquias luminosas, curiosidad cósmica',icon:'🌌'},
  biologia:{name:'Zorro de laboratorio',accent:'#f0af66',traits:'Orejas de zorro y cola exploradora',icon:'🧬'},
@@ -12,6 +17,7 @@ export const PET_KINDS = {
  ingenieria:{name:'Robot ingenioso',accent:'#a9c5ef',traits:'Antena, visor y piezas mecánicas',icon:'⚙️'},
 } as const;
 export type PetAreaId = keyof typeof PET_KINDS;
+/** Normaliza IDs de área desconocidos a biología (compatibilidad visual). */
 export const petArea=(areaId:string):PetAreaId=>Object.prototype.hasOwnProperty.call(PET_KINDS,areaId)?areaId as PetAreaId:'biologia';
 /** Retorna URL local propia del sitio: evita inyectar rutas externas en el estilo. */
 export const petSprite=(areaId:string)=>`./pets/${petArea(areaId)}.svg`;

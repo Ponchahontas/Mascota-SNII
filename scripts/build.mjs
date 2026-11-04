@@ -1,4 +1,9 @@
-/** Genera una distribución 100% estática sin empaquetadores ni llamadas de red. */
+/**
+ * Construcción determinista de la PWA estática.
+ * Limpia `dist`, transpila TypeScript a JS, copia HTML/CSS y recursos públicos.
+ * No requiere variables secretas ni servicios externos en tiempo de build.
+ * Si añade módulos, `public/sw.js` debe conocerlos para permitir uso offline.
+ */
 import { cp, mkdir, rm } from 'node:fs/promises';
 import { spawnSync } from 'node:child_process';
 await rm('dist', { recursive: true, force: true });

@@ -1,4 +1,8 @@
-/** Servidor local para probar app, IndexedDB y service worker desde localhost. */
+/**
+ * Servidor HTTP de desarrollo local, no backend de producción.
+ * Su validación de rutas impide salir de `dist`; no procesa cuentas ni datos.
+ * IndexedDB y service workers requieren contexto web seguro o localhost.
+ */
 import { createServer } from 'node:http';
 import { readFile, stat } from 'node:fs/promises';
 import { resolve, sep } from 'node:path';

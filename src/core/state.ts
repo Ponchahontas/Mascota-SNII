@@ -1,7 +1,22 @@
-/** Estado serializable de partida; nunca incluimos funciones ni código de usuarios. */
+/**
+ * @module state
+ * Esquema del guardado en IndexedDB y en las exportaciones JSON.
+ * CAMBIOS INCOMPATIBLES: requieren elevar `schemaVersion`, migración y pruebas.
+ * Todo campo debe seguir siendo serializable; no introducir Date, DOM o funciones.
+ * Ver validateSave() en persistence.ts y el esquema descrito en docs/11_GUIA_DE_CODIGO.md.
+ */
+/** Necesidades cuantitativas en escala 0–100; `stress` es perjudicial al subir. */
 export interface NeedsState { energy:number; motivation:number; concentration:number; wellbeing:number; stress:number; curiosity:number; competence:number; socialization:number; scientificIntegrity:number }
+/** Identidad persistente; `stageId` cambia al progresar, `appearanceId` representa área. */
 export interface PetState { id:string; name:string; stageId:string; appearanceId:string; needs:NeedsState }
+/** Elección pendiente: debe resolverse antes de permitir otra actividad académica. */
 export interface GameEvent { id:string; title:string; body:string; options:readonly {id:string;label:string;credits:number;stress:number;pe:number}[] }
+/**
+ * Partida activa: una sola unidad de lectura/escritura transaccional.
+ * `revision` se incrementa en persistence.ts después de ejecutar el motor.
+ * `apRegenRemainder` conserva fracciones entre pulsos de recuperación.
+ * `normativeVersionId`="unverified" impide tratar el balance como normativa oficial.
+ */
 export interface GameSave {
  gameId:string; schemaVersion:number; contentVersion:string; balanceVersion:string; normativeVersionId:string;
  revision:number; createdAt:string; lastProcessedSimTime:string;
