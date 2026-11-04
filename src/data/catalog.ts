@@ -17,22 +17,9 @@ export const STAGES: readonly Stage[] = [
   ['emerito','SNII Emérito','Emérito',1250,90,7,1.4,2.6,6,'🌟'],
 ].map(([id,label,short,target,maxAP,apPerHour,cost,reward,automationSlots,emblem]) => ({id:id as string,label:label as string,short:short as string,target:target as number,maxAP:maxAP as number,apPerHour:apPerHour as number,cost:cost as number,reward:reward as number,automationSlots:automationSlots as number,emblem:emblem as string}));
 
-export interface Activity { id:string; label:string; icon:string; minStage:number; pa:number; pe:number; credits:number; energy:number; stress:number; focus:number; motivation?:number; type:string; flavor:string; }
-export const ACTIVITIES: readonly Activity[] = [
-  {id:'tutoria',label:'Dar una tutoría',icon:'🪙',minStage:0,pa:5,pe:6,credits:4,energy:-4,stress:-1,focus:0,motivation:2,type:'social',flavor:'Compartes conocimientos y ganas créditos para continuar.'},
-  {id:'estudiar',label:'Estudiar',icon:'📒',minStage:0,pa:5,pe:8,credits:-2,energy:-4,stress:1,focus:3,type:'estudio',flavor:'Un concepto nuevo; tres preguntas existenciales.'},
-  {id:'leer',label:'Leer bibliografía',icon:'📚',minStage:1,pa:4,pe:7,credits:-1,energy:-3,stress:1,focus:2,type:'estudio',flavor:'La bibliografía cita otra bibliografía.'},
-  {id:'examen',label:'Preparar examen',icon:'📝',minStage:1,pa:6,pe:10,credits:-2,energy:-5,stress:3,focus:4,type:'estudio',flavor:'El temario acaba de crecer misteriosamente.'},
-  {id:'experimentar',label:'Experimentar',icon:'🧪',minStage:3,pa:10,pe:14,credits:-5,energy:-8,stress:4,focus:-2,type:'investigacion',flavor:'¡Control positivo! Ahora falta el presupuesto.'},
-  {id:'analizar',label:'Analizar datos',icon:'📊',minStage:4,pa:7,pe:12,credits:-3,energy:-5,stress:2,focus:-3,type:'investigacion',flavor:'Una gráfica bonita no significa causalidad.'},
-  {id:'articulo',label:'Escribir artículo',icon:'✍️',minStage:6,pa:9,pe:14,credits:-2,energy:-7,stress:4,focus:-4,type:'escritura',flavor:'Versión final_v7_ahora_sí.docx'},
-  {id:'revisar',label:'Revisar manuscrito',icon:'🔍',minStage:6,pa:6,pe:10,credits:-1,energy:-5,stress:3,focus:-2,type:'escritura',flavor:'El revisor dos solicita una luna adicional.'},
-  {id:'ensenar',label:'Enseñar',icon:'👩‍🏫',minStage:4,pa:7,pe:10,credits:3,energy:-5,stress:1,focus:0,motivation:3,type:'social',flavor:'Una pregunta del alumnado lo cambia todo.'},
-  {id:'colaborar',label:'Colaborar',icon:'🤝',minStage:3,pa:6,pe:9,credits:-2,energy:-4,stress:-1,focus:0,motivation:4,type:'social',flavor:'Una buena idea necesita más de una cabeza.'},
-  {id:'divulgar',label:'Divulgar ciencia',icon:'🎙️',minStage:3,pa:5,pe:8,credits:-2,energy:-3,stress:0,focus:0,motivation:4,type:'social',flavor:'Alguien entendió la ciencia sin pagar por el PDF.'},
-  {id:'expediente',label:'Tramitar expediente',icon:'🗃️',minStage:4,pa:5,pe:8,credits:-1,energy:-3,stress:2,focus:-1,type:'gestion',flavor:'Falta una firma de quien ya firmó.'},
-  {id:'proyecto',label:'Gestionar proyecto',icon:'📋',minStage:4,pa:8,pe:10,credits:-4,energy:-5,stress:3,focus:-2,type:'gestion',flavor:'Se completó el formato para pedir un formato.'},
-];
+/** Actividades ahora están separadas por etapa y no se arrastran a otras edades. */
+export { ACTIVITIES, activitiesForStage, STAGE_GUIDES } from './stage-activities.js';
+export type { Activity, StageGuide } from './stage-activities.js';
 export interface Care { id: string; label: string; icon: string; credits: number; energy?:number; stress?:number; wellbeing?:number; motivation?:number; concentration?:number; socialization?:number; }
 export const CARE: readonly Care[] = [
  {id:'comer',label:'Comer',icon:'🥪',credits:-3,energy:8,wellbeing:2,stress:-1},
@@ -56,4 +43,11 @@ export const EVENTS = [
  {id:'congreso',title:'Invitación inesperada',body:'Te invitan a presentar tu trabajo. ¿Qué decides?',options:[{id:'aceptar',label:'Participar',credits:-4,stress:4,pe:18},{id:'virtual',label:'Compartir en línea',credits:0,stress:-1,pe:8}]},
  {id:'burocracia',title:'El oficio misterioso',body:'Una ventanilla necesita tres copias de algo digital.',options:[{id:'formato',label:'Entregar el formato',credits:-3,stress:2,pe:10},{id:'dialogo',label:'Negociar el trámite',credits:0,stress:-3,pe:5}]},
  {id:'hallazgo',title:'Hallazgo improbable',body:'Tus notas contienen una conexión que nadie esperaba.',options:[{id:'investigar',label:'Seguir la pista',credits:-5,stress:3,pe:20},{id:'compartir',label:'Conversar con el equipo',credits:0,stress:-2,pe:10}]},
+] as const;
+
+/** Eventos escolares tempranos que sustituyen burocracia, revistas y congresos para menores. */
+export const SCHOOL_EVENTS = [
+ {id:'aula',title:'Materiales compartidos',body:'El grupo necesita organizar los colores y cuadernos.',options:[{id:'ayudar',label:'Compartir y ordenar',credits:2,stress:-2,pe:8},{id:'pedir',label:'Pedir ayuda a la persona docente',credits:0,stress:-4,pe:5}]},
+ {id:'curiosidad',title:'¡Una pregunta nueva!',body:'La mascota tiene una idea para una tarea o juego de clase.',options:[{id:'explorar',label:'Explorar con acompañamiento',credits:-1,stress:0,pe:12},{id:'equipo',label:'Preguntar al grupo',credits:0,stress:-2,pe:8}]},
+ {id:'feria',title:'Feria escolar',body:'Es momento de compartir lo que se aprendió.',options:[{id:'presentar',label:'Presentar su trabajo',credits:3,stress:3,pe:11},{id:'observar',label:'Escuchar y aprender',credits:0,stress:-2,pe:7}]},
 ] as const;

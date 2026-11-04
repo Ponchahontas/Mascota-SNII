@@ -1,9 +1,9 @@
 {
   "name": "tamagotchi-academico",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "private": true,
   "type": "module",
-  "description": "Juego local-first satírico de trayectoria académica mexicana (MVP funcional)",
+  "description": "Juego local-first satírico de trayectoria académica mexicana (MVP por etapas y especies)",
   "scripts": {
     "dev": "npm run build && node scripts/serve.mjs",
     "build": "node scripts/build.mjs",

@@ -6,7 +6,7 @@ export interface GameSave {
  gameId:string; schemaVersion:number; contentVersion:string; balanceVersion:string; normativeVersionId:string;
  revision:number; createdAt:string; lastProcessedSimTime:string;
  pet:PetState; areaId:string; difficultyId:string; stageIndex:number; generation:number;
- ap:number; credits:number; stageXp:number; totalXp:number; evidence:number; completedProjects:number;
+ ap:number; apRegenRemainder?:number; credits:number; stageXp:number; totalXp:number; evidence:number; completedProjects:number;
  projectProgress:number; projectName:string; actions:number; lastActivity:string; streak:number;
  automation:boolean; event:GameEvent|null; eventCursor:number; achievements:string[];
  history:string[]; records:{generation:number;score:number;maxStage:number;name:string}[];

@@ -29,6 +29,7 @@ export function validateSave(x:unknown):x is GameSave {
  for(const field of ['revision','stageIndex','generation','ap','credits','stageXp','totalXp','evidence','completedProjects','projectProgress','actions','streak','eventCursor'] as const){
   const n=v[field];if(typeof n!=='number'||!Number.isInteger(n)||n<0||n>1_000_000_000)return false;
  }
+ if(v.apRegenRemainder!==undefined&&(typeof v.apRegenRemainder!=='number'||!Number.isFinite(v.apRegenRemainder)||v.apRegenRemainder<0||v.apRegenRemainder>=1))return false;
  if(!v.generation||typeof v.areaId!=='string'||typeof v.difficultyId!=='string'||typeof v.projectName!=='string'||typeof v.lastActivity!=='string'||typeof v.automation!=='boolean')return false;
  if(typeof v.contentVersion!=='string'||typeof v.balanceVersion!=='string'||typeof v.normativeVersionId!=='string')return false;
  if(!Array.isArray(v.history)||v.history.length>50||!v.history.every(h=>typeof h==='string'&&h.length<512))return false;
