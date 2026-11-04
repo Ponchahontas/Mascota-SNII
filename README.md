@@ -1,4 +1,4 @@
-# Mascota-SNII — Tamagotchi Académico (MVP v0.3)
+# Mascota-SNII — Tamagotchi Académico (MVP v0.6)
 
 Juego satírico en español y **local-first** sobre una trayectoria académica ficticia de **14 etapas**, desde Kínder hasta Emérito. Tiene **84 actividades exclusivas por etapa** y **siete mascotas visualmente diferentes por área**, cada una con 14 cuadros de evolución. El jugador acompaña y cuida; la mascota realiza las actividades educativas apropiadas a su etapa.
 
@@ -7,9 +7,11 @@ Juego satírico en español y **local-first** sobre una trayectoria académica f
 ## Estado verificable
 
 - Aplicación estática PWA programada en TypeScript, CSS y SVG.
-- Compilación local con `npm run build`, comprobación `npm run typecheck` y **19 pruebas automatizadas Node** del motor ejecutadas correctamente en la versión documentada.
+- Compilación local con `npm run build`, comprobación `npm run typecheck` y **pruebas automatizadas Node** del motor ejecutadas correctamente en la versión documentada.
 - Guardado en IndexedDB, exportación/importación JSON, eventos, cuidado, proyectos, tiempo offline limitado, logros, asistentes básicos y legado voluntario.
 - La validación automatizada **no cubre todavía** el juego completo en navegadores reales, accesibilidad exhaustiva ni instalación PWA móvil. No afirmar que Netlify está desplegado o verificado solo por la existencia de `netlify.toml`.
+
+**Animaciones v0.6:** cansancio, estrés, distracción, desmotivación, bajo bienestar y celebración/reacción al cuidado; control para pausar movimientos y respeto a `prefers-reduced-motion`. Las reacciones son solo visuales y no modifican las partidas. Ver [docs/14_ANIMACIONES_DE_ESTADO.md](docs/14_ANIMACIONES_DE_ESTADO.md).
 
 **Repositorio de desarrollo:** https://github.com/Ponchahontas/Mascota-SNII
 
@@ -33,7 +35,9 @@ Abre `http://localhost:4173`. Para crear la distribución estática usa `npm run
 - **Economía ficticia:** PA se regeneran con el tiempo; CR son recursos de juego; UPE son progreso lúdico; proyectos conceden evidencias ficticias.
 - **Área/especie:** siete tipos originales con identidad persistente y evolución a través de los catorce niveles.
 - **Guardado y seguridad:** IndexedDB con transacciones para resultado y snapshot, revisión de partida, importación JSON validada, exportación manual.
-- **Sin final obligatorio:** al alcanzar suficiente trayectoria se puede comenzar una nueva generación y mantener récords.
+- **Consecuencias académicas:** cinco medidores se deterioran con el tiempo, reducen rendimiento, pueden bloquear actividades temporalmente y desencadenar deserción ficticia tras crisis combinadas prolongadas.
+- **Tres dificultades:** Tranquilo (sin deserción), Equilibrado (deserción tras 18 h de crisis combinada) y Exigente (12 h). Una sola ausencia procesa como máximo ocho horas y hay formas de recuperación con cuidados.
+- **Finales y reinicio:** el legado sigue siendo voluntario, pero una deserción en dificultades superiores termina la generación; se conserva su récord y puede comenzar otra oportunidad.
 
 ## Mapa de carpetas
 
@@ -66,9 +70,6 @@ Pruebas end-to-end en navegador y móvil; ajustes de balance con simulación; au
 
 **Pendiente de elección expresa por la persona propietaria.** No se ha asignado licencia abierta por defecto.
 
+## Balance de salud y consecuencias (v0.5)
 
-## Sistema de bienestar v0.5
-
-Los cinco medidores ahora se deterioran gradualmente en el tiempo y producen efectos jugables: menor rendimiento, bloqueos temporales y una posible **deserción ficticia por crisis combinada prolongada**. Se elige entre Tranquilo (sin pérdida definitiva), Equilibrado (18 h críticas acumuladas) y Exigente (12 h). Una sola ausencia procesa un máximo de ocho horas; el cuidado siempre está disponible sin consumir puntos de acción. Un desenlace conserva los récords y permite iniciar otra generación. Las partidas v2 siguen siendo compatibles mediante el campo opcional `risk`.
-
-Consulta [la guía completa de bienestar](docs/12_SISTEMA_DE_BIENESTAR.md) y [los criterios de interfaz](docs/13_INTERFAZ_Y_ALERTAS.md). **El balance es ficticio y provisional, no oficial ni clínico.**
+Ver [docs/12_SISTEMA_DE_BIENESTAR.md](docs/12_SISTEMA_DE_BIENESTAR.md). Las horas se procesan solo al abrir/activar la app o durante su uso, con límite de ocho horas por visita. No hay procesos ejecutándose en segundo plano. Las tasas y umbrales son provisionales, no parámetros clínicos ni requisitos oficiales. Los guardados v2 permanecen compatibles: el campo `risk` es opcional.

@@ -12,11 +12,34 @@ import type { GameSave } from '../core/state.js';
 import { newGame, STAGE_GATE } from '../core/engine-game.js';
 import { DIFFICULTIES, difficultyOf, riskOf, vitalAlerts, criticalCount, studyBlocker, performanceFactor } from '../core/engine-health.js';
 import { issueCommand } from '../core/game-coordinator.js';
+import { moodForNeeds, reactionForCommand, REACTION_LOOK } from './pet-animation.js';
+import type { PetReaction } from './pet-animation.js';
 import { exportSave, getSave, initializeSave, parseImport } from '../core/persistence.js';
 const root=document.querySelector<HTMLElement>('#app');
 if(!root)throw Error('Falta #app.');
 // Estado de pantalla (NO fuente persistente de verdad); cada comando vuelve a leer IDB.
 let save:GameSave|null=null,tab='actividades',notice='',noticeError=false,busy=false;
+/** Preferencia pequeña del dispositivo, separada de los guardados académicos. */
+const MOTION_KEY='mascota-snii-motion';
+function readMotionPreference():boolean {try{return localStorage.getItem(MOTION_KEY)!=='off'}catch{return true}}
+let animationsEnabled=readMotionPreference();
+/** Una reacción confirmada dura ~2 segundos; jamás se guarda ni modifica recursos. */
+let reaction:PetReaction|null=null;
+let reactionTimer:ReturnType<typeof setTimeout>|null=null;
+function showReaction(next:PetReaction|null):void {
+ if(reactionTimer!==null)clearTimeout(reactionTimer);
+ reaction=next;
+ if(!next)return;
+ reactionTimer=setTimeout(()=>{
+  if(reaction!==next)return;
+  reaction=null;
+  // Retirar solo los adornos temporales: NO repintar el panel ni perder foco.
+  root?.querySelector('.pixel-pet')?.classList.remove(`reaction-${next}`);
+  root?.querySelector('.pet-wrap')?.classList.remove(`reaction-${next}`);
+  root?.querySelector('.pet-action-flash')?.remove();
+ },2100);
+}
+
 /** Escapa HTML interpolado para evitar inyectar marcado desde nombres/resguardos JSON. */
 const esc=(text:unknown)=>String(text??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]||c));
 const fmt=(n:number)=>Math.round(n).toLocaleString('es-MX');
@@ -26,10 +49,6 @@ const stage=()=>STAGES[player().stageIndex];
 const notify=(msg:string,isError=false)=>{notice=msg;noticeError=isError;render()};
 const meter=(label:string,value:number,color:string,reverse=false,max=100)=>`<div class="meter"><div class="meter-label"><span>${label}</span><strong>${fmt(value)}${max===100?'%':''}</strong></div><div class="meter-track"><i class="${color} ${reverse?'meter-reverse':''}" style="width:${percent(value,max)}%"></i></div></div>`;
 const button=(action:string,id:string,label:string,disabled=false,extra='')=>`<button class="game-btn ${extra}" data-action="${action}" data-id="${esc(id)}" ${disabled?'disabled':''}>${label}</button>`;
-const emote=()=>{
- const p=player().pet.needs;
- return p.energy<=15?'agotado':p.stress>=90?'saturado':p.motivation<=15?'desanimado':p.wellbeing<=15?'abatido':p.concentration<=15?'distraído':p.wellbeing>80&&p.stress<35?'feliz':'atento';
-};
 /** Estado contextual por medidor: además del color, comunica consecuencias textuales. */
 function vitalMeter(key:'energy'|'motivation'|'concentration'|'wellbeing'|'stress',label:string,color:string){
  const value=player().pet.needs[key],item=vitalAlerts(player().pet.needs).find(a=>a.key===key);
@@ -62,11 +81,15 @@ function dropoutScreen(){const s=player(),r=riskOf(s);return `<main class="dropo
  * El cuadro nunca modifica el guardado; es una representación de stageIndex.
  */
 function avatar(){
- const s=player(),area=petArea(s.areaId),kind=PET_KINDS[area];
- return `<div class="pet-wrap sprite-wrap" role="img" aria-label="${esc(s.pet.name)}: ${esc(kind.name)}, ${esc(stage().label)}, estado ${esc(emote())}">
-  <div class="pixel-orb orb-one"></div><div class="pixel-orb orb-two"></div>
-  <div class="pixel-pet pixel-bob" style="background-position:${spriteFrame(s.stageIndex)*100/13}% 0;background-image:url('${petSprite(area)}')"></div>
-  <span class="pet-floor"></span><span class="species-label" style="--species-color:${kind.accent}">${kind.icon} ${esc(kind.name)}</span></div>`;
+ const s=player(),area=petArea(s.areaId),kind=PET_KINDS[area],mood=moodForNeeds(s.pet.needs);
+ const feedback=reaction?REACTION_LOOK[reaction]:null;
+ // Las 14 evoluciones del sprite son intactas; solo cambia transform/opacity en CSS.
+ return `<div class="pet-wrap sprite-wrap mood-${mood.mood} ${reaction?`reaction-${reaction}`:''}" role="img" aria-label="${esc(s.pet.name)}: ${esc(kind.name)}, ${esc(stage().label)}. ${esc(mood.label)}. ${esc(mood.hint)}">
+  <div class="pixel-orb orb-one" aria-hidden="true"></div><div class="pixel-orb orb-two" aria-hidden="true"></div>
+  <div class="pixel-pet mood-${mood.mood} ${reaction?`reaction-${reaction}`:''}" style="background-position:${spriteFrame(s.stageIndex)*100/13}% 0;background-image:url('${petSprite(area)}')" aria-hidden="true"></div>
+  <span class="pet-emotion-icon" aria-hidden="true">${mood.symbol}</span>
+  ${feedback?`<span class="pet-action-flash" aria-hidden="true">${feedback.symbol}<small>${esc(feedback.description)}</small></span>`:''}
+  <span class="pet-floor" aria-hidden="true"></span><span class="species-label" style="--species-color:${kind.accent}">${kind.icon} ${esc(kind.name)}</span></div>`;
 }
 /** Formulario de creación; cada área elige una especie pero ninguna ventaja de balance. */
 function creation(){
@@ -125,16 +148,16 @@ function archivePanel(){
  <div class="timeline-log"><h3>Últimos movimientos</h3>${s.history.map(h=>`<div class="log-item">${esc(h)}</div>`).join('')}</div>`;
 }
 function eventModal(){const e=player().event;if(!e)return '';return `<div class="modal-backdrop"><div class="event-modal" role="dialog" aria-modal="true" aria-labelledby="event-title"><span class="eyebrow">⚡ EVENTO IMPROBABLE</span><h2 id="event-title">${esc(e.title)}</h2><p>${esc(e.body)}</p><div class="event-choices">${e.options.map(o=>button('event',o.id,`${esc(o.label)}<small> ${o.credits} CR · ${o.pe} UPE base</small>`,busy)).join('')}</div></div></div>`}
-function dashboard(){const s=player(),n=s.pet.needs,st=stage();
- return `<div class="app-frame"><header class="topbar"><div class="brand"><div class="brand-mark">🧪</div><div><span class="eyebrow">ESTACIÓN DE INVESTIGACIÓN 001</span><h1>Tamagotchi <em>Académico</em></h1></div></div><div class="top-right"><span class="online-dot"></span><span class="save-label">Guardado local</span><span class="version-tag">MVP 0.5</span></div></header>
+function dashboard(){const s=player(),n=s.pet.needs,st=stage(),mood=moodForNeeds(n);
+ return `<div class="app-frame ${animationsEnabled?'':'motion-paused'}"><header class="topbar"><div class="brand"><div class="brand-mark">🧪</div><div><span class="eyebrow">ESTACIÓN DE INVESTIGACIÓN 001</span><h1>Tamagotchi <em>Académico</em></h1></div></div><div class="top-right"><span class="online-dot"></span><span class="save-label">Guardado local</span><span class="version-tag">MVP 0.6</span></div></header>
  <div class="notice-banner">UN JUEGO SATÍRICO · Los puntajes y criterios son <strong>ficticios</strong>; no evalúan oficialmente el SNII.</div>
  <div class="workspace"><aside class="left-sidebar"><div class="panel sidebar-top"><div class="panel-title">ESTADO VITAL <span>✦</span></div>
  ${vitalMeter('energy','⚡ Energía','yellow')}${vitalMeter('motivation','💖 Motivación','pink')}${vitalMeter('concentration','🎯 Concentración','purple')}${vitalMeter('wellbeing','🌿 Bienestar','mint')}${vitalMeter('stress','🌡️ Estrés','red')}
  ${healthPanel()}<details class="other-needs"><summary>Otras capacidades ▾</summary>${meter('🔎 Curiosidad',n.curiosity,'purple')}${meter('🧠 Competencia',n.competence,'mint')}${meter('🤝 Socialización',n.socialization,'pink')}${meter('⚖️ Integridad',n.scientificIntegrity,'yellow')}</details></div>
  <div class="panel care-panel"><div class="panel-title">CUIDAR A ${esc(s.pet.name).toUpperCase()}</div><p class="mini-description">El cuidado no consume PA.</p><div class="care-grid">${CARE.map(c=>button('care',c.id,`${c.icon} <span>${esc(c.label)}</span>`,busy,'care-btn')).join('')}</div></div>
  <div class="panel automation-panel"><div class="panel-title">ASISTENTE ACADÉMICO <span>🤖</span></div><p>${s.stageIndex<4?'Disponible a partir de Universidad.':s.automation?'Apoya proyectos durante ausencias. Consume créditos de mantenimiento.':'Actívalo por 35 CR; su producción está limitada.'}</p>${s.stageIndex>=4?button(s.automation?'auto-off':'auto-on','',s.automation?'Desactivar asistente':'Activar asistente (35 CR)',busy):''}</div></aside>
- <main class="center"><div class="pet-scene ${studyBlocker(n)?'scene-crisis':vitalAlerts(n).length?'scene-warning':'scene-good'}"><div class="scene-top"><span class="scene-label">✧ ${esc(PET_KINDS[petArea(s.areaId)].name).toUpperCase()}</span><span class="scene-time">GENERACIÓN ${s.generation}</span></div><div class="scene-decor decor-a">✦</div><div class="scene-decor decor-b">＋</div><div class="scene-decor decor-c">✧</div>${avatar()}
- <div class="pet-caption"><span class="mood-tag">● ${esc(emote())}</span><h2>${esc(s.pet.name)}</h2><p>${st.emblem} ${esc(st.label)} · Evolución ${s.stageIndex+1}/14</p></div></div>
+ <main class="center"><div class="pet-scene mood-${mood.mood} ${studyBlocker(n)?'scene-crisis':vitalAlerts(n).length?'scene-warning':'scene-good'}"><div class="scene-top"><span class="scene-label">✧ ${esc(PET_KINDS[petArea(s.areaId)].name).toUpperCase()}</span><span class="scene-tools"><button class="motion-toggle" data-action="motion" aria-pressed="${animationsEnabled}" title="El sistema también respeta la preferencia de movimiento reducido del dispositivo">${animationsEnabled?'⏸ Pausar movimiento':'▶ Activar movimiento'}</button><span class="scene-time">GENERACIÓN ${s.generation}</span></span></div><div class="scene-decor decor-a">✦</div><div class="scene-decor decor-b">＋</div><div class="scene-decor decor-c">✧</div>${avatar()}
+ <div class="pet-caption"><span class="mood-tag">${mood.symbol} ${esc(mood.label)}</span><h2>${esc(s.pet.name)}</h2><p>${st.emblem} ${esc(st.label)} · Evolución ${s.stageIndex+1}/14</p><p class="pet-mood-hint">${esc(mood.hint)}</p>${mood.signals.length?`<div class="pet-vital-signals" aria-label="Necesidades que requieren atención">${mood.signals.map(signal=>`<span class="pet-signal ${signal.severe?'critical':'warning'}">${signal.icon} ${esc(signal.label)}${signal.severe?' · crítico':''}</span>`).join('')}</div>`:''}</div></div>
  <div class="resource-cards"><div class="resource-card"><span>⚡ PUNTOS DE ACCIÓN</span><strong>${fmt(s.ap)} <small>/ ${st.maxAP}</small></strong><div class="micro-track"><i style="width:${percent(s.ap,st.maxAP)}%"></i></div><small>${s.ap>=st.maxAP?'PA completos':`+1 PA en aproximadamente ${Math.ceil((1-(s.apRegenRemainder??0))*60/st.apPerHour)} min`}</small></div><div class="resource-card"><span>🪙 CRÉDITOS</span><strong>${fmt(s.credits)}</strong><small>Fondos imaginarios</small></div><div class="resource-card"><span>⭐ UPE DE ETAPA</span><strong>${fmt(s.stageXp)} <small>/ ${fmt(st.target)}</small></strong><div class="micro-track violet"><i style="width:${percent(s.stageXp,st.target)}%"></i></div></div></div>
  <div class="panel stage-progress"><div class="progress-header"><div><span class="eyebrow">PROGRESO DE CARRERA</span><h3>${esc(st.label)} ${s.stageIndex<13?'→ '+esc(STAGES[s.stageIndex+1].short):'· Modo continuo'}</h3></div><span>${fmt(percent(s.stageXp,st.target))}%</span></div><div class="progress-track"><i style="width:${percent(s.stageXp,st.target)}%"></i></div><p>📄 Evidencias: ${s.evidence}/${STAGE_GATE(s.stageIndex)} · 🎯 Competencia: ${fmt(n.competence)}/50 · 🔁 Racha: ${s.streak+1} · ⚙️ Rendimiento vital: ${Math.round(performanceFactor(n)*100)} %</p></div>
  <div class="panel mini-log"><div class="panel-title">ÚLTIMA NOTA DE LABORATORIO <span>✎</span></div><p>${esc(s.history[0]||'¡Bienvenido al laboratorio!')}</p></div></main>
@@ -148,10 +171,17 @@ function render(){if(!root)return;root.innerHTML=(save?(riskOf(save).dropoutAt?d
  * Errores de dominio se convierten en aviso visible sin perder la partida.
  */
 async function execute(type:Parameters<typeof issueCommand>[1],payload:Record<string,unknown>={}){
- if(!save||busy)return;busy=true;render();
- try{const {result,save:updated}=await issueCommand(save,type,payload);save=updated;
-  if('code' in result){notice=result.message;noticeError=true;}else{notice=result.changes.join(' · ')||'Acción registrada';noticeError=false;}
- }catch(error){notice=error instanceof Error?error.message:'Error de almacenamiento';noticeError=true;}finally{busy=false;render();}
+ if(!save||busy)return;
+ const before=save;busy=true;render();
+ try{const {result,save:updated}=await issueCommand(before,type,payload);save=updated;
+  if('code' in result){notice=result.message;noticeError=true;showReaction(null);}
+  else{
+   notice=result.changes.join(' · ')||'Acción registrada';noticeError=false;
+   // Reacciones solo tras commit confirmado: jamás en errores o guardados sin cambios.
+   showReaction(updated&&!riskOf(updated).dropoutAt?reactionForCommand(type,before,updated):null);
+  }
+ }catch(error){notice=error instanceof Error?error.message:'Error de almacenamiento';noticeError=true;showReaction(null);}
+ finally{busy=false;render();}
 }
 /**
  * Consulta recuperación al volver al primer plano o cada minuto.
@@ -166,6 +196,11 @@ root.addEventListener('click',async(event)=>{
  const el=(event.target as HTMLElement).closest<HTMLButtonElement>('[data-action]');if(!el||busy)return;
  const action=el.dataset.action,id=el.dataset.id||'';
  switch(action){
+ case 'motion':{
+  animationsEnabled=!animationsEnabled;
+  try{localStorage.setItem(MOTION_KEY,animationsEnabled?'on':'off')}catch{/* Preferencia opcional si el almacenamiento está bloqueado. */}
+  render();break;
+ }
  case 'tab':tab=id;notice='';render();break;
  case 'activity':await execute('activity.execute',{activityId:id});break;
  case 'care':await execute('care.perform',{careActionId:id});break;

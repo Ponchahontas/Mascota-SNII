@@ -5,8 +5,8 @@
  * Al cambiar recursos estáticos de forma incompatible, elevar el sufijo CACHE.
  */
 // El identificador versiona únicamente la caché de recursos públicos.
-const CACHE = 'tama-academico-shell-v5';
-const SHELL = ['./','./index.html','./src/main.js','./src/ui/app.js','./src/styles.css','./src/core/commands.js','./src/core/state.js','./src/core/errors.js','./src/core/engine-needs.js','./src/core/engine-health.js','./src/core/game-coordinator.js','./src/core/engine-game.js','./src/core/persistence.js','./src/data/catalog.js','./src/data/stage-activities.js','./src/data/pet-visuals.js','./pets/fisico.svg','./pets/biologia.svg','./pets/medicina.svg','./pets/humanidades.svg','./pets/sociales.svg','./pets/agro.svg','./pets/ingenieria.svg','./manifest.webmanifest','./icons/icon.svg','./icons/icon-192.png','./icons/icon-512.png'];
+const CACHE = 'tama-academico-shell-v6';
+const SHELL = ['./','./index.html','./src/main.js','./src/ui/app.js','./src/ui/pet-animation.js','./src/styles.css','./src/core/commands.js','./src/core/state.js','./src/core/errors.js','./src/core/engine-needs.js','./src/core/engine-health.js','./src/core/game-coordinator.js','./src/core/engine-game.js','./src/core/persistence.js','./src/data/catalog.js','./src/data/stage-activities.js','./src/data/pet-visuals.js','./pets/fisico.svg','./pets/biologia.svg','./pets/medicina.svg','./pets/humanidades.svg','./pets/sociales.svg','./pets/agro.svg','./pets/ingenieria.svg','./manifest.webmanifest','./icons/icon.svg','./icons/icon-192.png','./icons/icon-512.png'];
 // Precache de shell para abrir la interfaz tras una primera visita exitosa.
 self.addEventListener('install', event => {
   event.waitUntil(caches.open(CACHE).then(cache=>cache.addAll(SHELL)).then(()=>self.skipWaiting()));
