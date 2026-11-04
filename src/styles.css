@@ -167,3 +167,93 @@
  .pet-emotion-icon{font-size:22px;right:11px;top:22px}
  .pet-vital-signals{gap:4px}.pet-signal{font-size:9px}
 }
+
+/* ===========================================================================
+ * v0.7 · ACOMPAÑAMIENTO EDUCATIVO INTERACTIVO
+ *
+ * La presentación describe los 14 capítulos y muestra uno de 84 mini retos.
+ * Las opciones no generan recompensas CSS/DOM: el motor las concede solo
+ * cuando activity.execute finaliza correctamente.
+ *
+ * Accesibilidad: controles táctiles >= 44 px, contraste claro sobre fondos
+ * oscuros, focos visibles, feedback mediante texto y aria-live.
+ * =========================================================================== */
+.learning-intro{border:1px solid #7794b6;border-radius:13px;padding:14px;margin-bottom:16px;
+ background:linear-gradient(140deg,#30445c 0%,#233649 46%,#29324f 100%);
+ box-shadow:inset 0 1px 0 #ffffff24}
+.learning-banner{display:flex;gap:13px;align-items:flex-start}
+.learning-spark{display:grid;place-items:center;flex-shrink:0;width:38px;height:38px;border-radius:11px;
+ color:#202a43;background:#f4da96;border:2px solid #fdf4c0;font-size:21px;font-weight:900}
+.learning-banner strong{display:block;color:#ffeab5;font-size:13px;line-height:1.35}
+.learning-banner p{margin:4px 0 0;color:#e9f8f6;font-size:11px;line-height:1.55}
+.learning-purpose{margin:13px 0 9px;padding:10px 11px;background:#1d3544;border:1px solid #679ea0;
+ border-radius:8px;color:#e6fff5;font-size:11px;line-height:1.6}
+.learning-purpose strong{color:#b0f2d2}
+.learning-about{background:#1d293e;border:1px solid #526986;border-radius:8px;padding:10px 12px;
+ margin-bottom:11px;color:#dfeeff;font-size:11px}
+.learning-about summary{color:#f0e6b9;font-weight:800;cursor:pointer;line-height:1.4}
+.learning-about p{font-size:11px;line-height:1.6;margin:9px 0 3px}
+.learning-about strong{color:#b8e8de}
+.learning-reality{border-left:4px solid #b8adeb;padding:8px 11px;background:#2d3852;border-radius:5px}
+.learning-reality strong{font-size:11px;color:#ece0ff}
+.learning-reality p{font-size:10px;color:#e1e5fb;line-height:1.5;margin:5px 0 0}
+.learning-motto{font-size:10px;color:#f8df9b;font-weight:750;line-height:1.6;margin:12px 0 0}
+.learning-heading{display:flex;align-items:flex-start;justify-content:space-between;gap:7px;margin:16px 0 11px}
+.learning-heading h3{font-size:14px;margin:0 0 4px;color:#f7f5ff}
+.learning-heading p{font-size:10px;color:#ccd5eb;line-height:1.4;margin:0}
+.learning-no-cost{flex-shrink:0;max-width:105px;color:#aff0d4;background:#224d43;border:1px solid #599981;
+ border-radius:8px;padding:6px 7px;font-size:9px;text-align:center;line-height:1.4}
+/* La tarjeta de actividad es un article, no un botón que contenga botones. */
+.learning-activities .learning-activity{flex-wrap:wrap;gap:9px;align-items:flex-start;padding:12px;min-width:0}
+.learning-activity .action-icon{flex-shrink:0}
+.learning-activity .action-body{min-width:0;flex:1 1 155px;line-height:1.4}
+.learning-activity .action-body strong{font-size:12px;color:#fff}
+.learning-activity .action-body small{display:block;font-size:10px;color:#c5cde4;margin-top:5px}
+.learning-activity .learning-actions{flex:1 0 100%;display:flex;gap:8px}
+.learning-actions .game-btn{flex:1 1 0;min-width:0;min-height:44px;font-size:10px;line-height:1.35;padding:8px}
+.learn-start{background:#2b6559;border-color:#79ceb2;color:#f6fffc}
+.learn-start:not(:disabled):hover{background:#327969}
+.learn-fast{flex:0 0 95px!important;max-width:95px;background:#323c59;border-color:#6e7d9c}
+.pet-learning-hint{margin:4px 8px 15px!important;color:#f0e4ae!important;font-size:11px!important;line-height:1.4!important}
+/* El reto abierto es una sección en el flujo normal: no bloquea cuidados. */
+.guided-learning{scroll-margin-top:12px;border:2px solid #b0d5bf;background:linear-gradient(160deg,#263e45,#272b48);
+ border-radius:13px;padding:14px;margin:16px 0;box-shadow:0 15px 30px #0b11263d}
+.guided-learning:focus{outline:3px solid #f4d992;outline-offset:3px}
+.guided-top{display:flex;gap:10px;align-items:flex-start;justify-content:space-between;margin-bottom:14px}
+.mission-label{font-size:9px;letter-spacing:.04em;font-weight:900;line-height:1.6;color:#a2f0d0}
+.guided-close{background:#403752;border:1px solid #9d8eaf;border-radius:7px;color:#fff;
+ min-height:38px;padding:7px 9px;font-size:10px;flex-shrink:0}
+.guided-story{display:flex;gap:9px;align-items:flex-start;border:1px dashed #9da9da;
+ background:#252c4a;padding:11px;border-radius:9px}
+.guided-story>span{font-size:27px}
+.guided-story strong{color:#dce7ff;font-size:11px}
+.guided-story p{color:#faf0bc;margin:4px 0 0;line-height:1.5;font-size:12px}
+.guided-learning h3{color:#fff;font-size:15px;margin:15px 0 7px;line-height:1.45}
+.guided-instruction{font-size:10px;color:#c9e2df;margin:0 0 12px;line-height:1.6}
+.guided-options{display:grid;gap:8px}
+.guided-option{display:flex;align-items:center;gap:10px;text-align:left;color:#f2f5ff;
+ background:#333f5e;border:2px solid #6b82a2;border-radius:9px;padding:11px;
+ font-size:11px;line-height:1.5;min-height:50px;transition:background .15s,border-color .15s}
+.guided-option:not(:disabled):hover{background:#445b79;border-color:#b6dbf6}
+.guided-option>span{display:grid;place-items:center;flex-shrink:0;width:26px;height:26px;
+ border-radius:7px;background:#202d49;color:#c2efef;font-size:11px;font-weight:900}
+.guided-option.is-correct{background:#1e5e4a;border-color:#aaf6cb;color:#fff}
+.guided-option.is-incorrect{background:#63434b;border-color:#efad9e;color:#fff}
+.guided-option:disabled{opacity:1;cursor:default}
+.guided-feedback{margin-top:12px;padding:11px;border-radius:8px;border-left:4px solid #ffe6a0;
+ background:#514736;color:#fff0d0}
+.guided-feedback.success{background:#214f43;border-left-color:#9beecd;color:#dcfff0}
+.guided-feedback strong{font-size:11px}
+.guided-feedback p{font-size:11px;margin:6px 0 0;line-height:1.6}
+.guided-next{margin-top:12px;border-top:1px solid #71859c;padding-top:10px}
+.guided-next p{font-size:10px;color:#d8e7f3;line-height:1.6}
+.guided-next .guided-practice{width:100%;min-height:46px;background:#246756;border-color:#91e6bd;color:#fff}
+.guided-rest-note{color:#f7dca8!important}
+@media(max-width:1180px){.learning-heading{flex-wrap:wrap}.learning-no-cost{max-width:none}}
+@media(max-width:680px){
+ .learning-intro,.guided-learning{padding:11px}
+ .learning-heading{flex-direction:column}
+ .learning-actions .game-btn{font-size:10px}
+ .learn-fast{flex-basis:88px!important;max-width:88px}
+}
+@media(prefers-reduced-motion:reduce){.guided-option,.learn-start,.learn-fast{transition:none}}

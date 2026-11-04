@@ -1,8 +1,16 @@
-# Mascota-SNII — Tamagotchi Académico (MVP v0.6)
+# Mascota-SNII — Tamagotchi Académico (MVP v0.7)
 
 Juego satírico en español y **local-first** sobre una trayectoria académica ficticia de **14 etapas**, desde Kínder hasta Emérito. Tiene **84 actividades exclusivas por etapa** y **siete mascotas visualmente diferentes por área**, cada una con 14 cuadros de evolución. El jugador acompaña y cuida; la mascota realiza las actividades educativas apropiadas a su etapa.
 
 > **Aviso:** las puntuaciones, requisitos, evidencias y representaciones son **ficticios**. No equivalen a evaluaciones, dictámenes, niveles ni criterios oficiales del SNII. El proyecto no declara afiliación institucional.
+
+## v0.7 · Aprender jugando y acompañar con preguntas
+
+- **14 capítulos de aprendizaje**: cada etapa explica qué se aprende, por qué importa, cómo acompañar a la mascota y una aplicación cotidiana.
+- **84 microdesafíos contextualizados**: uno por actividad con tres opciones, pista al equivocarse y explicación tras acertar.
+- **Sin penalización por explorar**: responder no consume PA ni CR ni afecta a la mascota. Los recursos se aplican al confirmar la actividad en el motor; sigue disponible «⚡ Repetir» para sesiones rápidas.
+- **Conservar partidas**: no se modificó el esquema IndexedDB (v2). El minireto es temporal y no se guarda.
+- El contenido pedagógico es general y el SNII del juego es una simulación satírica, no un criterio oficial. Ver `docs/15_GUIA_PEDAGOGICA_INTERACTIVA.md`.
 
 ## Estado verificable
 
