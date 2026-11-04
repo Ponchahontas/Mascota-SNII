@@ -50,11 +50,20 @@ export function validateSave(x:unknown):x is GameSave {
   const n=v[field];if(typeof n!=='number'||!Number.isInteger(n)||n<0||n>1_000_000_000)return false;
  }
  if(v.apRegenRemainder!==undefined&&(typeof v.apRegenRemainder!=='number'||!Number.isFinite(v.apRegenRemainder)||v.apRegenRemainder<0||v.apRegenRemainder>=1))return false;
+ // `risk` es opcional para que se puedan abrir partidas anteriores al sistema
+ // de crisis; el motor lo inicializa al procesar la siguiente orden.
+ if(v.risk!==undefined){
+  const r=v.risk;
+  if(!r||!Number.isFinite(r.criticalHours)||r.criticalHours<0||r.criticalHours>10000||!Number.isInteger(r.alerts)||r.alerts<0||r.alerts>2)return false;
+  if(r.dropoutAt!==null&&(typeof r.dropoutAt!=='string'||!Number.isFinite(Date.parse(r.dropoutAt))))return false;
+  if(r.reason!==null&&(typeof r.reason!=='string'||r.reason.length>512))return false;
+ }
+
  if(!v.generation||typeof v.areaId!=='string'||typeof v.difficultyId!=='string'||typeof v.projectName!=='string'||typeof v.lastActivity!=='string'||typeof v.automation!=='boolean')return false;
  if(typeof v.contentVersion!=='string'||typeof v.balanceVersion!=='string'||typeof v.normativeVersionId!=='string')return false;
  if(!Array.isArray(v.history)||v.history.length>50||!v.history.every(h=>typeof h==='string'&&h.length<512))return false;
  if(!Array.isArray(v.achievements)||v.achievements.length>150||!v.achievements.every(a=>typeof a==='string'&&a.length<100))return false;
- if(!Array.isArray(v.records)||v.records.length>50||!v.records.every(r=>r&&Number.isInteger(r.generation)&&Number.isFinite(r.score)&&Number.isInteger(r.maxStage)&&r.maxStage>=0&&r.maxStage<14&&typeof r.name==='string'))return false;
+ if(!Array.isArray(v.records)||v.records.length>50||!v.records.every(r=>r&&Number.isInteger(r.generation)&&Number.isFinite(r.score)&&Number.isInteger(r.maxStage)&&r.maxStage>=0&&r.maxStage<14&&typeof r.name==='string'&&(r.outcome===undefined||r.outcome==='legado'||r.outcome==='desercion')))return false;
  if(!v.careTimes||typeof v.careTimes!=='object'||Object.values(v.careTimes).some(t=>typeof t!=='number'||!Number.isFinite(t)))return false;
  if(v.event!==null){
   const e=v.event;if(!e||typeof e.id!=='string'||typeof e.title!=='string'||typeof e.body!=='string'||!Array.isArray(e.options)||e.options.length>5)return false;

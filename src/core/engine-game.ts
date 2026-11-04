@@ -18,10 +18,11 @@
 import { ACTIVITIES, CARE, EVENTS, SCHOOL_EVENTS, STAGES, STAGE_GUIDES, AREAS } from '../data/catalog.js';
 import type { GameSave, NeedsState } from './state.js';
 import { applyNeedChanges } from './engine-needs.js';
+import { difficultyOf, emptyRisk, passiveNeedChange, advanceAcademicRisk, easeRiskAfterCare, performanceFactor, studyBlocker, riskOf } from './engine-health.js';
 /** Resultado sin persistir. `next` debe guardarse junto al registro del comando. */
 export interface EngineOutcome { next:GameSave; changes:string[]; events:string[]; warnings:string[] }
 /** Vocabulario de operaciones que el motor implementa realmente (no el catálogo futuro). */
-export type ActionType = 'activity.execute'|'care.perform'|'career.confirmTransition'|'project.submit'|'event.resolve'|'automation.activate'|'automation.deactivate'|'time.processOffline'|'legacy.startGeneration'|'pet.rename'|'pet.changeArea';
+export type ActionType = 'activity.execute'|'care.perform'|'career.confirmTransition'|'project.submit'|'event.resolve'|'automation.activate'|'automation.deactivate'|'time.processOffline'|'legacy.startGeneration'|'pet.rename'|'pet.changeArea'|'career.restartAfterDropout';
 /** Limita números; usar especialmente en recursos y progreso para evitar valores fuera de rango. */
 export const clamp=(n:number,min:number,max:number)=>Math.max(min,Math.min(max,n));
 /** Evidencias lúdicas mínimas para transición; fórmula provisional, NO del DOF. */
@@ -35,16 +36,16 @@ const id=()=>typeof crypto !== 'undefined'&&'randomUUID' in crypto?crypto.random
  * Crea una partida completamente nueva con recursos iniciales de Kínder.
  * @param name Nombre visible, limitado a 28 caracteres.
  * @param areaId Área temática y especie visual (se mantiene entre etapas).
- * @param difficultyId Reservado para dificultad; el MVP aún no modifica el balance.
+ * @param difficultyId Tranquilo, normal o exigente; controla deterioro y desenlace.
  * @param generation Generación a registrar para el modo legado.
  * @returns Estado serializable con revisión cero, apto para initializeSave().
  */
 export function newGame(name:string,areaId:string='biologia',difficultyId:string='normal',generation=1):GameSave {
  const stage=STAGES[0]; const now=new Date().toISOString();
- return {gameId:id(),schemaVersion:2,contentVersion:'2026.11-areas-stages',balanceVersion:'0.3-provisional',normativeVersionId:'unverified',revision:0,createdAt:now,lastProcessedSimTime:now,
+ return {gameId:id(),schemaVersion:2,contentVersion:'2026.11-areas-stages',balanceVersion:'0.5-vitales-provisional',normativeVersionId:'unverified',revision:0,createdAt:now,lastProcessedSimTime:now,
  pet:{id:id(),name:name.trim().slice(0,28)||'Investigador',stageId:stage.id,appearanceId:areaId,
  needs:{energy:85,motivation:78,concentration:76,wellbeing:80,stress:12,curiosity:86,competence:58,socialization:70,scientificIntegrity:100}},
- areaId,difficultyId,stageIndex:0,generation,ap:stage.maxAP,credits:65,stageXp:0,totalXp:0,evidence:0,completedProjects:0,
+ areaId,difficultyId:difficultyOf(difficultyId).id,stageIndex:0,generation,ap:stage.maxAP,risk:emptyRisk(),credits:65,stageXp:0,totalXp:0,evidence:0,completedProjects:0,
  projectProgress:0,projectName:STAGE_GUIDES[0].project,actions:0,lastActivity:'',streak:0,automation:false,event:null,eventCursor:0,
  achievements:[],history:['La aventura científica acaba de comenzar.'],records:[],careTimes:{}};
 }
@@ -75,26 +76,33 @@ function advanceProject(s:GameSave,delta:number){
 export function applyGameAction(save:GameSave,type:ActionType,payload:Record<string,unknown>,now=Date.now()):EngineOutcome {
  const s=copy(save),changes:string[]=[], events:string[]=[], warnings:string[]=[];
  const stage=STAGES[s.stageIndex];
+ // Un final de deserción conserva el expediente, pero requiere reinicio para jugar.
+ if(riskOf(s).dropoutAt&&type!=='career.restartAfterDropout')fail('La trayectoria está interrumpida. Inicia una nueva generación para continuar.');
  switch(type){
  // Actividad pedagógica propia de la etapa: Kínder no imparte tutorías ni publica artículos.
  case 'activity.execute': {
   const a=ACTIVITIES.find(item=>item.id===payload.activityId);
   if(!a||s.stageIndex<a.minStage||s.stageIndex>a.maxStage)fail('Actividad no disponible en esta etapa educativa.');
   if(s.event)fail('Primero resuelve el evento pendiente.');
-  const cost=Math.max(1,Math.ceil(a.pa*stage.cost));
+  const n=s.pet.needs;
+  const blocked=studyBlocker(n);
+  if(blocked)fail(blocked);
+  // Bienestar bajo también hace que trabajar cueste más PA, aun sin bloquear.
+  const cost=Math.max(1,Math.ceil(a.pa*stage.cost*(n.wellbeing<=25?1.2:1)));
   if(s.ap<cost)fail('Faltan puntos de acción. Se recuperan con el tiempo.');
   if(s.credits+a.credits<0)fail('No alcanzan los créditos ficticios. Busca una actividad de apoyo o entrega un proyecto de tu etapa.');
-  if(s.pet.needs.energy<6)fail('Tu mascota necesita descansar antes de continuar.');
   s.ap-=cost;s.credits+=a.credits;
-  const n=s.pet.needs;
   // Rendimiento provisional según cuatro necesidades; penaliza fatiga/estrés.
   const condition=clamp((n.energy+n.motivation+n.concentration+(100-n.stress))/400,.45,1.15);
   // Rendimientos decrecientes al repetir una actividad; diversificar aporta un bono.
   const repeat=s.lastActivity===a.id?clamp(1-.09*s.streak,.55,1):1;
   const combo=s.lastActivity!==a.id && s.lastActivity!==''?1.12:1;
-  const gained=addXp(s,a.pe*stage.reward*condition*repeat*combo);
+  // Penalizaciones causales acumulables por indicadores bajos y estrés elevado.
+  // La UI usa la misma función para informar del impacto al jugador.
+  const gained=addXp(s,a.pe*stage.reward*condition*performanceFactor(n)*repeat*combo);
   // La actividad se realiza por la mascota; en etapas infantiles está acompañada por docentes o cuidadores.
   s.pet.needs=applyNeedChanges(n,{energy:a.energy,stress:a.stress,concentration:a.focus,motivation:a.motivation??0,competence:1,curiosity:a.type==='investigacion'?2:1});
+  if(s.pet.needs.energy<=15||s.pet.needs.stress>=90)warnings.push('Tu mascota se encuentra en un estado crítico. Usa cuidados antes de continuar.');
   s.actions++; s.streak=s.lastActivity===a.id?s.streak+1:0;s.lastActivity=a.id;
   advanceProject(s,Math.max(3,Math.round(gained/2)+3));
   if(s.actions%5===0){s.evidence++;events.push('Evidencia lúdica agregada al expediente');}
@@ -113,6 +121,7 @@ export function applyGameAction(save:GameSave,type:ActionType,payload:Record<str
   const effects:Partial<Record<keyof NeedsState,number>>={};
   for(const field of ['energy','stress','wellbeing','motivation','concentration','socialization'] as const){const v=c[field];if(typeof v==='number')effects[field]=v;}
   s.pet.needs=applyNeedChanges(s.pet.needs,effects);
+  s.risk=easeRiskAfterCare(s);
   log(s,`${c.icon} ${c.label}: mascota cuidada`);changes.push('Bienestar actualizado');break;
  }
  // Solo una entrega completada concede evidencias y créditos; reinicia el avance.
@@ -128,8 +137,11 @@ export function applyGameAction(save:GameSave,type:ActionType,payload:Record<str
   if(s.stageXp<stage.target)fail(`Necesitas ${stage.target} UPE para avanzar.`);
   if(s.evidence<STAGE_GATE(s.stageIndex))fail(`Necesitas ${STAGE_GATE(s.stageIndex)} evidencias lúdicas para avanzar.`);
   if(s.pet.needs.competence<50)fail('Mejora la competencia con más actividades antes de avanzar.');
+  if(riskOf(s).criticalHours>=9)fail('Primero estabiliza a tu mascota antes de solicitar el avance de etapa.');
   const old=stage.label;s.stageXp-=stage.target;s.evidence-=STAGE_GATE(s.stageIndex);s.stageIndex++;
   const nextStage=STAGES[s.stageIndex];s.pet.stageId=nextStage.id;s.projectName=STAGE_GUIDES[s.stageIndex].project;s.projectProgress=0;s.ap=clamp(s.ap+Math.round(nextStage.maxAP*.5),0,nextStage.maxAP);s.apRegenRemainder=0;s.credits+=20;
+  // Un logro relevante alivia ligeramente el desgaste, sin borrar crisis acumuladas.
+  s.pet.needs=applyNeedChanges(s.pet.needs,{motivation:8,wellbeing:4,stress:-5});
   log(s,`🎓 ${old} → ${nextStage.label}. Bono de 20 CR`);changes.push('Etapa avanzada');events.push('Nueva etapa desbloqueada');break;
  }
  // Resolver el evento borra la elección pendiente; no se puede reclamar dos veces.
@@ -167,15 +179,26 @@ export function applyGameAction(save:GameSave,type:ActionType,payload:Record<str
   const regen=Math.floor(pooled);
   s.ap=clamp(s.ap+regen,0,stage.maxAP);
   s.apRegenRemainder=s.ap>=stage.maxAP?0:pooled-regen;
-  const eased=Math.round(hours*2);s.pet.needs=applyNeedChanges(s.pet.needs,{energy:eased,stress:-eased,concentration:Math.round(hours)});
-  if(s.automation&&hours>0){
+  // Simulamos intervalos de hasta una hora: NO contamos como crítico un periodo
+  // entero si los indicadores se volvieron críticos solo al final de la ausencia.
+  // A diferencia de v0.4, el paso de tiempo deteriora suavemente las necesidades.
+  let pending=hours;
+  while(pending>1e-8&&!riskOf(s).dropoutAt){
+    const step=Math.min(1,pending);
+    s.pet.needs=passiveNeedChange(s.pet.needs,step,s.stageIndex,s.difficultyId);
+    const outcome=advanceAcademicRisk(s,step,new Date(now).toISOString());
+    s.risk=outcome.risk;
+    for(const message of outcome.messages){warnings.push(message);log(s,message)}
+    pending-=step;
+  }
+  if(s.automation&&hours>0&&!riskOf(s).dropoutAt){
     const maintenance=Math.min(s.credits,Math.ceil(hours));s.credits-=maintenance;
     // Producción de apoyo pequeña, nunca crea evidencia ni diplomas automáticamente.
     const passive=addXp(s,Math.floor(hours*(s.stageIndex>=9?5:3)));
     advanceProject(s,Math.floor(hours*2));changes.push(`+${passive} UPE de apoyo, -${maintenance} CR`);
   }
   s.lastProcessedSimTime=new Date(now).toISOString();
-  if(hours>=.05)log(s,`🕰️ Ausencia simulada ${hours.toFixed(1)} h (máx. 8 h): +${regen} PA`);
+  if(hours>=.05&&!riskOf(s).dropoutAt)log(s,`🕰️ Tiempo simulado ${hours.toFixed(1)} h (máx. 8 h): +${regen} PA; las necesidades se desgastan gradualmente.`);
   changes.push(`+${regen} PA por tiempo`);break;
  }
  // Personalización visual reversible: no reinicia edad, PA, créditos ni progreso.
@@ -194,12 +217,22 @@ export function applyGameAction(save:GameSave,type:ActionType,payload:Record<str
   if(name.length<1||name.length>28)fail('El nombre debe tener entre 1 y 28 caracteres.');
   s.pet.name=name;changes.push('Nombre actualizado');break;
  }
- // Reinicio VOLUNTARIO: conserva récords y legado, sin final automático del juego.
+ // Deserción: final de una generación tras una crisis prolongada. Nueva oportunidad
+ // explícita; conservar expediente/score permite aprender sin perder su historial.
+ case 'career.restartAfterDropout': {
+  if(!riskOf(s).dropoutAt)fail('La trayectoria no está interrumpida.');
+  const previous={generation:s.generation,score:s.totalXp,maxStage:s.stageIndex,name:s.pet.name,outcome:'desercion' as const};
+  const fresh=newGame(s.pet.name,s.areaId,s.difficultyId,s.generation+1);
+  fresh.gameId=s.gameId;fresh.records=[...s.records,previous].slice(-40);
+  fresh.history=[`🌱 ${s.pet.name} comienza otra oportunidad; la generación anterior conserva su expediente ficticio.`,...fresh.history];
+  Object.assign(s,fresh);changes.push('Nueva oportunidad iniciada');break;
+ }
+ // Reinicio VOLUNTARIO: conserva récords y legado, sin final obligatorio al llegar a Emérito.
  case 'legacy.startGeneration': {
   if(s.stageIndex<9)fail('El modo legado se desbloquea desde Candidato SNII.');
   const name=typeof payload.newPetName==='string'?payload.newPetName.trim():'';
   if(!name||name.length>28)fail('Escribe un nombre válido para la siguiente generación.');
-  const record={generation:s.generation,score:s.totalXp,maxStage:s.stageIndex,name:s.pet.name};
+  const record={generation:s.generation,score:s.totalXp,maxStage:s.stageIndex,name:s.pet.name,outcome:'legado' as const};
   const fresh=newGame(name,s.areaId,s.difficultyId,s.generation+1);
   // El legado conserva récords y un bono moderado; es voluntario y nunca borra historial previo.
   fresh.gameId=s.gameId;fresh.records=[...s.records,record].slice(-40);fresh.credits+=Math.min(40,Math.floor(s.totalXp/100));

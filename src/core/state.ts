@@ -17,13 +17,15 @@ export interface GameEvent { id:string; title:string; body:string; options:reado
  * `apRegenRemainder` conserva fracciones entre pulsos de recuperación.
  * `normativeVersionId`="unverified" impide tratar el balance como normativa oficial.
  */
+/** Riesgo de deserción ficticia acumulado solo durante crisis combinadas. */
+export interface AcademicRisk { criticalHours:number; alerts:number; dropoutAt:string|null; reason:string|null }
 export interface GameSave {
  gameId:string; schemaVersion:number; contentVersion:string; balanceVersion:string; normativeVersionId:string;
  revision:number; createdAt:string; lastProcessedSimTime:string;
  pet:PetState; areaId:string; difficultyId:string; stageIndex:number; generation:number;
- ap:number; apRegenRemainder?:number; credits:number; stageXp:number; totalXp:number; evidence:number; completedProjects:number;
+ ap:number; apRegenRemainder?:number; risk?:AcademicRisk; credits:number; stageXp:number; totalXp:number; evidence:number; completedProjects:number;
  projectProgress:number; projectName:string; actions:number; lastActivity:string; streak:number;
  automation:boolean; event:GameEvent|null; eventCursor:number; achievements:string[];
- history:string[]; records:{generation:number;score:number;maxStage:number;name:string}[];
+ history:string[]; records:{generation:number;score:number;maxStage:number;name:string;outcome?:'legado'|'desercion'}[];
  careTimes:Record<string,number>;
 }

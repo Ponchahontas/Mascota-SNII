@@ -65,3 +65,10 @@ Pruebas end-to-end en navegador y móvil; ajustes de balance con simulación; au
 ## Licencia
 
 **Pendiente de elección expresa por la persona propietaria.** No se ha asignado licencia abierta por defecto.
+
+
+## Sistema de bienestar v0.5
+
+Los cinco medidores ahora se deterioran gradualmente en el tiempo y producen efectos jugables: menor rendimiento, bloqueos temporales y una posible **deserción ficticia por crisis combinada prolongada**. Se elige entre Tranquilo (sin pérdida definitiva), Equilibrado (18 h críticas acumuladas) y Exigente (12 h). Una sola ausencia procesa un máximo de ocho horas; el cuidado siempre está disponible sin consumir puntos de acción. Un desenlace conserva los récords y permite iniciar otra generación. Las partidas v2 siguen siendo compatibles mediante el campo opcional `risk`.
+
+Consulta [la guía completa de bienestar](docs/12_SISTEMA_DE_BIENESTAR.md) y [los criterios de interfaz](docs/13_INTERFAZ_Y_ALERTAS.md). **El balance es ficticio y provisional, no oficial ni clínico.**
