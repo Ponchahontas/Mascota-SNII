@@ -117,3 +117,16 @@ test('tasa y penalización del desgaste varían de Kínder a SNII III',()=>{
  assert.ok(late.energy<early.energy);
  assert.ok(late.stress>early.stress);
 });
+
+// Este caso era un bloqueo posible: sin créditos y con motivación/bienestar en cero,
+// las actividades estaban prohibidas y los cuidados de ambos medidores costaban CR.
+test('acompañamiento gratuito evita partidas bloqueadas con cero créditos',()=>{
+ const s=newGame('Rescate');s.credits=0;s.pet.needs.motivation=0;s.pet.needs.wellbeing=0;
+ assert.throws(()=>run(s,'activity.execute',{activityId:'etapa0-colores'}));
+ let a=run(s,'care.perform',{careActionId:'acompanar'},t);
+ assert.equal(a.credits,0);assert.equal(a.pet.needs.motivation,4);assert.equal(a.pet.needs.wellbeing,3);
+ a=run(a,'care.perform',{careActionId:'acompanar'},t+16_000);
+ assert.ok(a.pet.needs.motivation>5&&a.pet.needs.wellbeing>5);
+ const next=run(a,'activity.execute',{activityId:'etapa0-compartir'});
+ assert.ok(next.credits>0);
+});

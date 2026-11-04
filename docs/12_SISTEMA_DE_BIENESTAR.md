@@ -4,16 +4,16 @@
 
 ## Objetivo
 
-Las cinco barras vitales deben producir decisiones comprensibles: cuidar, planificar actividades, arriesgar recursos o posponer tareas. Los indicadores se deterioran de modo gradual con el tiempo, se ven afectados por actividades y se recuperan mediante **acciones de cuidado que no consumen puntos de acción (PA)**. La mascota no necesita estar en el juego constantemente y una única ausencia larga no debe liquidar inmediatamente la partida.
+Las cinco barras vitales deben producir decisiones comprensibles: cuidar, planificar actividades, arriesgar recursos o posponer tareas. Los indicadores se deterioran de modo gradual con el tiempo, se ven afectados por actividades y se recuperan mediante **acciones de cuidado que no consumen puntos de acción (PA)** (incluida una opción gratuita de acompañamiento para evitar partidas sin salida por falta de créditos). La mascota no necesita estar en el juego constantemente y una única ausencia larga no debe liquidar inmediatamente la partida.
 
 ## Medidores y consecuencias
 
 | Medidor | Precaución | Crítico | Bloqueo si extremo | Cuidados sugeridos |
 | --- | --- | --- | --- | --- |
 | Energía | ≤35 | ≤15 | ≤5: agotamiento para estudiar | Dormir (+25), descansar (+8) |
-| Motivación | ≤35 | ≤15 | ≤5: desmotivación impide trabajar | Socializar (+6), recreación (+2) |
+| Motivación | ≤35 | ≤15 | ≤5: desmotivación impide trabajar | Socializar (+6), recreación (+2), acompañar gratis (+4) |
 | Concentración | ≤35 | ≤15 | ≤5: bloqueo de atención | Dormir (+10), descansar (+3) |
-| Bienestar | ≤35 | ≤15 | ≤5: malestar impide trabajar | Recreación (+6), socializar (+4) |
+| Bienestar | ≤35 | ≤15 | ≤5: malestar impide trabajar | Recreación (+6), socializar (+4), acompañar gratis (+3) |
 | Estrés (escala inversa) | ≥70 | ≥90 | ≥95: saturación impide trabajar | Dormir (−10), recreación (−6) |
 
 El rendimiento por actividad se multiplica por factores según los medidores. Precaución suele aplicar 0.75–0.8 al rendimiento de cada indicador, crítico 0.48–0.55. Varias condiciones suman penalizaciones **multiplicativamente**, con un límite inferior de 12 % para evitar cálculos negativos; la penalización se suma al rendimiento general previo del motor. Cuando el bienestar cae a 25 o menos, **el coste de PA por tarea aumenta 20 %** (redondeo hacia arriba). Los costes mostrados en interfaz son los del motor.

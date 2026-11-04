@@ -40,7 +40,11 @@ function healthPanel(){
  const s=player(),n=s.pet.needs,alerts=vitalAlerts(n),risk=riskOf(s),mode=difficultyOf(s.difficultyId);
  const blocker=studyBlocker(n),critical=criticalCount(n);
  const description=critical>=2?'Dos o más indicadores críticos: el riesgo aumenta con el tiempo.':risk.criticalHours>0?'La crisis ha disminuido; mantener el equilibrio reduce el riesgo.':'Los indicadores están relativamente estables.';
- const preferred=alerts[0];const care=preferred?({'energy':'dormir','motivation':'socializar','concentration':'descansar','wellbeing':'recrear','stress':'recrear'} as const)[preferred.key]:null;
+ const preferred=alerts[0];
+ // Si no hay créditos, ofrecer cuidado gratis para evitar bloqueos sin salida.
+ const suggested=preferred?({'energy':'dormir','motivation':'socializar','concentration':'descansar','wellbeing':'recrear','stress':'recrear'} as const)[preferred.key]:null;
+ const care=s.credits<=0&&suggested&&['socializar','recrear'].includes(suggested)?'acompanar':suggested;
+ const careLabel=care==='acompanar'?'Acompañar (gratis)':preferred?.suggestedCare;
  const state=critical>=2||risk.criticalHours>=9?'danger':alerts.length?'caution':'ok';
  const ceiling=mode.dropoutHours;
  return `<section class="health-panel health-${state}" aria-label="Consecuencias y dificultad">
@@ -48,7 +52,7 @@ function healthPanel(){
   <p>${esc(blocker||description)}</p>
   ${alerts.length?`<ul class="health-list">${alerts.slice(0,3).map(a=>`<li>${a.label}: ${esc(a.suggestedCare)}</li>`).join('')}</ul>`:''}
   ${ceiling!==null?`<div class="crisis-progress" role="progressbar" aria-label="Tiempo acumulado de crisis académica" aria-valuemin="0" aria-valuemax="${ceiling}" aria-valuenow="${Math.min(ceiling,Number(risk.criticalHours.toFixed(1)))}"><i style="width:${percent(risk.criticalHours,ceiling)}%"></i></div><small>Riesgo de deserción: ${risk.criticalHours.toFixed(1)} / ${ceiling} horas críticas acumuladas</small>`:'<small>Modo tranquilo: puede haber bloqueos, pero no deserción definitiva.</small>'}
-  ${care?button('care',care,`💚 Cuidar ahora: ${esc(preferred?.suggestedCare)}`,busy,'health-care'):''}
+  ${care?button('care',care,`💚 Cuidar ahora: ${esc(careLabel)}`,busy,'health-care'):''}
  </section>`;
 }
 /** Final satírico no violento con respaldo y nueva generación sin borrar récords. */

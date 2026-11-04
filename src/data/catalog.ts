@@ -36,6 +36,8 @@ export const CARE: readonly Care[] = [
  {id:'dormir',label:'Dormir',icon:'🌙',credits:0,energy:25,stress:-10,concentration:10},
  {id:'socializar',label:'Socializar',icon:'💬',credits:-2,wellbeing:4,motivation:6,stress:-3,socialization:10},
  {id:'recrear',label:'Recreación',icon:'🎮',credits:-1,wellbeing:6,motivation:2,stress:-6},
+ // Salvaguarda de balance: no requiere créditos; impide estados sin salida a 0 CR.
+ {id:'acompanar',label:'Acompañar',icon:'🤗',credits:0,wellbeing:3,motivation:4,stress:-2,socialization:2},
 ];
 /** Catálogo de áreas visuales: cada ID debe corresponder a PET_KINDS y un SVG. */
 export const AREAS = [
