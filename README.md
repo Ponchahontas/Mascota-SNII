@@ -1,8 +1,33 @@
-# Mascota-SNII — Tamagotchi Académico (MVP v0.7)
+# Mascota-SNII — Tamagotchi Académico (MVP v0.9)
 
 Juego satírico en español y **local-first** sobre una trayectoria académica ficticia de **14 etapas**, desde Kínder hasta Emérito. Tiene **84 actividades exclusivas por etapa** y **siete mascotas visualmente diferentes por área**, cada una con 14 cuadros de evolución. El jugador acompaña y cuida; la mascota realiza las actividades educativas apropiadas a su etapa.
 
 > **Aviso:** las puntuaciones, requisitos, evidencias y representaciones son **ficticios**. No equivalen a evaluaciones, dictámenes, niveles ni criterios oficiales del SNII. El proyecto no declara afiliación institucional.
+
+## v0.9 · Estaciones conectadas a su aventura (corrección de interfaz)
+
+- **Cada botón del escenario abre exactamente su propia actividad.** La cabecera
+  ahora muestra su icono, nombre, etapa y número de estación. La estación y
+  su tarjeta lateral se destacan simultáneamente.
+- **Cinco preguntas relacionadas con cada actividad** en las 14 etapas: se
+  eliminaron los cuatro retos transversales repetidos entre estaciones de
+  Primaria a Emérito. Hay 420 textos de pregunta diferentes en el catálogo.
+  Los niveles superiores usan preguntas de preparación, ejecución, comprobación
+  y comunicación con respuestas adecuadas a cada actividad; estos últimos
+  cuatro momentos utilizan un formato común, no 312 minijuegos únicos.
+- **Se conservan los aciertos de partidas anteriores**. Si ya habías completado
+  un módulo, puedes consultar gratuitamente sus cinco preguntas actualizadas.
+- La estación no otorga PA, CR ni UPE por seleccionarla. Se mantienen los
+  costos y las recompensas originales al realizar la práctica.
+- **Pruebas:** `npm run typecheck && npm test` (61 pruebas automatizadas).
+- Detalles: [docs/17_ESTACIONES_Y_AVENTURAS_V09.md](docs/17_ESTACIONES_Y_AVENTURAS_V09.md).
+
+## v0.8 · Cinco descubrimientos y escenario por etapa
+
+- Se incluyeron seis estaciones por etapa, movimiento contextual, progreso
+  guardado por pregunta y bonificación única de la primera práctica.
+- Esta primera implementación reutilizaba bancos de preguntas entre estaciones
+  y tenía una cabecera genérica. Ambas limitaciones se corrigen en v0.9.
 
 ## v0.7 · Aprender jugando y acompañar con preguntas
 

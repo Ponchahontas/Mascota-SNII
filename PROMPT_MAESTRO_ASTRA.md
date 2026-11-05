@@ -168,3 +168,12 @@ No intentes implementar todo en un único bloque gigante. Primero inspecciona y 
 5. Mantén comentarios de código y documentación actualizados.
 
 Empieza ahora por la Fase 0: audita el paquete y enumera los faltantes. Luego continúa hasta donde permitan las herramientas y autorizaciones disponibles. No te detengas a pedir aprobación para cada detalle técnico reversible; sí pide confirmación para decisiones destructivas, costes externos, cambios de cuenta, licencias no decididas o publicación final en producción.
+
+
+### Convención añadida en v0.9: correspondencia de estaciones
+
+Al programar, asegurar que cada estación del entorno (`activity.id`) abra la
+aventura específica con el mismo nombre, icono, progreso y cinco preguntas,
+independientemente de las 14 etapas. Nunca identificar una actividad por su
+posición visual o un título traducible. Ver
+`docs/17_ESTACIONES_Y_AVENTURAS_V09.md` y `tests/station-links.test.mjs`.

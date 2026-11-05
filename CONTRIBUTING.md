@@ -92,3 +92,13 @@ En pull requests o commits, registra: *problema*, *solución*, *impacto en parti
   acciones, recompensas, IndexedDB, el caché o las seis estaciones.
 - En comentarios explicar siempre **por qué** una decisión pedagógica o de
   balance es necesaria, no describir obviedades de TypeScript.
+
+
+## v0.9: relación entre estación y actividad educativa
+
+No utilizar `index` como identificador de juego. El índice es solo una
+posición visual; la relación se resuelve mediante `activity.id` (ver
+`scene-world.ts`). Para extender el catálogo, cada nueva actividad necesita
+cinco desafíos con el mismo ID: el primer desafío en `learning-path.ts` y cuatro
+momentos en `activity-extras.ts` o el banco específico de Kínder. Mantener
+comentarios en español y pruebas de correspondencia: `npm test`.

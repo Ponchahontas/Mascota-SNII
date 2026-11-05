@@ -1,5 +1,21 @@
 # Historial de cambios · Mascota-SNII
 
+## v0.9.0 — Una estación, una actividad y sus cinco preguntas
+
+- Identidad visible de la estación elegida: icono, nombre, etapa, posición 1–6.
+- Fuente de selección por `activity.id` compartida entre escenario, tarjetas,
+  movimiento de la mascota y preguntas. Destacado visual en ambos paneles.
+- 78 perfiles específicos de Primaria a Emérito, cuatro momentos por actividad
+  además del desafío inicial; se eliminaron bancos transversales repetidos.
+- 420 textos de pregunta únicos; Kínder conserva sus preguntas infantiles.
+- Repaso gratuito de las preguntas para partidas ya completadas, sin borrar
+  aciertos y sin modificar la economía del juego.
+- Validaciones nuevas: cobertura de 84 estaciones, texto vinculado, bloqueo
+  entre etapas, independencia de progreso, ausencia de efectos de lectura.
+- `sw.js` actualizado para incluir `activity-extras.js` y caché v9.
+- 61 pruebas locales aprobadas; pendiente verificación visual real en navegador.
+
+
 ## v0.8.0 — Exploración por estaciones y rutas de cinco pasos
 
 - Cinco retos en cada una de las 84 actividades (420 posiciones jugables).

@@ -6,6 +6,8 @@
  * para no sacar a la mascota del marco en dispositivos pequeños.
  */
 import { activitiesForStage } from './catalog.js';
+import { learningSequence, STEP_COUNT } from './learning-sequences.js';
+import type { Activity } from './stage-activities.js';
 
 export interface StageScene { title:string;landscape:string;ambient:string;decoration:readonly [string,string,string]; }
 export const STAGE_SCENES: readonly StageScene[]=[
@@ -25,9 +27,38 @@ export const STAGE_SCENES: readonly StageScene[]=[
  {title:'Jardín del legado',landscape:'jardin',ambient:'La experiencia se comparte con nuevas generaciones.',decoration:['🌳','📜','🌺']},
 ];
 export const STATION_COUNT=6;
+/**
+ * Fuente única de estaciones jugables. El ID que se pinta en el escenario,
+ * el ID del catálogo y los cinco retos deben pertenecer a la misma actividad.
+ * No conectar estaciones por icono, texto o posición visual, porque esos datos
+ * cambian con el idioma y con la etapa.
+ */
+export interface LearningStation {activity:Activity;index:number;stageIndex:number;}
+export function stationsForStage(stageIndex:number):readonly LearningStation[]{
+ return activitiesForStage(stageIndex).map((activity,index)=>({activity,index,stageIndex}));
+}
+export function learningStation(stageIndex:number,activityId:string):LearningStation|null {
+ return stationsForStage(stageIndex).find(station=>station.activity.id===activityId&&learningSequence(activityId).length===STEP_COUNT)??null;
+}
+/** Diagnóstico para tests: falla si una escena abre preguntas de otra estación. */
+export function validateStationConnections(stageCount:number):string[]{
+ const errors:string[]=[];
+ for(let stageIndex=0;stageIndex<stageCount;stageIndex++){
+  const stations=stationsForStage(stageIndex);
+  if(stations.length!==STATION_COUNT)errors.push(`Etapa ${stageIndex}: ${stations.length} estaciones`);
+  for(const station of stations){
+   const selected=learningStation(stageIndex,station.activity.id);
+   const steps=learningSequence(station.activity.id);
+   if(!selected||selected.index!==station.index||steps.length!==STEP_COUNT||steps.some(step=>step.activityId!==station.activity.id)){
+    errors.push(`Estación ${stageIndex}/${station.index}: enlace incorrecto para ${station.activity.id}`);
+   }
+  }
+ }
+ return errors;
+}
 /** La posición es el índice de la actividad dentro de su etapa; nunca se guarda. */
 export function stationIndex(stageIndex:number,activityId:string):number {
- return activitiesForStage(stageIndex).findIndex(a=>a.id===activityId);
+ return learningStation(stageIndex,activityId)?.index??-1;
 }
 /** El escenario se deriva siempre de la etapa; no hay ventaja estadística por área. */
 export function sceneForStage(stageIndex:number):StageScene {return STAGE_SCENES[stageIndex]??STAGE_SCENES[0]}

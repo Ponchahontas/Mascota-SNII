@@ -1,9 +1,9 @@
 {
   "name": "tamagotchi-academico",
-  "version": "0.8.0",
+  "version": "0.9.0",
   "private": true,
   "type": "module",
-  "description": "Mascota-SNII: aventuras educativas de cinco preguntas por actividad, progreso guardado y escenarios animados",
+  "description": "Mascota-SNII: estaciones vinculadas por ID a aventuras propias de cada actividad en las 14 etapas",
   "scripts": {
     "dev": "npm run build && node scripts/serve.mjs",
     "build": "node scripts/build.mjs",
