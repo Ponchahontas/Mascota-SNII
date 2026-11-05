@@ -1,11 +1,8 @@
-# Publicación inicial en GitHub
+# Documento histórico reubicado
 
-- Repositorio: `Ponchahontas/Mascota-SNII` (rama `main`).
-- Compilación: `npm run build` → `dist/`.
-- Pruebas: `npm run typecheck && npm test`.
-- Netlify: conectar este repositorio; comando `npm run build`; carpeta pública `dist`.
-- El juego es local-first y no necesita variables de entorno.
-- No subir respaldos JSON de jugadores, claves ni tokens.
-- El número de versión 0.2 indica **MVP**, no producto terminado.
-- Los requisitos del SNII representados son ficticios; consulta fuentes oficiales para información normativa.
-- Falta validación interactiva en navegadores reales antes de anunciar lanzamiento.
+Este documento pertenece a una iteración anterior de Mascota-SNII y **no describe necesariamente el estado vigente**.
+
+- [Consultar el documento original archivado](historico/09_PUBLICACION_GITHUB.md)
+- [Ir al índice de la documentación actual](README.md)
+
+La ubicación anterior se conserva como enlace de compatibilidad. Para nuevas implementaciones, consultar primero `docs/README.md`.

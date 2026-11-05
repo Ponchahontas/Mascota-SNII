@@ -1,129 +1,55 @@
-# Mascota-SNII — Tamagotchi Académico (MVP v0.9)
+# Mascota-SNII · Tamagotchi Académico
 
-Juego satírico en español y **local-first** sobre una trayectoria académica ficticia de **14 etapas**, desde Kínder hasta Emérito. Tiene **84 actividades exclusivas por etapa** y **siete mascotas visualmente diferentes por área**, cada una con 14 cuadros de evolución. El jugador acompaña y cuida; la mascota realiza las actividades educativas apropiadas a su etapa.
+**MVP v0.9** · Juego web educativo y satírico en español, centrado en acompañar a una mascota a través de una trayectoria ficticia desde Kínder hasta SNII Emérito. La persona jugadora cuida y toma decisiones; la mascota aprende, experimenta y realiza las actividades apropiadas para su etapa.
 
-> **Aviso:** las puntuaciones, requisitos, evidencias y representaciones son **ficticios**. No equivalen a evaluaciones, dictámenes, niveles ni criterios oficiales del SNII. El proyecto no declara afiliación institucional.
+> **Aviso:** juego independiente. Las etapas, las recompensas y los requisitos del juego **no son criterios oficiales** del Sistema Nacional de Investigadoras e Investigadores.
 
-## v0.9 · Estaciones conectadas a su aventura (corrección de interfaz)
+## Qué incluye hoy
 
-- **Cada botón del escenario abre exactamente su propia actividad.** La cabecera
-  ahora muestra su icono, nombre, etapa y número de estación. La estación y
-  su tarjeta lateral se destacan simultáneamente.
-- **Cinco preguntas relacionadas con cada actividad** en las 14 etapas: se
-  eliminaron los cuatro retos transversales repetidos entre estaciones de
-  Primaria a Emérito. Hay 420 textos de pregunta diferentes en el catálogo.
-  Los niveles superiores usan preguntas de preparación, ejecución, comprobación
-  y comunicación con respuestas adecuadas a cada actividad; estos últimos
-  cuatro momentos utilizan un formato común, no 312 minijuegos únicos.
-- **Se conservan los aciertos de partidas anteriores**. Si ya habías completado
-  un módulo, puedes consultar gratuitamente sus cinco preguntas actualizadas.
-- La estación no otorga PA, CR ni UPE por seleccionarla. Se mantienen los
-  costos y las recompensas originales al realizar la práctica.
-- **Pruebas:** `npm run typecheck && npm test` (61 pruebas automatizadas).
-- Detalles: [docs/17_ESTACIONES_Y_AVENTURAS_V09.md](docs/17_ESTACIONES_Y_AVENTURAS_V09.md).
+- 14 etapas de crecimiento académico; 84 actividades (seis por etapa).
+- Cinco descubrimientos por actividad: 420 textos de pregunta, aciertos guardados y práctica repetible.
+- Un escenario por etapa con seis estaciones; estación, actividad y preguntas vinculadas por un identificador estable.
+- Siete mascotas visuales por área de conocimiento y 14 cuadros de evolución por especie.
+- Energía, motivación, concentración, bienestar y estrés; cuidados, tres dificultades y consecuencias lúdicas.
+- Progreso, proyectos, eventos, legado, respaldo JSON, guardado local mediante IndexedDB y PWA estática.
+- Interfaz y código documentados en español; pruebas automatizadas con GitHub Actions.
 
-## v0.8 · Cinco descubrimientos y escenario por etapa
+**Estado de calidad:** las pruebas automáticas de la iteración v0.9 se registraron en el historial. Siguen pendientes la validación visual en navegadores/móviles, la revisión educativa experta y el balance longitudinal. No afirmar que el despliegue Netlify está verificado sin comprobar una URL pública.
 
-- Se incluyeron seis estaciones por etapa, movimiento contextual, progreso
-  guardado por pregunta y bonificación única de la primera práctica.
-- Esta primera implementación reutilizaba bancos de preguntas entre estaciones
-  y tenía una cabecera genérica. Ambas limitaciones se corrigen en v0.9.
+## Para ejecutar localmente
 
-## v0.7 · Aprender jugando y acompañar con preguntas
+Requiere Node.js 20 o superior y npm.
 
-- **14 capítulos de aprendizaje**: cada etapa explica qué se aprende, por qué importa, cómo acompañar a la mascota y una aplicación cotidiana.
-- **84 microdesafíos contextualizados**: uno por actividad con tres opciones, pista al equivocarse y explicación tras acertar.
-- **Sin penalización por explorar**: responder no consume PA ni CR ni afecta a la mascota. Los recursos se aplican al confirmar la actividad en el motor; sigue disponible «⚡ Repetir» para sesiones rápidas.
-- **Conservar partidas**: no se modificó el esquema IndexedDB (v2). El minireto es temporal y no se guarda.
-- El contenido pedagógico es general y el SNII del juego es una simulación satírica, no un criterio oficial. Ver `docs/15_GUIA_PEDAGOGICA_INTERACTIVA.md`.
-
-## Estado verificable
-
-- Aplicación estática PWA programada en TypeScript, CSS y SVG.
-- Compilación local con `npm run build`, comprobación `npm run typecheck` y **pruebas automatizadas Node** del motor ejecutadas correctamente en la versión documentada.
-- Guardado en IndexedDB, exportación/importación JSON, eventos, cuidado, proyectos, tiempo offline limitado, logros, asistentes básicos y legado voluntario.
-- La validación automatizada **no cubre todavía** el juego completo en navegadores reales, accesibilidad exhaustiva ni instalación PWA móvil. No afirmar que Netlify está desplegado o verificado solo por la existencia de `netlify.toml`.
-
-**Animaciones v0.6:** cansancio, estrés, distracción, desmotivación, bajo bienestar y celebración/reacción al cuidado; control para pausar movimientos y respeto a `prefers-reduced-motion`. Las reacciones son solo visuales y no modifican las partidas. Ver [docs/14_ANIMACIONES_DE_ESTADO.md](docs/14_ANIMACIONES_DE_ESTADO.md).
-
-**Repositorio de desarrollo:** https://github.com/Ponchahontas/Mascota-SNII
-
-## Ejecutar
-
-Requisitos: Node.js 20 o posterior y npm.
-
-```bash
+~~~bash
 npm install
 npm run typecheck
 npm test
 npm run dev
-```
+~~~
 
-Abre `http://localhost:4173`. Para crear la distribución estática usa `npm run build`: publica **el contenido** de `dist/`. Netlify puede construir desde GitHub usando `npm run build` y el directorio `dist`, o recibir la carpeta compilada mediante Netlify Drop.
+`npm run build` genera una distribución estática en `dist/`. Configuración para Netlify: comando `npm run build`, publicación `dist`.
 
-## Mecánicas implementadas
+## Documentación organizada
 
-- **Desarrollo por etapa:** seis actividades educativas propias de cada nivel; no hay tutorías impartidas por menores en Kínder.
-- **Rol del jugador:** selecciona actividades, brinda cuidados, toma decisiones y controla el expediente. La mascota actúa, con apoyo escolar cuando procede.
-- **Economía ficticia:** PA se regeneran con el tiempo; CR son recursos de juego; UPE son progreso lúdico; proyectos conceden evidencias ficticias.
-- **Área/especie:** siete tipos originales con identidad persistente y evolución a través de los catorce niveles.
-- **Guardado y seguridad:** IndexedDB con transacciones para resultado y snapshot, revisión de partida, importación JSON validada, exportación manual.
-- **Consecuencias académicas:** cinco medidores se deterioran con el tiempo, reducen rendimiento, pueden bloquear actividades temporalmente y desencadenar deserción ficticia tras crisis combinadas prolongadas.
-- **Tres dificultades:** Tranquilo (sin deserción), Equilibrado (deserción tras 18 h de crisis combinada) y Exigente (12 h). Una sola ausencia procesa como máximo ocho horas y hay formas de recuperación con cuidados.
-- **Finales y reinicio:** el legado sigue siendo voluntario, pero una deserción en dificultades superiores termina la generación; se conserva su récord y puede comenzar otra oportunidad.
-
-## Mapa de carpetas
-
-| Carpeta o archivo | Responsabilidad |
+| Tema | Ir a |
 | --- | --- |
-| `src/data/` | Actividades por etapa, balance ficticio, nombres y metadatos de especie |
-| `src/core/engine-game.ts` | Reglas puras de actividades, recursos, carrera, offline y legado |
-| `src/core/state.ts` | Esquema de guardado y contratos de estado |
-| `src/core/persistence.ts` | IndexedDB, validaciones, idempotencia y conflictos de versión |
-| `src/core/game-coordinator.ts` | Canal de órdenes entre UI y persistencia |
-| `src/ui/app.ts` | Presentación y eventos de usuario; no entrega recompensas directamente |
-| `public/pets/` | Siete sprites SVG de 14 evoluciones |
-| `public/sw.js` | Caché de la aplicación PWA, separado de partidas privadas |
-| `tests/` | Pruebas de regresión del motor |
-| `docs/` | Diseño, decisiones, glosario y guías de mantenimiento |
+| **Índice general** | [docs/README.md](docs/README.md) |
+| Estado actual y limitaciones | [Estado](docs/01-proyecto/ESTADO_ACTUAL.md) |
+| Próximos desarrollos | [Hoja de ruta](docs/01-proyecto/HOJA_DE_RUTA.md) |
+| Mecánicas y dificultad | [Balance](docs/02-juego/JUGABILIDAD_Y_BALANCE.md) |
+| Preguntas y estaciones educativas | [Pedagogía](docs/02-juego/PEDAGOGIA_Y_ESTACIONES.md) |
+| Mascotas, escenarios y animaciones | [Arte](docs/02-juego/AVATARES_Y_ESCENARIOS.md) |
+| Arquitectura y guardado | [Arquitectura](docs/03-tecnica/ARQUITECTURA.md) |
+| Pruebas y accesibilidad | [Calidad](docs/04-calidad/PRUEBAS_Y_ACEPTACION.md) |
+| Instalación y Netlify | [Publicación](docs/05-publicacion/INSTALACION_Y_NETLIFY.md) |
+| Instrucciones para colaborar | [CONTRIBUTING.md](CONTRIBUTING.md) |
+| Continuidad con Codex/Work | [CONTINUAR_EN_CODEX_O_WORK.md](CONTINUAR_EN_CODEX_O_WORK.md) |
+| Documentos de versiones anteriores | [Archivo histórico](docs/historico/README.md) |
 
-## Documentación para quien revise el código
+## Orientación del código
 
-- **[CONTRIBUTING.md](CONTRIBUTING.md):** convención obligatoria de comentarios en español, JSDoc/TSDoc, revisión de cambios y pruebas.
-- **[docs/11_GUIA_DE_CODIGO.md](docs/11_GUIA_DE_CODIGO.md):** ruta de comandos, invariantes, campos del guardado, recuperación de PA, balances, sprites y puntos de extensión.
-- **[PROMPT_MAESTRO_ASTRA.md](PROMPT_MAESTRO_ASTRA.md):** visión de producto a largo plazo; distinguir planes futuros de funciones existentes.
+`src/core/` contiene reglas, estado, comandos y persistencia. `src/data/` define etapas, preguntas, escenarios y especies. `src/ui/` contiene la interfaz y las animaciones. `tests/` cubre el motor y las asociaciones entre actividades y estaciones. Las funcionalidades deben mantenerse desacopladas y el código debe incluir **comentarios útiles en español**.
 
-La documentación en el código explica restricciones, fórmulas y decisiones; no se agregan comentarios a cada línea trivial. **Cuando una regla cambia, su explicación y sus pruebas deben actualizarse en el mismo cambio.**
+## Licencia y contribuciones
 
-## Pendientes
-
-Pruebas end-to-end en navegador y móvil; ajustes de balance con simulación; auditoría WCAG; migración robusta de partidas antiguas; sistema avanzado de inventarios, proyectos, eventos y automatizaciones; verificación oficial de normas y áreas vigentes; validación de publicación y actualización PWA.
-
-## Licencia
-
-**Pendiente de elección expresa por la persona propietaria.** No se ha asignado licencia abierta por defecto.
-
-## Balance de salud y consecuencias (v0.5)
-
-Ver [docs/12_SISTEMA_DE_BIENESTAR.md](docs/12_SISTEMA_DE_BIENESTAR.md). Las horas se procesan solo al abrir/activar la app o durante su uso, con límite de ocho horas por visita. No hay procesos ejecutándose en segundo plano. Las tasas y umbrales son provisionales, no parámetros clínicos ni requisitos oficiales. Los guardados v2 permanecen compatibles: el campo `risk` es opcional.
-
-## Novedades v0.8 — aventuras de cinco descubrimientos
-
-Cada una de las 84 actividades incluye **cinco retos con pistas y explicaciones**.
-Una barra de progreso guarda las respuestas correctas, incluso si se recarga la
-página; acertar es gratis. Al completar los cinco, se desbloquea **Repetir** y
-la primera práctica guiada concede un bono moderado de +25 % UPE, una sola vez.
-Los cinco aciertos no conceden puntos por sí solos: para ganar UPE hay que
-confirmar una práctica y disponer de PA y bienestar suficientes.
-
-En Kínder, los retos adicionales son diferentes para cada actividad. En las
-etapas posteriores, cuatro preguntas transversales se comparten por nivel,
-además del reto original propio de cada actividad; es un primer banco que se
-ampliará progresivamente. No hay 420 preguntas distintas todavía.
-
-El entorno de la mascota muestra un paisaje por etapa —patio, aula, taller,
-vestíbulo universitario, biblioteca o laboratorio— y **seis estaciones
-interactivas**. Pulsar una estación provoca un desplazamiento de la mascota
-hasta la actividad; el movimiento es meramente visual y se puede desactivar.
-
-Consulta [la guía técnica y pedagógica v0.8](docs/16_MISIONES_Y_ESCENARIOS_V08.md).
+En el estado revisado no existe un archivo `LICENSE` en el repositorio: por ello **no se presume una licencia de código abierto**. Antes de reutilizar o distribuir el código fuera de los permisos explícitos del titular, aclarar la licencia y procedencia de los recursos. Consulta [CONTRIBUTING.md](CONTRIBUTING.md).

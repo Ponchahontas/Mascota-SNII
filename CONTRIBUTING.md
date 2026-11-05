@@ -1,104 +1,48 @@
-# Cómo colaborar en Mascota-SNII
+# Guía de contribución — Mascota-SNII
 
-Este documento es la convención de mantenimiento para personas y asistentes de programación (Codex, Work u otros). Se aplica **también a cambios generados con IA**. Idioma preferido para explicaciones, comentarios y documentación: **español**. Identificadores técnicos, nombres de API y palabras clave conservan su formato en inglés si mejora interoperabilidad.
+Esta guía rige cambios humanos o hechos con Codex/Work/IA. **Idioma preferido de documentación y comentarios: español.** Mantener identificadores técnicos y nombres de API con su grafía original.
 
-## 1. Antes de modificar una función
+## Antes de cambiar algo
 
-1. Lee [`README.md`](README.md), [`docs/11_GUIA_DE_CODIGO.md`](docs/11_GUIA_DE_CODIGO.md) y el archivo afectado.
-2. Determina si el cambio pertenece a **contenido** (`src/data`), **reglas puras** (`src/core/engine-game.ts`), **persistencia** (`src/core/persistence.ts`) o **presentación** (`src/ui`).
-3. Identifica qué invariantes deben permanecer verdaderas: no duplicar premios, no saltar etapas, no permitir actividades de edades indebidas, no perder partidas.
-4. Añade o actualiza pruebas cuando el comportamiento cambie. Para cambios *solo de comentarios*, verifica que el código siga compilando y las pruebas existentes continúen pasando.
-5. Actualiza README y documentación técnica si cambian el contrato, el balance, el almacenamiento o los requisitos para ejecutar el proyecto.
+1. Leer [README](README.md), [índice documental](docs/README.md), [estado](docs/01-proyecto/ESTADO_ACTUAL.md) y [arquitectura](docs/03-tecnica/ARQUITECTURA.md).
+2. Verificar el comportamiento **en el código actual**, no en una especificación histórica.
+3. Identificar si afecta a `src/core` (reglas), `src/data` (contenido), `src/ui` (interfaz) o `public` (PWA/assets).
+4. Revisar compatibilidad con partidas anteriores, datos persistentes y el vínculo `activity.id`.
 
-## 2. Comentarios útiles, no ruido
+## Estilo de documentación y comentarios
 
-- Escribe **qué hace** el módulo en un encabezado `/** ... */` y cuál es su límite de responsabilidad.
-- Documenta **por qué** existe una restricción, fórmula, precondición o decisión de diseño.
-- Agrega JSDoc/TSDoc a funciones públicas y funciones importantes con `@param`, `@returns` y `@throws` cuando corresponda.
-- Usa comentarios breves sobre bloques delicados: idempotencia, revisiones, fechas, recuperación de PA, migraciones, sanitización y balance.
-- Evita comentarios obvios como `// sumar uno` junto a `i++`; pueden ocultar decisiones importantes.
-- No inventes soporte normativo: distingue explícitamente **reglas de juego**, **datos provisionales** y **criterios oficiales verificados**.
-- No desactives código mediante comentarios para «arreglarlo». El comentario debe estar aislado del comportamiento ejecutable.
-- Corrige cualquier comentario obsoleto junto al cambio de implementación: los comentarios desactualizados son deuda técnica.
+- En cada módulo importante, explicar su **responsabilidad**, entradas, salidas e invariantes.
+- Preferir JSDoc/TSDoc para funciones públicas o complejas: parámetros, retorno, efectos, errores, límites y ejemplos cuando aclaren.
+- Comentar el **porqué** de fórmulas, umbrales, validación, riesgos de cambio, datos versionados y decisiones de accesibilidad. No comentar mecánicamente cada asignación evidente.
+- Señalar qué es criterio pedagógico, decisión de juego, valor provisional o requisito normativo **verificado**.
+- Si cambia una regla, actualizar comentario, tests y documento en el **mismo commit**.
+- No mezclar instrucciones para asistentes o texto de documentación dentro de los cálculos ejecutables.
 
-**Ejemplo recomendado:**
+## Invariantes fundamentales
 
-```ts
-/**
- * Calcula el costo en PA aplicando el multiplicador lúdico de la etapa.
- *
- * @param paBase Costo diseñado para la actividad antes del multiplicador.
- * @param factor Etapa actual; no procede de la normativa SNII.
- * @returns Costo entero, de al menos un punto.
- */
-function costoDeActividad(paBase: number, factor: number): number {
-  // El redondeo hacia arriba impide actividades productivas sin costo de PA.
-  return Math.max(1, Math.ceil(paBase * factor));
-}
-```
+- El motor calcula UPE/PA/CR; la interfaz no los adjudica directamente.
+- Comandos con revisión e idempotencia: un reintento no duplica recompensas.
+- Guardado IndexedDB, exportación JSON, progreso de preguntas y tiempo offline conservan compatibilidad.
+- Estación, pregunta y progreso siempre se asocian por **`activity.id`**, nunca por el título o posición.
+- Cada actividad presenta **cinco** pasos con índices estables. No alterar preguntas ya publicadas sin revisar su progreso migrado.
+- Animaciones y reacciones visuales no deciden economía ni requieren movimiento obligatorio.
+- Reglas SNII del juego son ficción, no disposiciones oficiales.
 
-Este fragmento es **un ejemplo de documentación**, no una función adicional del motor.
+## Validación obligatoria
 
-## 3. Separación de responsabilidades
-
-| Archivo / módulo | Se permite | Evitar |
-| --- | --- | --- |
-| `src/data/*` | Catálogos, valores de balance, etiquetas, descripciones de actividades y metadatos visuales | Acceso al DOM/IndexedDB o cálculos que muten el guardado |
-| `src/core/engine-game.ts` | Decidir consecuencias de comandos desde un snapshot clonado | Guardar directamente, crear notificaciones UI o llamar a la red |
-| `src/core/persistence.ts` | Validar, serializar y confirmar operaciones atómicas | Inventar recompensas, saltar revisiones o modificar reglas de progresión |
-| `src/core/game-coordinator.ts` | Crear comandos, coordinar escrituras y volver a leer guardados | Mutar directamente el estado de juego |
-| `src/ui/app.ts` | Renderizar, escapar texto, recoger interacción, mostrar resultados | Otorgar PA/CR/UPE o aplicar reglas de etapa por sí solo |
-| `public/sw.js` | Recursos estáticos de PWA y lectura offline | Guardar partidas, información privada o secretos |
-| `tests/*` | Verificar invariantes y regresiones reproducibles | Hacer depender pruebas de una cuenta externa |
-
-## 4. Reglas que requieren especial cuidado
-
-- **Actividades:** son seis por etapa en el MVP; Kínder/Primaria nunca deben impartir tutorías a terceros ni participar en publicaciones académicas. Usa la propiedad `performer:'mascota'` y la descripción contextual para aclarar el rol del jugador.
-- **Balance:** `target`, costes, multiplicadores, evidencias y UPE son **parámetros de juego**. Registrar motivos de cambios y aumentar `balanceVersion` si se modifica su interpretación.
-- **Especies:** IDs de `AREAS`, `PET_KINDS`, sprites SVG y guardados están vinculados. No renombrarlos sin estrategia de compatibilidad.
-- **Tiempo:** `apRegenRemainder` conserva fracciones de recuperación; `time.processOffline` tiene tope de ocho horas por procesamiento.
-- **Persistencia:** nunca separar las dos escrituras de `commitCommand()` en transacciones independientes. Una solicitud repetida debe devolver `replayed` sin volver a recompensar.
-- **Seguridad:** cualquier texto interpolado en HTML debe pasar por `esc()`; archivos importados se validan antes de reemplazar el guardado.
-- **Versionado:** una evolución incompatible del esquema necesita migración explícita. No subir `schemaVersion` sin prueba de migración.
-
-## 5. Verificación mínima
-
-```bash
+~~~bash
 npm install
 npm run typecheck
 npm test
-npm run dev
-```
+npm run build
+~~~
 
-`npm test` compila y ejecuta pruebas del motor. **No sustituye** pruebas de interfaz, IndexedDB, instalación PWA ni verificación del despliegue real en Netlify. Señala claramente cuáles de estas comprobaciones sí se ejecutaron.
+Para cambios de UI, añadir **prueba manual** en móvil y escritorio, teclado, preferencia de movimiento reducido, persistencia tras recarga y funcionamiento offline. Documentar explícitamente si la prueba manual no se pudo completar.
 
-## 6. Describir cada cambio
+## Pull requests y documentación
 
-En pull requests o commits, registra: *problema*, *solución*, *impacto en partidas existentes*, *pruebas ejecutadas* y *pendientes*. Prefiere mensajes como `docs: documenta invariantes e idempotencia del motor` o `feat: actividades propias para etapa secundaria`.
+Explicar: problema, modificación, invariantes afectadas, nuevas pruebas, compatibilidad, capturas si hay interfaz y pendientes. Actualizar [CHANGELOG](CHANGELOG.md) cuando cambien funcionalidades; [Estado actual](docs/01-proyecto/ESTADO_ACTUAL.md) y [Hoja de ruta](docs/01-proyecto/HOJA_DE_RUTA.md) cuando cambie el alcance.
 
-**Licencia:** el código permanece sin licencia abierta definida hasta que la persona propietaria del proyecto elija una. No añadir licencias ni dependencias de pago sin autorización.
+Guías temáticas: [pedagogía y estaciones](docs/02-juego/PEDAGOGIA_Y_ESTACIONES.md), [persistencia](docs/03-tecnica/PERSISTENCIA_Y_COMANDOS.md), [pruebas](docs/04-calidad/PRUEBAS_Y_ACEPTACION.md).
 
-## Añadir preguntas educativas (desde v0.8)
-
-- Escribir contenidos con una respuesta inequívoca y explicaciones útiles.
-- Mantener formato, `stepIndex` y `activityId` estables si ya hay partidas
-  guardadas: una migración debe acompañar todo cambio de orden de preguntas.
-- Cada aventura tiene 5 posiciones; completar una no otorga automáticamente
-  créditos ni UPE, y ningún error debe penalizar recursos.
-- Las cuatro preguntas transversales de las etapas 1–13 se encuentran en
-  `src/data/learning-sequences.ts`. Documentar si se amplían a preguntas
-  específicas antes de reemplazar contenido publicado.
-- Probar `npm run typecheck` y `npm test` después de cambiar las preguntas,
-  acciones, recompensas, IndexedDB, el caché o las seis estaciones.
-- En comentarios explicar siempre **por qué** una decisión pedagógica o de
-  balance es necesaria, no describir obviedades de TypeScript.
-
-
-## v0.9: relación entre estación y actividad educativa
-
-No utilizar `index` como identificador de juego. El índice es solo una
-posición visual; la relación se resuelve mediante `activity.id` (ver
-`scene-world.ts`). Para extender el catálogo, cada nueva actividad necesita
-cinco desafíos con el mismo ID: el primer desafío en `learning-path.ts` y cuatro
-momentos en `activity-extras.ts` o el banco específico de Kínder. Mantener
-comentarios en español y pruebas de correspondencia: `npm test`.
+**Antes de aportar recursos externos**, verificar permisos/licencias. No se presupone licencia general de reutilización para este repositorio.

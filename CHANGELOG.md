@@ -1,5 +1,12 @@
 # Historial de cambios · Mascota-SNII
 
+## Documentación · 4 de noviembre de 2026 (sin cambios al motor)
+
+- Se organiza la documentación vigente en proyecto, juego, técnica, calidad, publicación y normativa.
+- Se preservan 18 documentos previos en `docs/historico/` y se mantienen enlaces de compatibilidad en sus rutas originales.
+- Se actualizan README, CONTRIBUTING e instrucciones para Codex/Work según el MVP v0.9.
+- Se distingue contenido implementado, pruebas automatizadas y validación visual/educativa pendiente.
+- Sin cambio de versión de juego ni de reglas: `package.json` permanece en v0.9.
 ## v0.9.0 — Una estación, una actividad y sus cinco preguntas
 
 - Identidad visible de la estación elegida: icono, nombre, etapa, posición 1–6.

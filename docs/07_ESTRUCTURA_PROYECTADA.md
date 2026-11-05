@@ -1,62 +1,8 @@
-# Estructura proyectada del proyecto
+# Documento histórico reubicado
 
-```text
-tamagotchi-academico/
-├── README.md
-├── PROMPT_MAESTRO_ASTRA.md
-├── package.json
-├── tsconfig.json
-├── vite.config.ts
-├── netlify.toml
-├── index.html
-├── public/
-│   ├── manifest.webmanifest
-│   ├── icons/
-│   └── sprites/
-├── src/
-│   ├── main.ts
-│   ├── app/
-│   │   ├── app-shell.ts
-│   │   └── game-coordinator.ts
-│   ├── core/
-│   │   ├── commands.ts
-│   │   ├── result.ts
-│   │   ├── errors.ts
-│   │   ├── state.ts
-│   │   ├── engine-needs.ts
-│   │   ├── engine-actions.ts
-│   │   ├── engine-projects.ts
-│   │   ├── engine-progression.ts
-│   │   ├── engine-economy.ts
-│   │   ├── engine-combos.ts
-│   │   ├── engine-automation.ts
-│   │   ├── engine-time.ts
-│   │   └── engine-events.ts
-│   ├── data/
-│   │   ├── stages.ts
-│   │   ├── activities.ts
-│   │   ├── events.ts
-│   │   └── normative.ts
-│   ├── persistence/
-│   │   ├── indexed-db.ts
-│   │   ├── migrations.ts
-│   │   └── export-import.ts
-│   ├── pwa/
-│   │   └── service-worker.ts
-│   ├── ui/
-│   │   ├── dashboard.ts
-│   │   ├── activities.ts
-│   │   ├── career.ts
-│   │   ├── dossier.ts
-│   │   ├── events.ts
-│   │   └── legacy.ts
-│   └── styles/
-│       └── main.css
-├── tests/
-│   ├── unit/
-│   ├── integration/
-│   └── e2e/
-└── docs/
-```
+Este documento pertenece a una iteración anterior de Mascota-SNII y **no describe necesariamente el estado vigente**.
 
-La estructura es una propuesta. El equipo puede ajustar nombres o dividir archivos si mantiene los contratos, las responsabilidades y la cobertura de pruebas.
+- [Consultar el documento original archivado](historico/07_ESTRUCTURA_PROYECTADA.md)
+- [Ir al índice de la documentación actual](README.md)
+
+La ubicación anterior se conserva como enlace de compatibilidad. Para nuevas implementaciones, consultar primero `docs/README.md`.

@@ -1,5 +1,8 @@
 # PROMPT MAESTRO PARA ASTRA — TAMAGOTCHI ACADÉMICO
 
+> **Nota de mantenimiento · 4 de noviembre de 2026:** este prompt contiene objetivos ambiciosos y decisiones que evolucionaron. Antes de ejecutarlo, leer [el índice vigente](docs/README.md), [estado actual v0.9](docs/01-proyecto/ESTADO_ACTUAL.md), [pedagogía y estaciones](docs/02-juego/PEDAGOGIA_Y_ESTACIONES.md) y [continuidad en Codex/Work](CONTINUAR_EN_CODEX_O_WORK.md). **No reconstruir el MVP ni confundir contratos propuestos con módulos ya implementados.** Las referencias antiguas a `docs/00_...`–`docs/17_...` apuntan a páginas de compatibilidad y material archivado.
+
+
 Actúa como un equipo senior multidisciplinario encargado de convertir la especificación incluida en este repositorio en un videojuego web completo, estable, documentado, probado, instalable como PWA y desplegado en GitHub y Netlify.
 
 ## 1. Roles que debes asumir
