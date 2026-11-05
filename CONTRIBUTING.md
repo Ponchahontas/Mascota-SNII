@@ -77,3 +77,18 @@ npm run dev
 En pull requests o commits, registra: *problema*, *solución*, *impacto en partidas existentes*, *pruebas ejecutadas* y *pendientes*. Prefiere mensajes como `docs: documenta invariantes e idempotencia del motor` o `feat: actividades propias para etapa secundaria`.
 
 **Licencia:** el código permanece sin licencia abierta definida hasta que la persona propietaria del proyecto elija una. No añadir licencias ni dependencias de pago sin autorización.
+
+## Añadir preguntas educativas (desde v0.8)
+
+- Escribir contenidos con una respuesta inequívoca y explicaciones útiles.
+- Mantener formato, `stepIndex` y `activityId` estables si ya hay partidas
+  guardadas: una migración debe acompañar todo cambio de orden de preguntas.
+- Cada aventura tiene 5 posiciones; completar una no otorga automáticamente
+  créditos ni UPE, y ningún error debe penalizar recursos.
+- Las cuatro preguntas transversales de las etapas 1–13 se encuentran en
+  `src/data/learning-sequences.ts`. Documentar si se amplían a preguntas
+  específicas antes de reemplazar contenido publicado.
+- Probar `npm run typecheck` y `npm test` después de cambiar las preguntas,
+  acciones, recompensas, IndexedDB, el caché o las seis estaciones.
+- En comentarios explicar siempre **por qué** una decisión pedagógica o de
+  balance es necesaria, no describir obviedades de TypeScript.

@@ -32,3 +32,15 @@ Actúa como equipo de programación, diseño pixel art, UX, QA, accesibilidad, i
 
 ## Entregables
 Producto jugable y probado, build verificable, ZIP de fuente y ZIP listo para hospedaje estático, documentación y —si el usuario autoriza/publica— enlaces remotos comprobados.
+
+### Estado de la iteración v0.8
+
+- Banco pedagógico de cinco preguntas por cada una de las 84 actividades.
+- Aciertos guardados en IndexedDB mediante `learning.answer`; 5/5 desbloquea
+  repetir y permite reclamar una primera práctica guiada con +25 % UPE.
+- Seis estaciones clicables y escenario temático para cada una de 14 etapas,
+  con desplazamiento CSS y movimiento reducido.
+- Mejoras futuras: sustituir bancos transversales repetidos por ejercicios
+  específicos en primaria a Emérito; incorporar minijuegos manipulativos; probar
+  visualmente en dispositivos reales y verificar equilibrio con partidas largas.
+- Leer `docs/16_MISIONES_Y_ESCENARIOS_V08.md` antes de reordenar preguntas.

@@ -81,3 +81,24 @@ Pruebas end-to-end en navegador y móvil; ajustes de balance con simulación; au
 ## Balance de salud y consecuencias (v0.5)
 
 Ver [docs/12_SISTEMA_DE_BIENESTAR.md](docs/12_SISTEMA_DE_BIENESTAR.md). Las horas se procesan solo al abrir/activar la app o durante su uso, con límite de ocho horas por visita. No hay procesos ejecutándose en segundo plano. Las tasas y umbrales son provisionales, no parámetros clínicos ni requisitos oficiales. Los guardados v2 permanecen compatibles: el campo `risk` es opcional.
+
+## Novedades v0.8 — aventuras de cinco descubrimientos
+
+Cada una de las 84 actividades incluye **cinco retos con pistas y explicaciones**.
+Una barra de progreso guarda las respuestas correctas, incluso si se recarga la
+página; acertar es gratis. Al completar los cinco, se desbloquea **Repetir** y
+la primera práctica guiada concede un bono moderado de +25 % UPE, una sola vez.
+Los cinco aciertos no conceden puntos por sí solos: para ganar UPE hay que
+confirmar una práctica y disponer de PA y bienestar suficientes.
+
+En Kínder, los retos adicionales son diferentes para cada actividad. En las
+etapas posteriores, cuatro preguntas transversales se comparten por nivel,
+además del reto original propio de cada actividad; es un primer banco que se
+ampliará progresivamente. No hay 420 preguntas distintas todavía.
+
+El entorno de la mascota muestra un paisaje por etapa —patio, aula, taller,
+vestíbulo universitario, biblioteca o laboratorio— y **seis estaciones
+interactivas**. Pulsar una estación provoca un desplazamiento de la mascota
+hasta la actividad; el movimiento es meramente visual y se puede desactivar.
+
+Consulta [la guía técnica y pedagógica v0.8](docs/16_MISIONES_Y_ESCENARIOS_V08.md).

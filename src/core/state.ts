@@ -27,5 +27,9 @@ export interface GameSave {
  projectProgress:number; projectName:string; actions:number; lastActivity:string; streak:number;
  automation:boolean; event:GameEvent|null; eventCursor:number; achievements:string[];
  history:string[]; records:{generation:number;score:number;maxStage:number;name:string;outcome?:'legado'|'desercion'}[];
+ /** Respuestas correctas por aventura, índices 0..4. Opcional para partidas previas a v0.8. */
+ learningProgress?: Record<string,number[]>;
+ /** IDs de actividades con primera práctica premiada, evita duplicar bono. */
+ learningRewarded?: string[];
  careTimes:Record<string,number>;
 }

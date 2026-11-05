@@ -1,9 +1,9 @@
 {
   "name": "tamagotchi-academico",
-  "version": "0.7.0",
+  "version": "0.8.0",
   "private": true,
   "type": "module",
-  "description": "Juego local-first satírico de trayectoria académica mexicana (MVP educativo con 84 retos interactivos, cuidado, riesgo académico, etapas y especies)",
+  "description": "Mascota-SNII: aventuras educativas de cinco preguntas por actividad, progreso guardado y escenarios animados",
   "scripts": {
     "dev": "npm run build && node scripts/serve.mjs",
     "build": "node scripts/build.mjs",
@@ -14,5 +14,7 @@
   "devDependencies": {
     "typescript": "^5.8.0"
   },
-  "engines": { "node": ">=20" }
+  "engines": {
+    "node": ">=20"
+  }
 }

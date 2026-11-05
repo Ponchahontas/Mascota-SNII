@@ -64,6 +64,15 @@ export function validateSave(x:unknown):x is GameSave {
  if(!Array.isArray(v.history)||v.history.length>50||!v.history.every(h=>typeof h==='string'&&h.length<512))return false;
  if(!Array.isArray(v.achievements)||v.achievements.length>150||!v.achievements.every(a=>typeof a==='string'&&a.length<100))return false;
  if(!Array.isArray(v.records)||v.records.length>50||!v.records.every(r=>r&&Number.isInteger(r.generation)&&Number.isFinite(r.score)&&Number.isInteger(r.maxStage)&&r.maxStage>=0&&r.maxStage<14&&typeof r.name==='string'&&(r.outcome===undefined||r.outcome==='legado'||r.outcome==='desercion')))return false;
+ // Compatibilidad v0.7: los dos campos son opcionales. Validar la forma si
+ // aparecen en JSON importados para bloquear índices o IDs ajenos al catálogo.
+ if(v.learningProgress!==undefined){
+  if(!v.learningProgress||typeof v.learningProgress!=='object'||Array.isArray(v.learningProgress)||Object.keys(v.learningProgress).length>84)return false;
+  for(const [key,steps] of Object.entries(v.learningProgress)){
+   if(!/^etapa(?:[0-9]|1[0-3])-[a-z0-9_]+$/.test(key)||!Array.isArray(steps)||steps.length>5||steps.some(i=>!Number.isInteger(i)||i<0||i>4)||new Set(steps).size!==steps.length||steps.some((i,n)=>i!==n))return false;
+  }
+ }
+ if(v.learningRewarded!==undefined&&(!Array.isArray(v.learningRewarded)||v.learningRewarded.length>84||new Set(v.learningRewarded).size!==v.learningRewarded.length||v.learningRewarded.some(key=>typeof key!=='string'||!/^etapa(?:[0-9]|1[0-3])-[a-z0-9_]+$/.test(key))))return false;
  if(!v.careTimes||typeof v.careTimes!=='object'||Object.values(v.careTimes).some(t=>typeof t!=='number'||!Number.isFinite(t)))return false;
  if(v.event!==null){
   const e=v.event;if(!e||typeof e.id!=='string'||typeof e.title!=='string'||typeof e.body!=='string'||!Array.isArray(e.options)||e.options.length>5)return false;

@@ -8,9 +8,11 @@
  */
 import { STAGES, CARE, AREAS, activitiesForStage, STAGE_GUIDES } from '../data/catalog.js';
 import { PET_KINDS, petArea, petSprite, spriteFrame } from '../data/pet-visuals.js';
-import { LEARNING_STAGES, challengeForActivity } from '../data/learning-path.js';
+import { LEARNING_STAGES } from '../data/learning-path.js';
+import { STEP_COUNT, learningSequence, masteredSteps } from '../data/learning-sequences.js';
+import type { LearningStep } from '../data/learning-sequences.js';
+import { sceneForStage, stationIndex } from '../data/scene-world.js';
 import type { GameSave } from '../core/state.js';
-import type { LearningChallenge } from '../data/learning-path.js';
 import { newGame, STAGE_GATE } from '../core/engine-game.js';
 import { DIFFICULTIES, difficultyOf, riskOf, vitalAlerts, criticalCount, studyBlocker, performanceFactor } from '../core/engine-health.js';
 import { issueCommand } from '../core/game-coordinator.js';
@@ -28,8 +30,20 @@ let save:GameSave|null=null,tab='actividades',notice='',noticeError=false,busy=f
  */
 let guidedActivityId:string|null=null;
 let guidedAnswer:number|null=null;
+/** Paso mostrado; los pasos respondidos viven en IndexedDB, no aquí. */
+let guidedStepIndex=0;
+/** La mascota viaja visualmente al lugar de la actividad elegida. */
+let sceneDestination:string|null=null,sceneWalkPending=false;
 /** Preferencia visual independiente de la economía y del estado guardado. */
-function dismissGuidedActivity():void {guidedActivityId=null;guidedAnswer=null;}
+function dismissGuidedActivity():void {guidedActivityId=null;guidedAnswer=null;sceneDestination=null;sceneWalkPending=false;}
+/** El progreso previo sobrevive a cerrar panel, recargar o regresar del cuidado. */
+function openLearningActivity(activityId:string):void {
+ if(!activitiesForStage(player().stageIndex).some(a=>a.id===activityId)||learningSequence(activityId).length!==STEP_COUNT)return;
+ guidedActivityId=activityId;guidedAnswer=null;
+ guidedStepIndex=masteredSteps(player().learningProgress,activityId);
+ sceneWalkPending=sceneDestination!==activityId;
+ sceneDestination=activityId;tab='actividades';render();focusGuidedActivity();
+}
 function focusGuidedActivity():void {root?.querySelector<HTMLElement>('#guided-learning')?.focus();}
 
 /** Preferencia pequeña del dispositivo, separada de los guardados académicos. */
@@ -106,7 +120,7 @@ function avatar(){
 }
 /** Formulario de creación; cada área elige una especie pero ninguna ventaja de balance. */
 function creation(){
- return `<div class="startup"><div class="startup-art">🎓 <span>✦</span> 🔬</div><div class="startup-card"><div class="eyebrow">★ LABORATORIO DE LO IMPROBABLE · EDICIÓN EDUCATIVA 0.7</div>
+ return `<div class="startup"><div class="startup-art">🎓 <span>✦</span> 🔬</div><div class="startup-card"><div class="eyebrow">★ LABORATORIO DE LO IMPROBABLE · EDICIÓN EDUCATIVA 0.8</div>
  <h1>Tu carrera científica<br><em>empieza en Kínder.</em></h1><p>Elige la especie de tu futura investigadora o investigador. Cada área tiene una mascota diferente y 14 apariencias que evolucionan con sus aprendizajes.</p>
  <form id="create-form"><label for="pet-name">Nombre de la mascota</label><input id="pet-name" name="petName" maxlength="28" minlength="1" required value="Curiosín" autocomplete="off" />
  <fieldset class="area-fieldset"><legend>Elige un área y una especie</legend><div class="area-gallery">${AREAS.map(([id,label,icon])=>{
@@ -123,18 +137,27 @@ function creation(){
  * Todas las opciones están redactadas a mano para la actividad correspondiente:
  * ninguna pregunta depende de la dificultad ni calcula recompensas.
  */
-function guidedLearningPanel(challenge:LearningChallenge,activityId:string,cost:number,unavailable:boolean){
- const s=player(),answer=guidedAnswer,answered=answer!==null,solved=answered&&answer===challenge.correct;
- return `<section id="guided-learning" class="guided-learning" tabindex="-1" aria-label="Reto de aprendizaje guiado">
-  <div class="guided-top"><span class="mission-label">🎲 AVENTURA DE APRENDIZAJE · SIN PENALIZACIÓN POR EQUIVOCARSE</span><button class="guided-close" data-action="learn-close" aria-label="Cerrar el reto">✕ Cerrar</button></div>
-  <div class="guided-story"><span aria-hidden="true">${esc(stage().emblem)}</span><div><strong>${esc(s.pet.name)} te cuenta:</strong><p>«${esc(challenge.scene)}»</p></div></div>
-  <h3>${esc(challenge.question)}</h3>
-  <p class="guided-instruction">Elige una idea para explorarla juntos. Puedes intentar todas las veces que quieras.</p>
-  <div class="guided-options" role="group" aria-label="Respuestas al reto">${challenge.options.map((option,index)=>`<button class="guided-option ${answered&&index===answer?(solved?'is-correct':'is-incorrect'):''}" data-action="learn-answer" data-id="${index}" ${solved||busy?'disabled':''} aria-pressed="${answered&&index===answer}"><span>${index===0?'A':index===1?'B':'C'}</span>${esc(option)}</button>`).join('')}</div>
-  ${answered?`<div class="guided-feedback ${solved?'success':'try-again'}" role="status" aria-live="polite"><strong>${solved?'✨ ¡Eso es, aprendimos algo nuevo!':'🌱 ¡Buena exploración! Vamos a pensar otra vez.'}</strong><p>${esc(solved?challenge.explanation:challenge.hint)}</p></div>`:''}
-  ${solved?`<div class="guided-next"><p>Ahora ${esc(s.pet.name)} puede ponerlo en práctica. El aprendizaje guiado es gratis: <strong>solo al confirmar</strong> se gastan ${cost} PA y se aplica el progreso de la actividad.</p><button class="game-btn primary guided-practice" data-action="guided-execute" data-id="${esc(activityId)}" ${unavailable?'disabled':''}>${unavailable?'⏸ Necesita recuperarse antes de practicar':'⭐ ¡Vamos a practicar y sumar UPE!'}</button>${unavailable?'<p class="guided-rest-note">Puedes cerrar este reto, darle cuidados y volver cuando tenga recursos suficientes. No perdiste puntos por aprender.</p>':''}</div>`:''}
+function guidedLearningPanel(sequence:readonly LearningStep[],activityId:string,cost:number,unavailable:boolean){
+ const s=player(),learned=masteredSteps(s.learningProgress,activityId),mastered=learned===STEP_COUNT;
+ const step=sequence[Math.min(guidedStepIndex,STEP_COUNT-1)];
+ const submitted=guidedAnswer!==null,correct=submitted&&guidedAnswer===step.correct&&!!s.learningProgress?.[activityId]?.includes(step.stepIndex);
+ const recorded=!!s.learningProgress?.[activityId]?.includes(step.stepIndex);
+ const readyForNext=recorded&&learned<STEP_COUNT;
+ const firstReward=!(s.learningRewarded??[]).includes(activityId);
+ return `<section id="guided-learning" class="guided-learning" tabindex="-1" aria-label="Aventura educativa de cinco pasos">
+ <div class="guided-top"><span class="mission-label">🎲 EXPEDICIÓN EDUCATIVA · ${learned}/${STEP_COUNT} DESCUBRIMIENTOS</span><button class="guided-close" data-action="learn-close" aria-label="Cerrar aventura">✕ Cerrar</button></div>
+ <div class="learning-steps" aria-label="Respuestas acertadas">${sequence.map((_,i)=>`<span class="learning-step ${s.learningProgress?.[activityId]?.includes(i)?'done':i===guidedStepIndex?'current':''}" aria-label="Paso ${i+1}: ${s.learningProgress?.[activityId]?.includes(i)?'resuelto':'pendiente'}">${s.learningProgress?.[activityId]?.includes(i)?'✓':i+1}</span>`).join('')}</div>
+ <div class="learning-step-track" role="progressbar" aria-label="Progreso de aventura" aria-valuemin="0" aria-valuemax="5" aria-valuenow="${learned}"><i style="width:${percent(learned,STEP_COUNT)}%"></i></div>
+ ${mastered?`<div class="mastery-celebration" role="status"><strong>🏅 ¡Aventura completada!</strong><p>¡Cinco descubrimientos! Ya puedes repetir esta actividad cuando lo desees, o explorar otra estación. ${firstReward?'La primera práctica guiada ofrece +25 % de UPE.':''}</p></div>`:`<div class="guided-story"><span aria-hidden="true">${esc(stage().emblem)}</span><div><strong>Descubrimiento ${step.stepIndex+1} de ${STEP_COUNT} · ${esc(s.pet.name)} pregunta:</strong><p>«${esc(step.scene)}»</p></div></div>
+ <h3>${esc(step.question)}</h3>
+ <p class="guided-instruction">Busca una solución con tu mascota. Las respuestas incorrectas no gastan PA y puedes probar otra vez.</p>
+ <div class="guided-options" role="group" aria-label="Opciones del desafío">${step.options.map((option,index)=>`<button class="guided-option ${submitted&&index===guidedAnswer?(correct?'is-correct':'is-incorrect'):''}" data-action="learn-answer" data-id="${index}" ${busy||recorded?'disabled':''} aria-pressed="${submitted&&index===guidedAnswer}"><span>${index===0?'A':index===1?'B':'C'}</span>${esc(option)}</button>`).join('')}</div>
+ ${submitted?`<div class="guided-feedback ${correct?'success':'try-again'}" role="status" aria-live="polite"><strong>${correct?'✨ ¡Lo has descubierto!':'🌱 Buena exploración; prueba otra idea.'}</strong><p>${esc(correct?step.explanation:step.hint)}</p></div>`:''}
+ ${readyForNext?`<button class="game-btn primary guided-next-step" data-action="learn-next">➡️ Siguiente descubrimiento (${learned+1}/${STEP_COUNT})</button>`:''}`}
+ ${mastered?`<div class="guided-next"><p>Ya están guardados tus cinco aciertos. <strong>Solo al practicar</strong> se cobran ${cost} PA y se otorgan UPE. ${firstReward?'La primera práctica concede un bono moderado; las siguientes se ajustan al rendimiento y a las repeticiones.':''}</p><button class="game-btn primary guided-practice" data-action="guided-execute" data-id="${esc(activityId)}" ${unavailable?'disabled':''}>${unavailable?'⏸ Necesita recuperarse para practicar':'⭐ ¡Practicar lo aprendido!'}</button>${unavailable?'<p class="guided-rest-note">Puedes descansar, cuidar a tu mascota y volver. No perderás tus cinco aciertos.</p>':''}</div>`:''}
  </section>`;
 }
+
 /**
  * Guía narrativa de etapa: explica el propósito de la educación, vincula un
  * ejemplo con la vida cotidiana y diferencia apoyo de la persona jugadora.
@@ -142,9 +165,11 @@ function guidedLearningPanel(challenge:LearningChallenge,activityId:string,cost:
 function activityPanel(){
  const s=player(),list=activitiesForStage(s.stageIndex),chapter=LEARNING_STAGES[s.stageIndex];
  const chosen=guidedActivityId?list.find(a=>a.id===guidedActivityId):undefined;
- const challenge=chosen?challengeForActivity(chosen.id):undefined;
+ const sequence=chosen?learningSequence(chosen.id):[];
  const guidedCost=chosen?Math.max(1,Math.ceil(chosen.pa*stage().cost*(s.pet.needs.wellbeing<=25?1.2:1))):0;
  const guidedUnavailable=busy||!!s.event||!!studyBlocker(s.pet.needs)||s.ap<guidedCost||!!chosen&&s.credits+chosen.credits<0;
+ const chapterSolved=list.reduce((sum,activity)=>sum+masteredSteps(s.learningProgress,activity.id),0);
+ const badges=list.filter(activity=>masteredSteps(s.learningProgress,activity.id)===STEP_COUNT).length;
  return `<div class="panel-heading"><div><span class="eyebrow">📖 CAPÍTULO ${s.stageIndex+1} DE 14 · ${esc(stage().label.toUpperCase())}</span><h2>${esc(chapter.chapter)}</h2><p>¡Tu mascota aprende contigo! Tú decides cómo acompañarla; ella descubre, practica y crece.</p></div><span class="tiny-pill">${list.length} aventuras</span></div>
   <section class="learning-intro" aria-label="¿Qué se aprende en esta etapa?">
    <div class="learning-banner"><span class="learning-spark" aria-hidden="true">✦</span><div><strong>${esc(chapter.hook)}</strong><p>«¡Hola! Soy ${esc(s.pet.name)}. ¿Me ayudas a descubrir algo hoy?»</p></div></div>
@@ -152,14 +177,15 @@ function activityPanel(){
    <div class="learning-reality"><strong>🔎 ¿Dónde lo vemos en la vida real?</strong><p>${esc(chapter.realWorld)}</p></div>
    <p class="learning-motto">💡 ${esc(chapter.closing)}</p>
   </section>
-  <div class="learning-heading"><div><h3>🗺️ Elige una aventura</h3><p>Juega un mini reto con pistas y explicación, o repite una actividad rápidamente para avanzar.</p></div><span class="learning-no-cost">🎲 Descubrir es gratis</span></div>
-  ${challenge&&chosen?guidedLearningPanel(challenge,chosen.id,guidedCost,guidedUnavailable):''}
+  <section class="chapter-collection" aria-label="Colección de descubrimientos de la etapa"><div><strong>📔 Álbum de descubrimientos</strong><span>🏅 ${badges}/6 aventuras dominadas · ${chapterSolved}/30 aciertos</span></div><div class="learning-step-track" role="progressbar" aria-label="Colección de etapa" aria-valuemin="0" aria-valuemax="30" aria-valuenow="${chapterSolved}"><i style="width:${percent(chapterSolved,30)}%"></i></div><p>${chapterSolved===30?'✨ ¡Completaste las seis aventuras de la etapa! Puedes seguir practicando o avanzar cuando cumplas los requisitos de carrera.':'Avanza a tu ritmo: puedes probar distintas aventuras y continuar después sin perder tus aciertos.'}</p></section>
+  <div class="learning-heading"><div><h3>🗺️ Elige una aventura</h3><p>Cada actividad incluye cinco descubrimientos; al dominarlos podrás repetir la práctica. Tus respuestas se guardan.</p></div><span class="learning-no-cost">🎲 Descubrir es gratis</span></div>
+  ${sequence.length===STEP_COUNT&&chosen?guidedLearningPanel(sequence,chosen.id,guidedCost,guidedUnavailable):''}
   ${studyBlocker(s.pet.needs)?`<div class="activity-blocked" role="alert">⛔ ${esc(studyBlocker(s.pet.needs))} Puedes explorar los retos sin gastar recursos; para practicar primero cuida a tu mascota.</div>`:''}
   <div class="activity-grid learning-activities">${list.map(a=>{
    const cost=Math.max(1,Math.ceil(a.pa*stage().cost*(s.pet.needs.wellbeing<=25?1.2:1)));
    const unavailable=busy||!!s.event||!!studyBlocker(s.pet.needs)||s.ap<cost||s.credits+a.credits<0;
-   const ready=!!challengeForActivity(a.id);
-   return `<article class="activity learning-activity" aria-label="${esc(a.label)}"><span class="action-icon" aria-hidden="true">${a.icon}</span><div class="action-body"><strong>${esc(a.label)}</strong><small>${esc(a.flavor)}</small><small>⭐ UPE base: ${a.pe} · 🪙 CR: ${a.credits>=0?'+':''}${a.credits} · ⚡ ${cost} PA</small></div><div class="learning-actions"><button class="game-btn learn-start" data-action="learn" data-id="${esc(a.id)}" ${busy||!ready?'disabled':''}>🎲 Aventura guiada</button><button class="game-btn learn-fast" data-action="activity" data-id="${esc(a.id)}" ${unavailable?'disabled':''} aria-label="Repetir ${esc(a.label)} sin reto, ${cost} PA">⚡ Repetir</button></div></article>`;
+   const ready=learningSequence(a.id).length===STEP_COUNT,learned=masteredSteps(s.learningProgress,a.id),mastered=learned===STEP_COUNT;
+   return `<article class="activity learning-activity" aria-label="${esc(a.label)}"><span class="action-icon" aria-hidden="true">${a.icon}</span><div class="action-body"><strong>${esc(a.label)}</strong><small>${esc(a.flavor)}</small><small>⭐ UPE base: ${a.pe} · 🪙 CR: ${a.credits>=0?'+':''}${a.credits} · ⚡ ${cost} PA</small><small class="activity-learning-progress">${mastered?'🏅 Dominada · Repetir disponible':`📖 ${learned}/${STEP_COUNT} preguntas acertadas`}</small></div><div class="learning-actions"><button class="game-btn learn-start" data-action="learn" data-id="${esc(a.id)}" ${busy||!ready?'disabled':''}>${mastered?'📘 Repasar aventura':`🎲 Aventura ${learned}/${STEP_COUNT}`}</button><button class="game-btn learn-fast" data-action="activity" data-id="${esc(a.id)}" ${unavailable||!mastered?'disabled':''} title="${mastered?'Practicar de nuevo gastando PA':'Desbloquea esta opción tras acertar las cinco preguntas'}" aria-label="Repetir ${esc(a.label)}, ${cost} PA">⚡ Repetir</button></div></article>`;
   }).join('')}</div><p class="muted">Las actividades de juego y los UPE son ficticios. Los mini retos enseñan ideas generales, no otorgan calificaciones reales ni representan criterios oficiales del SNII.</p>`;
 }
 /** Presenta requisitos lúdicos de transición; motor los vuelve a validar al confirmar. */
@@ -194,15 +220,32 @@ function archivePanel(){
  <div class="timeline-log"><h3>Últimos movimientos</h3>${s.history.map(h=>`<div class="log-item">${esc(h)}</div>`).join('')}</div>`;
 }
 function eventModal(){const e=player().event;if(!e)return '';return `<div class="modal-backdrop"><div class="event-modal" role="dialog" aria-modal="true" aria-labelledby="event-title"><span class="eyebrow">⚡ EVENTO IMPROBABLE</span><h2 id="event-title">${esc(e.title)}</h2><p>${esc(e.body)}</p><div class="event-choices">${e.options.map(o=>button('event',o.id,`${esc(o.label)}<small> ${o.credits} CR · ${o.pe} UPE base</small>`,busy)).join('')}</div></div></div>`}
+/**
+ * Estaciones de la etapa en el paisaje. Pulsarlas abre aprendizaje guiado.
+ * Son puntos de navegación, no comandos; elegir un lugar nunca cobra recursos.
+ */
+function sceneEnvironment():string {
+ const s=player(),world=sceneForStage(s.stageIndex),activities=activitiesForStage(s.stageIndex);
+ return `<div class="world-landscape" aria-hidden="true"><span class="world-cloud">☁️</span><span class="world-hill"></span><span class="world-landscape-item a">${esc(world.decoration[0])}</span><span class="world-landscape-item b">${esc(world.decoration[1])}</span><span class="world-landscape-item c">${esc(world.decoration[2])}</span></div>
+ <div class="world-heading"><strong>🗺️ ${esc(world.title)}</strong><span>${esc(world.ambient)}</span></div>
+ <div class="world-stations" aria-label="Lugares interactivos de aprendizaje">${activities.map((a,i)=>`<button class="world-station station-${i} ${sceneDestination===a.id?'selected':''}" data-action="scene-go" data-id="${esc(a.id)}" aria-label="Ir a ${esc(a.label)}" title="${esc(a.label)}"><span aria-hidden="true">${a.icon}</span><small>${esc(a.label)}</small></button>`).join('')}</div>`;
+}
+/** Distancias fijas para que el movimiento sea CSS, sin canvas ni física pesada. */
+function travelOffset():{x:number;y:number} {
+ if(!save||!sceneDestination)return {x:0,y:0};
+ const idx=stationIndex(save.stageIndex,sceneDestination);
+ const offsets=[[-78,-24],[78,-24],[-92,17],[92,17],[-70,50],[70,50]];
+ const [x,y]=offsets[idx]??[0,0];return {x,y};
+}
 function dashboard(){const s=player(),n=s.pet.needs,st=stage(),mood=moodForNeeds(n);
- return `<div class="app-frame ${animationsEnabled?'':'motion-paused'}"><header class="topbar"><div class="brand"><div class="brand-mark">🧪</div><div><span class="eyebrow">ESTACIÓN DE INVESTIGACIÓN 001</span><h1>Tamagotchi <em>Académico</em></h1></div></div><div class="top-right"><span class="online-dot"></span><span class="save-label">Guardado local</span><span class="version-tag">MVP 0.7</span></div></header>
+ return `<div class="app-frame ${animationsEnabled?'':'motion-paused'}"><header class="topbar"><div class="brand"><div class="brand-mark">🧪</div><div><span class="eyebrow">ESTACIÓN DE INVESTIGACIÓN 001</span><h1>Tamagotchi <em>Académico</em></h1></div></div><div class="top-right"><span class="online-dot"></span><span class="save-label">Guardado local</span><span class="version-tag">MVP 0.8</span></div></header>
  <div class="notice-banner">UN JUEGO SATÍRICO · Los puntajes y criterios son <strong>ficticios</strong>; no evalúan oficialmente el SNII.</div>
  <div class="workspace"><aside class="left-sidebar"><div class="panel sidebar-top"><div class="panel-title">ESTADO VITAL <span>✦</span></div>
  ${vitalMeter('energy','⚡ Energía','yellow')}${vitalMeter('motivation','💖 Motivación','pink')}${vitalMeter('concentration','🎯 Concentración','purple')}${vitalMeter('wellbeing','🌿 Bienestar','mint')}${vitalMeter('stress','🌡️ Estrés','red')}
  ${healthPanel()}<details class="other-needs"><summary>Otras capacidades ▾</summary>${meter('🔎 Curiosidad',n.curiosity,'purple')}${meter('🧠 Competencia',n.competence,'mint')}${meter('🤝 Socialización',n.socialization,'pink')}${meter('⚖️ Integridad',n.scientificIntegrity,'yellow')}</details></div>
  <div class="panel care-panel"><div class="panel-title">CUIDAR A ${esc(s.pet.name).toUpperCase()}</div><p class="mini-description">El cuidado no consume PA.</p><div class="care-grid">${CARE.map(c=>button('care',c.id,`${c.icon} <span>${esc(c.label)}</span>`,busy,'care-btn')).join('')}</div></div>
  <div class="panel automation-panel"><div class="panel-title">ASISTENTE ACADÉMICO <span>🤖</span></div><p>${s.stageIndex<4?'Disponible a partir de Universidad.':s.automation?'Apoya proyectos durante ausencias. Consume créditos de mantenimiento.':'Actívalo por 35 CR; su producción está limitada.'}</p>${s.stageIndex>=4?button(s.automation?'auto-off':'auto-on','',s.automation?'Desactivar asistente':'Activar asistente (35 CR)',busy):''}</div></aside>
- <main class="center"><div class="pet-scene mood-${mood.mood} ${studyBlocker(n)?'scene-crisis':vitalAlerts(n).length?'scene-warning':'scene-good'}"><div class="scene-top"><span class="scene-label">✧ ${esc(PET_KINDS[petArea(s.areaId)].name).toUpperCase()}</span><span class="scene-tools"><button class="motion-toggle" data-action="motion" aria-pressed="${animationsEnabled}" title="El sistema también respeta la preferencia de movimiento reducido del dispositivo">${animationsEnabled?'⏸ Pausar movimiento':'▶ Activar movimiento'}</button><span class="scene-time">GENERACIÓN ${s.generation}</span></span></div><div class="scene-decor decor-a">✦</div><div class="scene-decor decor-b">＋</div><div class="scene-decor decor-c">✧</div>${avatar()}
+ <main class="center"><div class="pet-scene world-${esc(sceneForStage(s.stageIndex).landscape)} mood-${mood.mood} ${studyBlocker(n)?'scene-crisis':vitalAlerts(n).length?'scene-warning':'scene-good'}"><div class="scene-top"><span class="scene-label">✧ ${esc(PET_KINDS[petArea(s.areaId)].name).toUpperCase()}</span><span class="scene-tools"><button class="motion-toggle" data-action="motion" aria-pressed="${animationsEnabled}" title="El sistema también respeta la preferencia de movimiento reducido del dispositivo">${animationsEnabled?'⏸ Pausar movimiento':'▶ Activar movimiento'}</button><span class="scene-time">GENERACIÓN ${s.generation}</span></span></div>${sceneEnvironment()}<div class="pet-travel ${sceneDestination&&stationIndex(s.stageIndex,sceneDestination)>=0?'at-station':''} ${sceneWalkPending?'is-walking':''}" style="--travel-x:${travelOffset().x}px;--travel-y:${travelOffset().y}px">${avatar()}</div>
  <div class="pet-caption"><span class="mood-tag">${mood.symbol} ${esc(mood.label)}</span><h2>${esc(s.pet.name)}</h2><p>${st.emblem} ${esc(st.label)} · Evolución ${s.stageIndex+1}/14</p><p class="pet-mood-hint">${esc(mood.hint)}</p><p class="pet-learning-hint">📖 ${esc(LEARNING_STAGES[s.stageIndex].hook)}</p>${mood.signals.length?`<div class="pet-vital-signals" aria-label="Necesidades que requieren atención">${mood.signals.map(signal=>`<span class="pet-signal ${signal.severe?'critical':'warning'}">${signal.icon} ${esc(signal.label)}${signal.severe?' · crítico':''}</span>`).join('')}</div>`:''}</div></div>
  <div class="resource-cards"><div class="resource-card"><span>⚡ PUNTOS DE ACCIÓN</span><strong>${fmt(s.ap)} <small>/ ${st.maxAP}</small></strong><div class="micro-track"><i style="width:${percent(s.ap,st.maxAP)}%"></i></div><small>${s.ap>=st.maxAP?'PA completos':`+1 PA en aproximadamente ${Math.ceil((1-(s.apRegenRemainder??0))*60/st.apPerHour)} min`}</small></div><div class="resource-card"><span>🪙 CRÉDITOS</span><strong>${fmt(s.credits)}</strong><small>Fondos imaginarios</small></div><div class="resource-card"><span>⭐ UPE DE ETAPA</span><strong>${fmt(s.stageXp)} <small>/ ${fmt(st.target)}</small></strong><div class="micro-track violet"><i style="width:${percent(s.stageXp,st.target)}%"></i></div></div></div>
  <div class="panel stage-progress"><div class="progress-header"><div><span class="eyebrow">PROGRESO DE CARRERA</span><h3>${esc(st.label)} ${s.stageIndex<13?'→ '+esc(STAGES[s.stageIndex+1].short):'· Modo continuo'}</h3></div><span>${fmt(percent(s.stageXp,st.target))}%</span></div><div class="progress-track"><i style="width:${percent(s.stageXp,st.target)}%"></i></div><p>📄 Evidencias: ${s.evidence}/${STAGE_GATE(s.stageIndex)} · 🎯 Competencia: ${fmt(n.competence)}/50 · 🔁 Racha: ${s.streak+1} · ⚙️ Rendimiento vital: ${Math.round(performanceFactor(n)*100)} %</p></div>
@@ -211,7 +254,7 @@ function dashboard(){const s=player(),n=s.pet.needs,st=stage(),mood=moodForNeeds
  <footer class="footer"><span>© 2026 · Experimento lúdico sin afiliación institucional</span><span>🔒 Tu partida vive en este navegador · Hecho con curiosidad</span></footer></div>${eventModal()}`;
 }
 /** Vuelve a pintar pantalla desde snapshot ya cargado; no escribe en IndexedDB. */
-function render(){if(!root)return;root.innerHTML=(save?(riskOf(save).dropoutAt?dropoutScreen():dashboard()):creation())+(notice?`<div class="toast ${noticeError?'error':''}" role="status">${esc(notice)} <button data-action="dismiss" aria-label="Cerrar aviso">×</button></div>`:'');}
+function render(){if(!root)return;root.innerHTML=(save?(riskOf(save).dropoutAt?dropoutScreen():dashboard()):creation())+(notice?`<div class="toast ${noticeError?'error':''}" role="status">${esc(notice)} <button data-action="dismiss" aria-label="Cerrar aviso">×</button></div>`:'');sceneWalkPending=false;}
 /**
  * Envía una orden atómica y sustituye la vista solo con el estado confirmado.
  * Errores de dominio se convierten en aviso visible sin perder la partida.
@@ -251,27 +294,35 @@ root.addEventListener('click',async(event)=>{
   render();break;
  }
  case 'tab':tab=id;notice='';dismissGuidedActivity();render();break;
- case 'learn':{
-  // Previsualizar siempre es gratuito, aun cuando la mascota no tenga PA.
-  if(!activitiesForStage(player().stageIndex).some(a=>a.id===id)||!challengeForActivity(id))break;
-  guidedActivityId=id;guidedAnswer=null;render();focusGuidedActivity();break;
- }
+ case 'scene-go':case 'learn':openLearningActivity(id);break;
  case 'learn-answer':{
-  if(!guidedActivityId)break;
-  const challenge=challengeForActivity(guidedActivityId);
+  if(!guidedActivityId||busy)break;
+  const step=learningSequence(guidedActivityId)[guidedStepIndex];
   const answer=Number(id);
-  if(!challenge||!Number.isInteger(answer)||answer<0||answer>2||guidedAnswer===challenge.correct)break;
-  guidedAnswer=answer;render();focusGuidedActivity();break;
+  if(!step||!Number.isInteger(answer)||answer<0||answer>2||player().learningProgress?.[guidedActivityId]?.includes(guidedStepIndex))break;
+  guidedAnswer=answer;
+  if(answer===step.correct){
+   // SOLO el motor transaccional guarda el acierto. No concede UPE ni PA.
+   await execute('learning.answer',{activityId:guidedActivityId,stepIndex:guidedStepIndex,answer});focusGuidedActivity();
+  }else {render();focusGuidedActivity();}
+  break;
+ }
+ case 'learn-next':{
+  if(!guidedActivityId||guidedAnswer===null)break;
+  const progress=masteredSteps(player().learningProgress,guidedActivityId);
+  if(progress<STEP_COUNT){guidedStepIndex=progress;guidedAnswer=null;render();focusGuidedActivity();}
+  break;
  }
  case 'learn-close':dismissGuidedActivity();render();break;
  case 'guided-execute':{
-  // Seguridad: una respuesta correcta desbloquea la confirmación, pero
-  // solamente el comando real del motor puede otorgar recursos y UPE.
-  const challenge=guidedActivityId&&challengeForActivity(guidedActivityId);
-  if(!challenge||guidedAnswer!==challenge.correct||guidedActivityId!==id)break;
-  await execute('activity.execute',{activityId:id});break;
+  if(!guidedActivityId||guidedActivityId!==id||masteredSteps(player().learningProgress,id)!==STEP_COUNT)break;
+  await execute('activity.execute',{activityId:id,practiceMode:'guided'});break;
  }
- case 'activity':await execute('activity.execute',{activityId:id});break;
+ case 'activity':{
+  if(masteredSteps(player().learningProgress,id)!==STEP_COUNT)break;
+  sceneDestination=id;sceneWalkPending=true;
+  await execute('activity.execute',{activityId:id,practiceMode:'repeat'});break;
+ }
  case 'care':await execute('care.perform',{careActionId:id});break;
  case 'species':{const area=document.querySelector<HTMLSelectElement>('#species-choice')?.value; if(area)await execute('pet.changeArea',{areaId:area});break;}
  case 'advance':await execute('career.confirmTransition');break;

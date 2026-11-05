@@ -257,3 +257,62 @@
  .learn-fast{flex-basis:88px!important;max-width:88px}
 }
 @media(prefers-reduced-motion:reduce){.guided-option,.learn-start,.learn-fast{transition:none}}
+
+/* ===========================================================================
+ * v0.8 · MISIONES DE CINCO PASOS Y ESCENARIO HABITABLE
+ * Las estaciones son navegación, nunca una vía de cobro. El desplazamiento
+ * transforma un contenedor EXTERNO: las animaciones de ánimo del sprite pueden
+ * mantenerse dentro sin competir por la propiedad CSS transform.
+ * La vista reducida y el botón de pausa desactivan el movimiento por accesibilidad.
+ * =========================================================================== */
+.learning-steps{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:8px;margin:8px 0 11px}
+.learning-step{display:grid;place-items:center;min-height:33px;border-radius:9px;background:#303e53;color:#e9edfb;border:1px solid #6a789d;font-size:13px;font-weight:900}
+.learning-step.current{border:2px solid #fce1a4;color:#ffe6ac}
+.learning-step.done{background:#256452;border-color:#a8efc8;color:#fff}
+.learning-step-track{height:9px;margin:0 0 14px;background:#111e2e;border-radius:8px;overflow:hidden;border:1px solid #597e88}
+.learning-step-track i{display:block;height:100%;background:linear-gradient(90deg,#9be1d6,#f3d488);transition:width .2s}
+.mastery-celebration{background:linear-gradient(135deg,#1b5b4a,#354d5c);border:2px solid #a9efc6;border-radius:12px;padding:16px;color:#f7fff8}
+.mastery-celebration strong{font-size:18px;color:#ffe4a4}
+.mastery-celebration p{line-height:1.65;font-size:12px}
+.guided-next-step{display:block;width:100%;margin:12px 0;background:#226655;border-color:#86edbb;color:#fff}
+.activity-learning-progress{margin-top:7px!important;color:#f5d798!important;font-weight:700}
+.world-jardin{background:radial-gradient(circle at 55% 25%,#5f91a9,#3a7574 45%,#213b50 100%)}
+.world-aula{background:linear-gradient(180deg,#59718b 0%,#354660 58%,#293a45 59%,#1f3342 100%)}
+.world-taller{background:linear-gradient(135deg,#425667,#37475b 45%,#39454c)}
+.world-campus{background:radial-gradient(ellipse at 50% 35%,#526781,#313b64 75%,#282d49)}
+.world-laboratorio{background:linear-gradient(155deg,#28536a,#354460 60%,#1e3648)}
+.world-biblioteca{background:linear-gradient(145deg,#594960,#393d60 65%,#243248)}
+.pet-scene:has(.world-landscape){min-height:490px;isolation:isolate}
+.world-landscape{position:absolute;inset:65px 0 32%;pointer-events:none;opacity:.78;z-index:0}
+.world-cloud{position:absolute;left:49%;top:2px;font-size:30px;animation:cloud-drift 8s ease-in-out infinite alternate}
+.world-hill{position:absolute;left:-15%;right:-15%;height:87px;bottom:0;background:linear-gradient(90deg,#355d53,#477660,#355d53);border-radius:50% 50% 0 0;opacity:.6}
+.world-aula .world-hill,.world-taller .world-hill,.world-biblioteca .world-hill,.world-laboratorio .world-hill{background:repeating-linear-gradient(90deg,#56627d,#56627d 18px,#485472 18px,#485472 36px);height:48px;border-radius:0}
+.world-landscape-item{position:absolute;font-size:37px;filter:drop-shadow(3px 6px 0 #1d2b3d44)}
+.world-landscape-item.a{top:15%;left:5%}.world-landscape-item.b{top:4%;right:12%}.world-landscape-item.c{bottom:6%;right:26%}
+.world-heading{position:relative;z-index:2;display:flex;flex-direction:column;align-items:center;gap:4px;margin:0 16px;min-height:53px;color:#fff3c1;text-align:center;text-shadow:0 2px 7px #0d1725aa}
+.world-heading strong{font-size:13px;line-height:1.2}.world-heading span{font-size:10px;color:#f1f7fa}
+.world-stations{position:absolute;inset:135px 5px auto 5px;height:212px;z-index:4;pointer-events:none}
+.world-station{position:absolute;display:flex;flex-direction:column;gap:3px;align-items:center;justify-content:center;max-width:100px;width:27%;min-height:53px;padding:5px 4px;border-radius:10px;border:1px solid #c3d9e8;background:#182f46e8;color:#f1fff8;box-shadow:0 5px 0 #101d2e99;pointer-events:auto;line-height:1.15;transition:background .2s,box-shadow .2s,transform .15s}
+.world-station span{font-size:19px}.world-station small{font-size:8px;line-height:1.15;max-width:100%;overflow:hidden;text-overflow:ellipsis;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical}
+.world-station:hover{background:#3c6571;transform:translateY(-2px)}
+.world-station.selected{border:2px solid #ffe7a4;background:#335e51;box-shadow:0 0 0 2px #172a35,0 0 14px #ffe4a777}
+.world-station.station-0{left:0;top:0}.world-station.station-1{right:0;top:0}
+.world-station.station-2{left:0;top:77px}.world-station.station-3{right:0;top:77px}
+.world-station.station-4{left:0;top:155px}.world-station.station-5{right:0;top:155px}
+.pet-travel{position:relative;z-index:2;will-change:transform;transform-origin:center bottom}
+.pet-travel.at-station{transform:translate(var(--travel-x),var(--travel-y)) scale(.78)}
+.pet-travel.is-walking{animation:walk-to-station 1.1s ease-in-out both}
+.pet-scene:has(.world-landscape) .pet-caption{padding:0 12px 14px}
+.pet-scene:has(.world-landscape) .pet-caption h2{font-size:23px}
+@keyframes walk-to-station{0%{transform:translate(0,0) scale(1)}20%{transform:translate(calc(var(--travel-x)*.2),-9px) scale(.95)}60%{transform:translate(calc(var(--travel-x)*.6),calc(var(--travel-y)*.7 - 8px)) scale(.82)}100%{transform:translate(var(--travel-x),var(--travel-y)) scale(.78)}}
+@keyframes cloud-drift{from{transform:translateX(-10px)}to{transform:translateX(16px)}}
+.motion-paused .pet-travel,.motion-paused .world-cloud{animation:none!important;transition:none!important}
+@media(prefers-reduced-motion:reduce){.pet-travel,.world-cloud{animation:none!important;transition:none!important}}
+@media(max-width:500px){.world-station{width:25%;min-height:49px}.world-station small{font-size:7px}.world-heading span{font-size:9px}.pet-travel.at-station{transform:translate(calc(var(--travel-x)*.6),calc(var(--travel-y)*.5)) scale(.84)}
+@keyframes walk-to-station{from{transform:translate(0,0) scale(1)}to{transform:translate(calc(var(--travel-x)*.6),calc(var(--travel-y)*.5)) scale(.84)}}}
+/* Álbum opcional de etapa: motiva a explorar sin convertir 30/30 en requisito. */
+.chapter-collection{margin:12px 0 16px;padding:12px;border:1px solid #7ca9ad;border-radius:11px;background:#243d49;color:#f4fafb}
+.chapter-collection>div:first-child{display:flex;justify-content:space-between;align-items:center;gap:9px;flex-wrap:wrap;font-size:11px}
+.chapter-collection span{color:#ffe7aa;font-size:10px}
+.chapter-collection .learning-step-track{margin-top:9px;margin-bottom:6px}
+.chapter-collection p{margin:2px 0 0;font-size:10px;color:#e2f1ec}

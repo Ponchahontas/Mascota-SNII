@@ -16,13 +16,14 @@
  * Ver docs/11_GUIA_DE_CODIGO.md antes de modificar fórmulas o progresión.
  */
 import { ACTIVITIES, CARE, EVENTS, SCHOOL_EVENTS, STAGES, STAGE_GUIDES, AREAS } from '../data/catalog.js';
+import { learningSequence, masteredSteps, STEP_COUNT } from '../data/learning-sequences.js';
 import type { GameSave, NeedsState } from './state.js';
 import { applyNeedChanges } from './engine-needs.js';
 import { difficultyOf, emptyRisk, passiveNeedChange, advanceAcademicRisk, easeRiskAfterCare, performanceFactor, studyBlocker, riskOf } from './engine-health.js';
 /** Resultado sin persistir. `next` debe guardarse junto al registro del comando. */
 export interface EngineOutcome { next:GameSave; changes:string[]; events:string[]; warnings:string[] }
 /** Vocabulario de operaciones que el motor implementa realmente (no el catálogo futuro). */
-export type ActionType = 'activity.execute'|'care.perform'|'career.confirmTransition'|'project.submit'|'event.resolve'|'automation.activate'|'automation.deactivate'|'time.processOffline'|'legacy.startGeneration'|'pet.rename'|'pet.changeArea'|'career.restartAfterDropout';
+export type ActionType = 'learning.answer'|'activity.execute'|'care.perform'|'career.confirmTransition'|'project.submit'|'event.resolve'|'automation.activate'|'automation.deactivate'|'time.processOffline'|'legacy.startGeneration'|'pet.rename'|'pet.changeArea'|'career.restartAfterDropout';
 /** Limita números; usar especialmente en recursos y progreso para evitar valores fuera de rango. */
 export const clamp=(n:number,min:number,max:number)=>Math.max(min,Math.min(max,n));
 /** Evidencias lúdicas mínimas para transición; fórmula provisional, NO del DOF. */
@@ -47,7 +48,7 @@ export function newGame(name:string,areaId:string='biologia',difficultyId:string
  needs:{energy:85,motivation:78,concentration:76,wellbeing:80,stress:12,curiosity:86,competence:58,socialization:70,scientificIntegrity:100}},
  areaId,difficultyId:difficultyOf(difficultyId).id,stageIndex:0,generation,ap:stage.maxAP,risk:emptyRisk(),credits:65,stageXp:0,totalXp:0,evidence:0,completedProjects:0,
  projectProgress:0,projectName:STAGE_GUIDES[0].project,actions:0,lastActivity:'',streak:0,automation:false,event:null,eventCursor:0,
- achievements:[],history:['La aventura científica acaba de comenzar.'],records:[],careTimes:{}};
+ achievements:[],history:['La aventura científica acaba de comenzar.'],records:[],careTimes:{},learningProgress:{},learningRewarded:[]};
 }
 /** Suma UPE de juego y actualiza el total histórico; NO concede evidencia por sí mismo. */
 function addXp(s:GameSave,pe:number){const value=Math.max(0,Math.round(pe));s.stageXp+=value;s.totalXp+=value; return value}
@@ -79,10 +80,37 @@ export function applyGameAction(save:GameSave,type:ActionType,payload:Record<str
  // Un final de deserción conserva el expediente, pero requiere reinicio para jugar.
  if(riskOf(s).dropoutAt&&type!=='career.restartAfterDropout')fail('La trayectoria está interrumpida. Inicia una nueva generación para continuar.');
  switch(type){
+ // Las respuestas correctas se guardan sin PA ni UPE. Si el comando se reenvía,
+ // la idempotencia del coordinador impide duplicar el acierto o la recompensa.
+ case 'learning.answer': {
+  const activityId=typeof payload.activityId==='string'?payload.activityId:'';
+  const stepIndex=payload.stepIndex,answer=payload.answer;
+  const a=ACTIVITIES.find(item=>item.id===activityId);
+  if(!a||s.stageIndex<a.minStage||s.stageIndex>a.maxStage)fail('La aventura no corresponde a esta etapa.');
+  if(!Number.isInteger(stepIndex)||typeof stepIndex!=='number'||stepIndex<0||stepIndex>=STEP_COUNT)fail('Paso de aprendizaje inválido.');
+  if(!Number.isInteger(answer)||typeof answer!=='number'||answer<0||answer>2)fail('Opción de respuesta inválida.');
+  const sequence=learningSequence(activityId);
+  if(sequence[stepIndex]?.correct!==answer)fail('La respuesta no es correcta. Puedes volver a intentarlo sin costo.');
+  s.learningProgress??={};
+  const completed=s.learningProgress[activityId]??[];
+  if(completed.includes(stepIndex)){changes.push('Respuesta ya registrada');break;}
+  // La secuencia se completa en orden para que no se puedan saltar pasos.
+  if(stepIndex!==completed.length)fail('Termina el paso anterior antes de continuar.');
+  s.learningProgress[activityId]=[...completed,stepIndex];
+  const mastered=masteredSteps(s.learningProgress,activityId)===STEP_COUNT;
+  if(mastered)log(s,`🏅 Aventura dominada: ${a.label} (5/5). Repetición desbloqueada.`);
+  changes.push(mastered?'¡5 de 5! Aventura dominada y repetición desbloqueada':`Respuesta ${stepIndex+1}/5 guardada`);
+  break;
+ }
  // Actividad pedagógica propia de la etapa: Kínder no imparte tutorías ni publica artículos.
  case 'activity.execute': {
   const a=ACTIVITIES.find(item=>item.id===payload.activityId);
   if(!a||s.stageIndex<a.minStage||s.stageIndex>a.maxStage)fail('Actividad no disponible en esta etapa educativa.');
+  const practiceMode=payload.practiceMode;
+  if(practiceMode!==undefined&&practiceMode!=='guided'&&practiceMode!=='repeat')fail('Modalidad de práctica desconocida.');
+  // Las acciones heredadas sin practiceMode siguen funcionando para no romper
+  // pruebas ni versiones antiguas del contrato. La UI nueva siempre envía modo.
+  if(practiceMode&&masteredSteps(s.learningProgress,a.id)<STEP_COUNT)fail('Completa los cinco desafíos antes de practicar o repetir.');
   if(s.event)fail('Primero resuelve el evento pendiente.');
   const n=s.pet.needs;
   const blocked=studyBlocker(n);
@@ -99,7 +127,12 @@ export function applyGameAction(save:GameSave,type:ActionType,payload:Record<str
   const combo=s.lastActivity!==a.id && s.lastActivity!==''?1.12:1;
   // Penalizaciones causales acumulables por indicadores bajos y estrés elevado.
   // La UI usa la misma función para informar del impacto al jugador.
-  const gained=addXp(s,a.pe*stage.reward*condition*performanceFactor(n)*repeat*combo);
+  // La primera práctica guiada concede un 25 % adicional UNA SOLA VEZ;
+  // completar las preguntas sin hacer la práctica nunca regala recursos.
+  s.learningRewarded??=[];
+  const firstGuided=practiceMode==='guided'&&!s.learningRewarded.includes(a.id);
+  const gained=addXp(s,a.pe*stage.reward*condition*performanceFactor(n)*repeat*combo*(firstGuided?1.25:1));
+  if(firstGuided){s.learningRewarded.push(a.id);events.push('Primera práctica guiada: +25 % UPE base ajustadas');}
   // La actividad se realiza por la mascota; en etapas infantiles está acompañada por docentes o cuidadores.
   s.pet.needs=applyNeedChanges(n,{energy:a.energy,stress:a.stress,concentration:a.focus,motivation:a.motivation??0,competence:1,curiosity:a.type==='investigacion'?2:1});
   if(s.pet.needs.energy<=15||s.pet.needs.stress>=90)warnings.push('Tu mascota se encuentra en un estado crítico. Usa cuidados antes de continuar.');
