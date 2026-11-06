@@ -1,4 +1,4 @@
-# Arquitectura técnica — v0.10.0
+# Arquitectura técnica — v0.11.0
 
 Aplicación estática local-first en TypeScript/HTML/CSS/SVG; transpilada a `dist/` por `scripts/build.mjs`. No usa backend para el progreso ordinario. Persistencia con IndexedDB, caché pública con Cache Storage y exportación/importación manual JSON.
 

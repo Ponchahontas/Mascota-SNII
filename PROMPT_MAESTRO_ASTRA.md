@@ -65,7 +65,7 @@ Los comentarios deben ser comentarios reales del lenguaje (`//`, `/* ... */`, JS
 - Mantener versionado separado para esquema, contenido, balance, recursos y normativa.
 
 ## 6. Idempotencia y transacciones
-Implementa el catálogo de `docs/04_CATALOGO_COMANDOS.md`. Para comandos de escritura:
+El antiguo `docs/04_CATALOGO_COMANDOS.md` es una propuesta histórica, no el contrato implementado. Consulta `src/core/engine-game.ts` (tipo `ActionType`) y `docs/03-tecnica/PERSISTENCIA_Y_COMANDOS.md` antes de añadir operaciones. Para comandos de escritura:
 - Cada intención tiene un `commandId` único.
 - Un reintento usa la misma clave y exactamente el mismo payload.
 - Misma clave con payload diferente: rechazar con `IDEMPOTENCY_KEY_REUSE`.

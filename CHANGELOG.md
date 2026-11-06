@@ -1,4 +1,12 @@
-# Historial de cambios · Academic Pet (Mascota-SNII)
+# Historial de cambios
+
+## Auditoría documental y de calidad — 6 de noviembre de 2026 (sin cambios a reglas del juego)
+
+- Matriz de solicitudes históricas: implementado, parcial y pendiente. Se señala que **no existe el mínimo de 24 horas por etapa**.
+- Guía para nuevos revisores con mapa de módulos, contratos persistentes y decisiones delicadas.
+- Comentarios sincronizados con nueve mascotas y preguntas de opción múltiple (no minijuegos manipulativos).
+- Prueba nueva de integridad de recursos precargados, documentación y nueve áreas.
+- No cambia esquema IndexedDB, recompensas, dificultad ni identidad visible. · Academic Pet (Mascota-SNII)
 
 ## v0.11.0 — Identidad original Academic Pet
 

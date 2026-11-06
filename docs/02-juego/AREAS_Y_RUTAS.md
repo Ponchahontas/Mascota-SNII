@@ -1,4 +1,4 @@
-# Nueve áreas, especies y rutas educativas — MVP v0.10.0
+# Nueve áreas, especies y rutas educativas — MVP v0.11.0
 
 ## Fuente y alcance
 

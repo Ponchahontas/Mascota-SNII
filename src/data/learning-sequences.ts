@@ -3,8 +3,9 @@
  * Banco de misiones de aprendizaje por actividad.
  *
  * Cada aventura se compone de cinco pasos: el desafío propio de v0.7 y
- * cuatro ejercicios adicionales. Kínder posee retos manipulativos exclusivos;
- * el resto usa cuatro momentos concretos redactados para cada actividad:
+ * cuatro ejercicios adicionales. Kínder posee preguntas infantiles propias;
+ * los minijuegos manipulativos aún no se han implementado. El resto usa
+ * cuatro momentos concretos redactados para cada actividad:
  * preparar, ejecutar, verificar y comunicar, sin mezclar las estaciones.
  *
  * IMPORTANTE: esta biblioteca solo presenta conocimientos; acertar NO concede

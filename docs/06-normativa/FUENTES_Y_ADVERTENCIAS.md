@@ -1,6 +1,6 @@
 # Fuentes normativas y límites de interpretación
 
-Mascota-SNII es un juego independiente. Los niveles, puntajes, rangos de PA/CR/UPE, rutas, enseñanzas, evidencias y finales son **ficticios** y no acreditan requisitos reales ni otorgan reconocimiento de ninguna institución.
+Academic Pet es un juego independiente (repositorio técnico: Mascota-SNII). Los niveles, puntajes, rangos de PA/CR/UPE, rutas, enseñanzas, evidencias y finales son **ficticios** y no acreditan requisitos reales ni otorgan reconocimiento de ninguna institución.
 
 ## Fuente primaria sobre la clasificación de nueve áreas
 

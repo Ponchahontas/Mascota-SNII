@@ -18,7 +18,9 @@
 
 ## Evidencia de pruebas
 
-En v0.10.0 se aprobaron 71 pruebas automatizadas; v0.11.0 añade comprobaciones de identidad, manifiesto y compatibilidad de exportaciones. Consultar el resultado real del commit actual. En GitHub Actions se debe consultar el resultado del último commit, no reutilizar el resultado de una versión anterior.
+La auditoría local de v0.11.0 pasó 77 pruebas automatizadas antes de añadir comprobaciones documentales adicionales. La cifra de referencia definitiva depende del último commit y debe revisarse en GitHub Actions. Las pruebas automáticas no certifican la interfaz en dispositivos reales.
+
+Consulta también la [auditoría de todos los requisitos](AUDITORIA_CUMPLIMIENTO_2026_11_06.md), que distingue funciones completas, parciales y aún no implementadas.
 
 ## Pendiente
 

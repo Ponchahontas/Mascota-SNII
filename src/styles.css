@@ -7,7 +7,7 @@
 @media (max-width:680px){.app-frame{padding:12px}.topbar{padding-bottom:11px}.brand-mark{height:42px;width:42px}.brand h1{font-size:18px}.brand .eyebrow{font-size:8px}.version-tag{display:none}.workspace{display:flex;flex-direction:column}.center{order:0;width:100%}.left-sidebar{order:1;width:100%;display:grid;grid-template-columns:1fr 1fr;gap:10px}.left-sidebar .sidebar-top{grid-column:1/-1}.right-sidebar{order:2;width:100%}.pet-scene{min-height:355px}.pet-wrap{height:200px}.pet-scene .scene-time{font-size:9px}.resource-card{padding:10px 7px;min-height:94px}.resource-card strong{font-size:19px}.resource-card>span{font-size:8px}.resource-card strong small{font-size:10px}.stage-progress,.mini-log{padding:15px}.activity-grid{grid-template-columns:1fr}.archive-actions{grid-template-columns:1fr}.footer{flex-direction:column;align-items:flex-start}.notice-banner{font-size:10px}.left-sidebar .panel{padding:13px}.panel-title{font-size:9px}.care-grid{grid-template-columns:1fr 1fr}.care-btn{min-height:55px}.automation-panel .game-btn{padding:7px;font-size:10px}}
 @media (prefers-reduced-motion:reduce){*,*:before,*:after{animation:none!important;transition:none!important}}
 
-/* Diferenciación real por área: siete siluetas y 14 cuadros por especie.
+/* Diferenciación real por área: nueve siluetas y 14 cuadros por especie.
  * Los sprites son SVG locales de pixeles (32x32 cada cuadro), sin peticiones externas. */
 .sprite-wrap{width:240px;height:221px;display:flex;align-items:flex-start;justify-content:center}
 .pixel-pet{width:196px;height:196px;flex:0 0 196px;background-repeat:no-repeat;background-size:1400% 100%;background-position:0% 0;image-rendering:pixelated;image-rendering:crisp-edges;filter:drop-shadow(4px 11px 0 #14172966)}
@@ -87,7 +87,7 @@
  * juego viven exclusivamente en engine-health.ts; pet-animation.ts decide
  * las clases mood-* y reaction-* sin mutar la partida.
  *
- * Cada una de las siete especies mantiene sus 14 cuadros de evolución SVG:
+ * Cada una de las nueve especies mantiene sus 14 cuadros de evolución SVG:
  * solo se anima el contenedor del cuadro (transform, filter, opacity).
  * En particular NO animar background-position: eso cambiaría de etapa.
  * Reducir movimiento tiene prioridad (ver reglas finales).

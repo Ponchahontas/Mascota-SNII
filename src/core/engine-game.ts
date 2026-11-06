@@ -1,6 +1,6 @@
 /**
  * @module engine-game
- * Motor de dominio de Mascota-SNII.
+ * Motor de dominio de Academic Pet.
  *
  * RESPONSABILIDAD: evaluar reglas y devolver un snapshot NUEVO de la partida.
  * No utiliza DOM, IndexedDB ni red. La UI no debe modificar recursos por su cuenta.
@@ -13,7 +13,7 @@
  * - Un comando NO se vuelve idempotente aquí: la deduplicación vive en persistence.ts.
  *
  * Ruta de una acción: UI -> game-coordinator -> persistence -> applyGameAction.
- * Ver docs/11_GUIA_DE_CODIGO.md antes de modificar fórmulas o progresión.
+ * Ver docs/03-tecnica/ARQUITECTURA.md y docs/02-juego/JUGABILIDAD_Y_BALANCE.md antes de cambiar reglas.
  */
 import { ACTIVITIES, CARE, EVENTS, SCHOOL_EVENTS, STAGES, STAGE_GUIDES, AREAS } from '../data/catalog.js';
 import { learningSequence, masteredSteps, STEP_COUNT } from '../data/learning-sequences.js';

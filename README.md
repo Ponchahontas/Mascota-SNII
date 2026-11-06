@@ -62,7 +62,7 @@ Servidor de desarrollo: `http://localhost:4173`. Compilación de publicación: `
 | `scripts/generate-pets.py` | Generación reproducible de los sprites con Pillow (solo para regenerar) |
 | `tests/` | Pruebas del motor, rutas, persistencia, actividades y assets |
 
-Documentación: **[Identidad y compatibilidad](docs/01-proyecto/IDENTIDAD_Y_COMPATIBILIDAD.md)** · **[Índice general](docs/README.md)** · [Áreas y especializaciones](docs/02-juego/AREAS_Y_RUTAS.md) · [Estado real](docs/01-proyecto/ESTADO_ACTUAL.md) · [Pruebas](docs/04-calidad/PRUEBAS_Y_ACEPTACION.md) · [Colaborar](CONTRIBUTING.md) · [Historial](CHANGELOG.md) · [Instrucciones Codex/Work](CONTINUAR_EN_CODEX_O_WORK.md).
+Documentación: **[Identidad y compatibilidad](docs/01-proyecto/IDENTIDAD_Y_COMPATIBILIDAD.md)** · **[Índice general](docs/README.md)** · **[Auditoría de cumplimiento](docs/01-proyecto/AUDITORIA_CUMPLIMIENTO_2026_11_06.md)** · [Guía para revisar el código](docs/03-tecnica/GUIA_DE_LECTURA_CODIGO.md) · [Áreas y especializaciones](docs/02-juego/AREAS_Y_RUTAS.md) · [Estado real](docs/01-proyecto/ESTADO_ACTUAL.md) · [Pruebas](docs/04-calidad/PRUEBAS_Y_ACEPTACION.md) · [Colaborar](CONTRIBUTING.md) · [Historial](CHANGELOG.md) · [Instrucciones Codex/Work](CONTINUAR_EN_CODEX_O_WORK.md).
 
 ## Verificaciones y límites
 

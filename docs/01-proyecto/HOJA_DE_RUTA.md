@@ -1,4 +1,4 @@
-# Hoja de ruta después de v0.10.0
+# Hoja de ruta de Academic Pet desde v0.11.0
 
 | Prioridad | Trabajo | Aceptación |
 |---|---|---|

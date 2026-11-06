@@ -3,7 +3,7 @@
  * Esquema del guardado en IndexedDB y en las exportaciones JSON.
  * CAMBIOS INCOMPATIBLES: requieren elevar `schemaVersion`, migración y pruebas.
  * Todo campo debe seguir siendo serializable; no introducir Date, DOM o funciones.
- * Ver validateSave() en persistence.ts y el esquema descrito en docs/11_GUIA_DE_CODIGO.md.
+ * Ver validateSave() en persistence.ts y el esquema descrito en docs/03-tecnica/PERSISTENCIA_Y_COMANDOS.md.
  */
 /** Necesidades cuantitativas en escala 0–100; `stress` es perjudicial al subir. */
 export interface NeedsState { energy:number; motivation:number; concentration:number; wellbeing:number; stress:number; curiosity:number; competence:number; socialization:number; scientificIntegrity:number }

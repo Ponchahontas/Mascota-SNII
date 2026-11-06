@@ -1,4 +1,4 @@
-# Contratos y persistencia — versión v0.10.0
+# Contratos y persistencia — versión v0.11.0
 
 `GameSave` está en `src/core/state.ts`. La lectura/escritura se realiza en `src/core/persistence.ts` con **IndexedDB** y dos almacenes en una transacción: partida (`saves`) y comando confirmado (`commands`). Los comandos incluyen `expectedRevision` y una clave idempotente; un reintento no puede reclamar premios duplicados.
 

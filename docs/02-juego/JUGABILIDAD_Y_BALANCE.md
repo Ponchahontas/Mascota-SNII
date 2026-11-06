@@ -1,4 +1,4 @@
-# Jugabilidad y balance (MVP v0.10.0)
+# Jugabilidad y balance (MVP v0.11.0)
 
 El usuario acompaña a una mascota ficticia por 14 etapas. En cada etapa puede visitar seis estaciones educativas (cinco preguntas por actividad), cumplir una misión de campo propia de su área, realizar prácticas con PA y cuidados sin PA, completar proyectos y solicitar avance cuando el motor valide los requisitos del juego.
 
