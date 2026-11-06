@@ -14,7 +14,18 @@ import type { GameCommand, CommandResult, CommandError } from './commands.js';
 import { applyGameAction, type ActionType } from './engine-game.js';
 import { AREA_ROUTES, branchOf } from '../data/area-routes.js';
 // Mantener este nombre/versionado estable evita perder partidas existentes.
+/**
+ * Nombre LEGADO de la base IndexedDB.
+ * No representa la marca visible del producto. Mantener esta clave evita que
+ * una actualización abra otra base vacía y aparente borrar todas las partidas.
+ * Si se desea migrar el ID, implementar primero una migración transaccional
+ * probada con partidas antiguas (y plan de reversión).
+ */
 const DB='tamagotchi-academico-v2', SAVE='saves', COMMANDS='commands';
+/** Identificador de los respaldos nuevos; independiente del nombre de IndexedDB. */
+export const EXPORT_APPLICATION='academic-pet';
+/** Se acepta SOLO para respaldos existentes; jamás se usa en nuevas exportaciones. */
+const LEGACY_EXPORT_APPLICATION='tamagotchi-academico';
 const ACTIVE_KEY='active';
 interface SavedCommand { id:string; signature:string; result:CommandResult<null> }
 /** Convierte un IDBRequest a Promise; NO reemplaza el `tx.oncomplete` del commit. */
@@ -162,7 +173,7 @@ export async function commitCommand(command:GameCommand<Record<string,unknown>>)
  * Exportación de respaldo sin acceso al servidor: JSON descargable por la UI.
  * El límite de 2 MB de importación se comprueba en src/ui/app.ts.
  */
-export function exportSave(save:GameSave):string{return JSON.stringify({application:'tamagotchi-academico',formatVersion:1,exportedAt:new Date().toISOString(),save},null,2)}
+export function exportSave(save:GameSave):string{return JSON.stringify({application:EXPORT_APPLICATION,formatVersion:1,exportedAt:new Date().toISOString(),save},null,2)}
 /**
  * Interpreta un respaldo y rechaza archivos fuera del contrato de aplicación.
  * @param text Texto JSON local seleccionado explícitamente por el jugador.
@@ -171,7 +182,10 @@ export function exportSave(save:GameSave):string{return JSON.stringify({applicat
  */
 export function parseImport(text:string):GameSave{
  const raw:unknown=JSON.parse(text);
- if(!raw||typeof raw!=='object'||(raw as {application?:string}).application!=='tamagotchi-academico')throw Error('Este archivo no es una exportación del juego.');
+ // Compatibilidad retrospectiva: un JSON creado antes del cambio de identidad
+ // debe seguir importándose sin modificar esquema, partidas ni recompensas.
+ const application=raw&&typeof raw==='object'?(raw as {application?:unknown}).application:null;
+ if(application!==EXPORT_APPLICATION&&application!==LEGACY_EXPORT_APPLICATION)throw Error('Este archivo no es una exportación de Academic Pet.');
  const save=(raw as {save?:unknown}).save;
  if(!validateSave(save))throw Error('El archivo pertenece a otra versión o contiene datos inválidos.');
  // Reabrir un archivo crea sesión nueva; no acepta comandos ocultos ni ejecuta scripts.

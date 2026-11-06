@@ -1,4 +1,4 @@
-# PROMPT MAESTRO PARA ASTRA — TAMAGOTCHI ACADÉMICO
+# PROMPT MAESTRO PARA ASTRA — ACADEMIC PET
 
 > **Actualización v0.10.0 (6 de noviembre de 2026):** este archivo es una visión de largo plazo, no el inventario de funciones ya terminadas. Comienza por [README](README.md), [índice vigente](docs/README.md), [estado del MVP](docs/01-proyecto/ESTADO_ACTUAL.md) y [nueve áreas/rutas](docs/02-juego/AREAS_Y_RUTAS.md). Mantén los nueve IDs de área (siete legados y dos nuevos), los `branch.id`, cinco pasos por actividad y las partidas de esquema v2. La especialización desde Universidad y los cierres son **mecánicas ficticias**, no requisitos oficiales SNII. La nueva versión contiene 126 retos de campo pero las seis aventuras de cada nivel aún se comparten entre áreas; no prometer nueve juegos completos e independientes.
 
@@ -23,7 +23,7 @@ No afirmes haber ejecutado acciones que no hayas realizado. Si no tienes acceso 
 ## 2. Fuente de verdad
 Lee todos los documentos de `docs/` y este README antes de modificar el proyecto. Los contratos y decisiones documentados son la fuente de verdad. Si hay contradicciones, detén esa parte, enumera el conflicto y propone una resolución antes de hacer cambios destructivos.
 
-El proyecto es un juego satírico tipo Tamagotchi/clicker/idle sobre la formación académica mexicana y el sistema científico. Las 14 etapas son Kínder, Primaria, Secundaria, Prepa Técnica, Universidad, Especialidad, Maestría, Doctorado, Posdoctorado, Candidato SNII, Nivel I, Nivel II, Nivel III y Emérito.
+Academic Pet es un juego original de mascota virtual educativa: combina cuidado, retos de aprendizaje, exploración de escenarios y progresión académica ficticia en México. No debe imitar nombres, personajes, imágenes ni presentación de productos comerciales existentes. Las 14 etapas son Kínder, Primaria, Secundaria, Prepa Técnica, Universidad, Especialidad, Maestría, Doctorado, Posdoctorado, Candidato SNII, Nivel I, Nivel II, Nivel III y Emérito.
 
 La sátira debe ser inteligente y centrarse en procesos académicos y burocráticos. No conviertas el juego en una herramienta que afirme evaluar oficialmente personas reales. Todo valor de juego (PA, PE, UPE, CR, multiplicadores, etapas) es ficticio y debe etiquetarse como tal.
 

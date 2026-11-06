@@ -1,8 +1,16 @@
-# Contribuir a Mascota-SNII
+# Contribuir a Academic Pet (repositorio Mascota-SNII)
 
 ## Antes de cambiar código
 
 Leer [README](README.md), [índice](docs/README.md), [arquitectura](docs/03-tecnica/ARQUITECTURA.md), [rutas](docs/02-juego/AREAS_Y_RUTAS.md) y revisar el código actual. Las especificaciones en `docs/historico/` **no** son fuente del comportamiento vigente.
+
+## Identidad, nombres y partidas antiguas
+
+- Usar **Academic Pet** como nombre visible, y «Una aventura de aprendizaje» como subtítulo; mantener buena ortografía española.
+- `Mascota-SNII` es el nombre técnico del repositorio, no el nombre comercial visible.
+- Las cadenas históricas conservadas en `src/core/persistence.ts` y el prefijo de limpieza de caché en `public/sw.js` son **identificadores técnicos para compatibilidad**. No volver a usarlas en textos visibles.
+- No renombrar la IndexedDB o el `id` de la PWA sin migraciones y pruebas de restauración.
+- Ver [Identidad y compatibilidad](docs/01-proyecto/IDENTIDAD_Y_COMPATIBILIDAD.md).
 
 ## Documentación y comentarios
 

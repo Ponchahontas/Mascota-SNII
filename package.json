@@ -1,9 +1,9 @@
 {
-  "name": "tamagotchi-academico",
-  "version": "0.10.0",
+  "name": "academic-pet",
+  "version": "0.11.0",
   "private": true,
   "type": "module",
-  "description": "Mascota-SNII: nueve áreas con especies, catorce evoluciones, misiones de campo y dos especializaciones por área",
+  "description": "Academic Pet: aventura educativa de mascotas y rutas de investigación con nueve áreas y catorce etapas",
   "scripts": {
     "dev": "npm run build && node scripts/serve.mjs",
     "build": "node scripts/build.mjs",

@@ -276,7 +276,7 @@ function travelOffset():{x:number;y:number} {
  const [x,y]=offsets[idx]??[0,0];return {x,y};
 }
 function dashboard(){const s=player(),n=s.pet.needs,st=stage(),mood=moodForNeeds(n);
- return `<div class="app-frame ${animationsEnabled?'':'motion-paused'}"><header class="topbar"><div class="brand"><div class="brand-mark">🧪</div><div><span class="eyebrow">ESTACIÓN DE INVESTIGACIÓN 001</span><h1>Tamagotchi <em>Académico</em></h1></div></div><div class="top-right"><span class="online-dot"></span><span class="save-label">Guardado local</span><span class="version-tag">MVP 1.0</span></div></header>
+ return `<div class="app-frame ${animationsEnabled?'':'motion-paused'}"><header class="topbar"><div class="brand"><div class="brand-mark">🧪</div><div><span class="eyebrow">UNA AVENTURA DE APRENDIZAJE</span><h1>Academic <em>Pet</em></h1></div></div><div class="top-right"><span class="online-dot"></span><span class="save-label">Guardado local</span><span class="version-tag">v0.11.0</span></div></header>
  <div class="notice-banner">UN JUEGO SATÍRICO · Los puntajes y criterios son <strong>ficticios</strong>; no evalúan oficialmente el SNII.</div>
  <div class="workspace"><aside class="left-sidebar"><div class="panel sidebar-top"><div class="panel-title">ESTADO VITAL <span>✦</span></div>
  ${vitalMeter('energy','⚡ Energía','yellow')}${vitalMeter('motivation','💖 Motivación','pink')}${vitalMeter('concentration','🎯 Concentración','purple')}${vitalMeter('wellbeing','🌿 Bienestar','mint')}${vitalMeter('stress','🌡️ Estrés','red')}
@@ -388,7 +388,7 @@ root.addEventListener('click',async(event)=>{
  }
  case 'export':{
   if(!save)return;const contents=exportSave(save);const blob=new Blob([contents],{type:'application/json'});const url=URL.createObjectURL(blob);
-  const link=document.createElement('a');link.href=url;link.download=`tama-academico-generacion-${save.generation}.json`;link.click();URL.revokeObjectURL(url);notify('Respaldo JSON descargado.');break;
+  const link=document.createElement('a');link.href=url;link.download=`academic-pet-generacion-${save.generation}.json`;link.click();URL.revokeObjectURL(url);notify('Respaldo JSON descargado.');break;
  }
  case 'dismiss':notice='';render();break;
  }

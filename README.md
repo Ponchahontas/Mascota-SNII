@@ -1,6 +1,6 @@
-# Mascota-SNII · Tamagotchi Académico
+# Academic Pet · Una aventura de aprendizaje
 
-**MVP v0.10.0** · Videojuego web educativo y satírico en español, instalable como PWA, con almacenamiento local. La mascota crece desde **Kínder hasta SNII Emérito** en un recorrido *ficticio* de catorce etapas. La persona jugadora acompaña y cuida; la mascota realiza actividades propias de su edad o etapa.
+**MVP v0.11.0** · Videojuego web educativo y satírico en español, instalable como PWA, con almacenamiento local. La mascota crece desde **Kínder hasta SNII Emérito** en un recorrido *ficticio* de catorce etapas. La persona jugadora acompaña y cuida; la mascota realiza actividades propias de su edad o etapa.
 
 > **Independencia y alcance.** Las nueve denominaciones de áreas se corresponden con los *Lineamientos para el funcionamiento del SNII* publicados por la Secihti en el DOF el **6 de febrero de 2026**. Las mascotas, puntajes, rutas, preguntas, recompensas y desenlaces son **creaciones del videojuego**, no criterios oficiales, equivalencias de evaluación ni afiliación institucional.
 
@@ -32,7 +32,7 @@
 
 ## Jugar o ejecutar localmente
 
-**Web:** https://sniipet2026.netlify.app/ (la versión disponible depende del último despliegue de Netlify; comprobarlo antes de dar por publicada v0.10.0).
+**Web:** https://sniipet2026.netlify.app/ (comprobar el despliegue de la revisión actual en Netlify). El repositorio conserva el nombre técnico **Mascota-SNII** y la marca visible pasa a ser **Academic Pet**.
 
 Requisitos: Node.js 20 o superior y npm. El proyecto utiliza TypeScript sin Vite ni servidor de aplicaciones.
 
@@ -62,14 +62,20 @@ Servidor de desarrollo: `http://localhost:4173`. Compilación de publicación: `
 | `scripts/generate-pets.py` | Generación reproducible de los sprites con Pillow (solo para regenerar) |
 | `tests/` | Pruebas del motor, rutas, persistencia, actividades y assets |
 
-Documentación: **[Índice general](docs/README.md)** · [Áreas y especializaciones](docs/02-juego/AREAS_Y_RUTAS.md) · [Estado real](docs/01-proyecto/ESTADO_ACTUAL.md) · [Pruebas](docs/04-calidad/PRUEBAS_Y_ACEPTACION.md) · [Colaborar](CONTRIBUTING.md) · [Historial](CHANGELOG.md) · [Instrucciones Codex/Work](CONTINUAR_EN_CODEX_O_WORK.md).
+Documentación: **[Identidad y compatibilidad](docs/01-proyecto/IDENTIDAD_Y_COMPATIBILIDAD.md)** · **[Índice general](docs/README.md)** · [Áreas y especializaciones](docs/02-juego/AREAS_Y_RUTAS.md) · [Estado real](docs/01-proyecto/ESTADO_ACTUAL.md) · [Pruebas](docs/04-calidad/PRUEBAS_Y_ACEPTACION.md) · [Colaborar](CONTRIBUTING.md) · [Historial](CHANGELOG.md) · [Instrucciones Codex/Work](CONTINUAR_EN_CODEX_O_WORK.md).
 
 ## Verificaciones y límites
 
-- El banco automático tiene **71 pruebas locales** en v0.10.0, incluidas dos comprobaciones documentales. Verificar resultados del *commit* correspondiente en GitHub Actions.
+- La versión v0.10.0 pasó 71 pruebas automatizadas. Esta revisión v0.11.0 añade pruebas de identidad y compatibilidad; consultar el resultado de GitHub Actions del commit publicado.
 - Hay compatibilidad con partidas antiguas de las **siete áreas**: no se renombra ninguno de sus identificadores, el esquema permanece en v2 y los campos de ruta son opcionales.
 - Pendiente: revisión pedagógica experta, pruebas visuales completas en navegador/móvil, balance longitudinal, minijuegos manipulativos y comprobación de PWA/offline en dispositivos reales.
 - Una especialización cambia la misión de campo y el final narrativo; **no reemplaza automáticamente las seis actividades base de cada etapa**.
+
+## Identidad propia y compatibilidad
+
+**Academic Pet** es el nombre del videojuego y la PWA; **«Una aventura de aprendizaje»** es su subtítulo. El diseño se presenta como un proyecto original de mascota virtual y retos académicos, sin usar la denominación comercial de otros productos.
+
+El guardado local anterior y los respaldos JSON antiguos siguen siendo compatibles. El identificador interno legado de IndexedDB **no se renombra sin migración**. Este cambio de identidad **no constituye una certificación de disponibilidad o registro de marca**: antes de lanzar o comercializar, hacer una búsqueda por semejanza en el IMPI y en las jurisdicciones pertinentes.
 
 ## Licencia
 

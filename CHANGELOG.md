@@ -1,4 +1,14 @@
-# Historial de cambios · Mascota-SNII
+# Historial de cambios · Academic Pet (Mascota-SNII)
+
+## v0.11.0 — Identidad original Academic Pet
+
+- Nombre visible unificado en pantalla, título de navegador, metadatos, PWA, README e instrucciones técnicas.
+- Se elimina el uso promocional y descriptivo de denominaciones de productos de terceros; la propuesta se presenta como mascota virtual educativa original.
+- Nuevos respaldos JSON con identificador `academic-pet` y nombre de archivo `academic-pet-generacion-N.json`.
+- Se mantienen la base IndexedDB y el identificador PWA existente para conservar partidas e instalaciones; se aceptan respaldos históricos.
+- Nuevo prefijo de caché `academic-pet-shell-`, limpieza acotada de las cachés propias anteriores y incremento de versión.
+- Guía de identidad, pruebas de regresión y auditoría de textos. No cambia la progresión, las nueve áreas ni el balance.
+- **Pendiente legal:** comprobar disponibilidad del nombre en el IMPI y otras jurisdicciones antes de registrarlo o explotarlo comercialmente.
 
 ## v0.10.0 — Nueve áreas, 126 evoluciones y rutas académicas
 

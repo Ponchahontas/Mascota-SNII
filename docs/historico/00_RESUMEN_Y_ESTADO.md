@@ -1,7 +1,7 @@
 # Resumen ejecutivo y estado actual
 
 ## Concepto
-Tamagotchi Académico es un juego satírico de progresión académica. La mascota evoluciona a través de etapas educativas y académicas, afrontando necesidades, actividades, proyectos, eventos, recursos, herramientas, evaluaciones ficticias y burocracia.
+Academic Pet es un juego satírico de progresión académica. La mascota evoluciona a través de etapas educativas y académicas, afrontando necesidades, actividades, proyectos, eventos, recursos, herramientas, evaluaciones ficticias y burocracia.
 
 ## Etapas
 1. Kínder

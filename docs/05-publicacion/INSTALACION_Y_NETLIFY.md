@@ -20,7 +20,7 @@ Conectar `Ponchahontas/Mascota-SNII` con Netlify, rama `main`, comando `npm run 
 
 ## Caché PWA
 
-`public/sw.js` mantiene la lista de recursos del shell, incluidos `src/data/area-routes.js` y **nueve SVG** en `public/pets/`. Con cada modificación incompatible, subir el sufijo de caché. No cambiar el nombre de la IndexedDB `tamagotchi-academico-v2` sin migración, porque allí viven las partidas.
+`public/sw.js` mantiene la lista de recursos del shell, incluidos `src/data/area-routes.js` y **nueve SVG** en `public/pets/`. Con cada modificación incompatible, subir el sufijo de caché. La base IndexedDB conserva temporalmente su **identificador técnico heredado** para no perder partidas. No cambiar la constante `DB` de `src/core/persistence.ts` sin una migración probada. El identificador de exportación JSON nuevo es `academic-pet`; los respaldos anteriores siguen admitidos. El `id` del manifiesto PWA tampoco cambia para conservar la instalación existente.
 
 ## Verificaciones manuales
 

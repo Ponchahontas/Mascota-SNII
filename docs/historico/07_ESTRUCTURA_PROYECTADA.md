@@ -1,7 +1,7 @@
 # Estructura proyectada del proyecto
 
 ```text
-tamagotchi-academico/
+academic-pet/
 ├── README.md
 ├── PROMPT_MAESTRO_ASTRA.md
 ├── package.json

@@ -1,7 +1,7 @@
 {
-  "name": "Mascota-SNII — Tamagotchi Académico",
-  "short_name": "Mascota-SNII",
-  "description": "Juego educativo y satírico con nueve mascotas, 14 etapas y aventuras académicas ficticias.",
+  "name": "Academic Pet — Una aventura de aprendizaje",
+  "short_name": "Academic Pet",
+  "description": "Mascota virtual educativa original con nueve áreas del conocimiento, catorce etapas y aventuras interactivas.",
   "id": "./",
   "start_url": "./",
   "scope": "./",

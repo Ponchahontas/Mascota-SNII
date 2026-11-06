@@ -1,6 +1,6 @@
-# Estado actual de Mascota-SNII
+# Estado actual de Academic Pet (repositorio Mascota-SNII)
 
-**Corte: 6 de noviembre de 2026.** **MVP v0.10.0**; no significa producto final ni implementación exhaustiva del SNII.
+**Corte: 6 de noviembre de 2026.** **MVP v0.11.0**; no significa producto final ni implementación exhaustiva del SNII.
 
 ## Implementado
 
@@ -18,7 +18,7 @@
 
 ## Evidencia de pruebas
 
-El paquete local de v0.10.0 ha pasado **71 pruebas automatizadas** incluyendo comprobaciones documentales. En GitHub Actions se debe consultar el resultado del último commit, no reutilizar el resultado de una versión anterior.
+En v0.10.0 se aprobaron 71 pruebas automatizadas; v0.11.0 añade comprobaciones de identidad, manifiesto y compatibilidad de exportaciones. Consultar el resultado real del commit actual. En GitHub Actions se debe consultar el resultado del último commit, no reutilizar el resultado de una versión anterior.
 
 ## Pendiente
 
@@ -28,5 +28,7 @@ El paquete local de v0.10.0 ha pasado **71 pruebas automatizadas** incluyendo co
 - Pruebas visuales reales en móviles, teclado, lectores de pantalla, offline/PWA.
 - Pruebas de carga de partidas y balance prolongado, incluidas migraciones futuras.
 - Contraste permanente con normas oficiales, sin convertir puntos ficticios en métricas oficiales.
+
+La marca visible y los respaldos nuevos usan **Academic Pet**. El identificador técnico de IndexedDB permanece intacto para preservar partidas. Ver [Identidad y compatibilidad](IDENTIDAD_Y_COMPATIBILIDAD.md).
 
 Consulta [Hoja de ruta](HOJA_DE_RUTA.md), [Áreas y rutas](../02-juego/AREAS_Y_RUTAS.md) y [Pruebas](../04-calidad/PRUEBAS_Y_ACEPTACION.md).

@@ -1,6 +1,6 @@
 # Archivo histórico de especificaciones e iteraciones
 
-Estos documentos originales se preservan sin reescribir su contenido para conservar la trazabilidad. Algunos afirman que módulos «no existen» porque se redactaron **antes de que se implementaran**. **No deben usarse como la documentación actual.**
+Estos documentos históricos se preservan para conservar la trazabilidad, excepto las menciones a la denominación anterior del producto, que se normalizaron a Academic Pet por decisión de identidad. Algunos afirman que módulos «no existen» porque se redactaron **antes de que se implementaran**. **No deben usarse como la documentación actual.**
 
 | Documentos | Alcance |
 | --- | --- |

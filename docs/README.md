@@ -1,9 +1,10 @@
-# Documentación de Mascota-SNII (v0.10.0)
+# Academic Pet · Documentación (v0.11.0)
 
 Empieza por este índice. Las especificaciones históricas se preservan en [`historico/`](historico/README.md), pero **no sustituyen al código actual**. Si hay discrepancias, verificar los módulos y actualizar la documentación en el mismo cambio.
 
 | Objetivo | Documento |
 |---|---|
+| Consultar identidad, nombre y compatibilidad | [Marca y migración segura](01-proyecto/IDENTIDAD_Y_COMPATIBILIDAD.md) |
 | Entender qué existe y qué falta | [Estado actual](01-proyecto/ESTADO_ACTUAL.md) |
 | Priorizar próximos desarrollos | [Hoja de ruta](01-proyecto/HOJA_DE_RUTA.md) |
 | Consultar las nueve áreas y sus 18 rutas | **[Áreas, mascotas y especializaciones](02-juego/AREAS_Y_RUTAS.md)** |
