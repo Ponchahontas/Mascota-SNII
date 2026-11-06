@@ -39,17 +39,19 @@ export const CARE: readonly Care[] = [
  // Salvaguarda de balance: no requiere créditos; impide estados sin salida a 0 CR.
  {id:'acompanar',label:'Acompañar',icon:'🤗',credits:0,wellbeing:3,motivation:4,stress:-2,socialization:2},
 ];
-/** Catálogo de áreas visuales: cada ID debe corresponder a PET_KINDS y un SVG. */
+/** Nueve áreas del SNII 2026; correspondencia de personajes ficticios: cada ID debe corresponder a PET_KINDS y un SVG. */
 export const AREAS = [
- ['fisico','Ciencias físico-matemáticas y de la Tierra','🌌'],
- ['biologia','Biología y Química','🧬'],
- ['medicina','Medicina y Ciencias de la Salud','🩺'],
- ['humanidades','Humanidades y Ciencias de la Conducta','📜'],
- ['sociales','Ciencias Sociales','🌎'],
- ['agro','Biotecnología y Ciencias Agropecuarias','🌱'],
- ['ingenieria','Ingenierías','⚙️'],
+ ['fisico','I. Físico-Matemáticas y Ciencias de la Tierra','🌌'],
+ ['biologia','II. Biología y Química','🧬'],
+ ['medicina','III. Medicina y Ciencias de la Salud','🩺'],
+ ['conducta','IV. Ciencias de la Conducta y la Educación','🧠'],
+ ['humanidades','V. Humanidades','📜'],
+ ['sociales','VI. Ciencias Sociales','🌎'],
+ ['agro','VII. Ciencias de Agricultura, Agropecuarias, Forestales y de Ecosistemas','🌱'],
+ ['ingenieria','VIII. Ingenierías y Desarrollo Tecnológico','⚙️'],
+ ['interdisciplinaria','IX. Interdisciplinaria','🧩'],
 ] as const;
-/** Áreas lúdicas inspiradas en disciplinas de conocimiento; no equivalen a clasificación vigente verificada. */
+/** Las denominaciones se basan en DOF 06/02/2026; los retos/mascotas NO son oficiales. */
 export const EVENTS = [
  {id:'revision',title:'La revisión interminable',body:'Un comité pide una revisión adicional. ¿Cómo respondes?',options:[{id:'calma',label:'Responder con método',credits:-2,stress:-3,pe:7},{id:'prisa',label:'Responder de inmediato',credits:0,stress:7,pe:12}]},
  {id:'congreso',title:'Invitación inesperada',body:'Te invitan a presentar tu trabajo. ¿Qué decides?',options:[{id:'aceptar',label:'Participar',credits:-4,stress:4,pe:18},{id:'virtual',label:'Compartir en línea',credits:0,stress:-1,pe:8}]},

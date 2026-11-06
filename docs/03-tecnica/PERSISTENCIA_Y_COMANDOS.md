@@ -1,28 +1,19 @@
-# Persistencia, contratos e idempotencia
+# Contratos y persistencia — versión v0.10.0
 
-## Estado de la partida
+`GameSave` está en `src/core/state.ts`. La lectura/escritura se realiza en `src/core/persistence.ts` con **IndexedDB** y dos almacenes en una transacción: partida (`saves`) y comando confirmado (`commands`). Los comandos incluyen `expectedRevision` y una clave idempotente; un reintento no puede reclamar premios duplicados.
 
-`src/core/state.ts` define `GameSave`, identidad de mascota, necesidades, evolución, recompensas, historial y progreso educativo. `src/core/persistence.ts` valida los datos, mantiene IndexedDB y permite exportar/importar JSON.
+## Extensiones del juego de nueve áreas
 
-## Escribir una acción
+- `areaId`: se mantienen los siete IDs anteriores y se añaden `conducta`, `interdisciplinaria`.
+- `areaPath?: string`: rama elegida desde Universidad. Solo se admite una rama registrada para esa área.
+- `fieldMilestones?: number[]`: índices de etapas 0–13 donde ya se otorgó bono de misión de campo, con máximo un bono por etapa **aun si se cambia de área**.
+- Nuevos comandos: `career.chooseRoute`, `career.completeFieldMission`, procesados por el motor y guardados transaccionalmente.
+- La validación de importación (`validateSave`) acepta la ausencia de campos nuevos en partidas antiguas; los inicializa el motor al necesitarlos.
 
-Los comandos incluyen tipo, `commandId`, `gameId`, `expectedRevision` y versión de contrato. Cada comando debe confirmarse de forma atómica con su resultado. Repetir una orden idéntica no puede producir créditos, UPE, logros o evidencias duplicadas. Si cambia la revisión esperada, informar conflicto en lugar de sobrescribir silenciosamente.
+## Reglas de seguridad
 
-El repertorio implementado actualmente se encuentra en `ActionType` de `src/core/engine-game.ts`: respuesta educativa, actividad, cuidado, transición, entrega de proyecto, evento, automatización, tiempo offline, legado, nombre, área y reinicio tras deserción.
+No confiar en los datos de la interfaz: el motor debe validar área, etapa, rama, solución y recompensa; importar JSON exige validación de estructura. `pet.changeArea` conserva economía, etapa y logros, pero elimina una especialización que ya no corresponde a la nueva área.
 
-El antiguo [catálogo de comandos v1.0](../historico/04_CATALOGO_COMANDOS.md) **es una propuesta**, no una lista de endpoints disponibles.
+Las preguntas de las 84 aventuras usan `learningProgress[activityId]` e índices **0..4**. No reordenar IDs/índices sin migración. `fieldMilestones` es un mecanismo distinto y **no** reemplaza estos cinco aciertos.
 
-## Puntos de especial cuidado
-
-- **Tiempo offline**: hasta ocho horas por proceso de ausencia. Evitar que el reloj retroceda y no conceder premios dos veces.
-- **Progreso educativo**: actividad identificada por ID; índices de pasos 0–4; al actualizar preguntas no perder aciertos.
-- **Dificultad/riesgo**: partidas antiguas pueden carecer de campos nuevos; aplicar valores de compatibilidad antes de usarlos.
-- **Importar JSON**: comprobar estructura y versión, y advertir al usuario antes de sustituir un guardado.
-- **Preferencias**: separadas de reglas económicas y del estado de la partida.
-- **Múltiples pestañas**: revisar conflictos de revisión.
-
-## Prueba mínima al cambiar estructura
-
-Ejecutar `npm run typecheck` y `npm test`. Añadir prueba de importación antigua, doble ejecución del mismo comando, revisión desactualizada, respuesta duplicada y recuperación offline. Antes de desplegar, verificar cierre y reapertura en navegador real.
-
-Volver al [índice](../README.md).
+Ver [Áreas y rutas](../02-juego/AREAS_Y_RUTAS.md).

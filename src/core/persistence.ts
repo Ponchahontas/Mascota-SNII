@@ -12,6 +12,7 @@
 import type { GameSave } from './state.js';
 import type { GameCommand, CommandResult, CommandError } from './commands.js';
 import { applyGameAction, type ActionType } from './engine-game.js';
+import { AREA_ROUTES, branchOf } from '../data/area-routes.js';
 // Mantener este nombre/versionado estable evita perder partidas existentes.
 const DB='tamagotchi-academico-v2', SAVE='saves', COMMANDS='commands';
 const ACTIVE_KEY='active';
@@ -73,6 +74,15 @@ export function validateSave(x:unknown):x is GameSave {
   }
  }
  if(v.learningRewarded!==undefined&&(!Array.isArray(v.learningRewarded)||v.learningRewarded.length>84||new Set(v.learningRewarded).size!==v.learningRewarded.length||v.learningRewarded.some(key=>typeof key!=='string'||!/^etapa(?:[0-9]|1[0-3])-[a-z0-9_]+$/.test(key))))return false;
+ // Los campos de la edición con nueve rutas son opcionales para partidas v0.9.
+ // No elevar schemaVersion: los guardados previos deben seguir abriéndose.
+ if(typeof v.areaId!=='string'||!Object.hasOwn(AREA_ROUTES,v.areaId))return false;
+ if(v.areaPath!==undefined&&(!branchOf(v.areaId,v.areaPath)||v.stageIndex===undefined||v.stageIndex<4))return false;
+ if(v.fieldMilestones!==undefined&&(
+  !Array.isArray(v.fieldMilestones)||v.fieldMilestones.length>14||
+  v.fieldMilestones.some(index=>!Number.isInteger(index)||index<0||index>=14)||
+  new Set(v.fieldMilestones).size!==v.fieldMilestones.length
+ ))return false;
  if(!v.careTimes||typeof v.careTimes!=='object'||Object.values(v.careTimes).some(t=>typeof t!=='number'||!Number.isFinite(t)))return false;
  if(v.event!==null){
   const e=v.event;if(!e||typeof e.id!=='string'||typeof e.title!=='string'||typeof e.body!=='string'||!Array.isArray(e.options)||e.options.length>5)return false;

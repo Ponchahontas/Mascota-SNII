@@ -64,10 +64,10 @@ test('las reacciones solo se generan para acciones que realmente lo ameritan',()
  }
 });
 
-test('las siete especies conservan imágenes diferentes y sus 14 cuadros por etapa',()=>{
+test('las nueve especies conservan imágenes diferentes y sus 14 cuadros por etapa',()=>{
  const areas=Object.keys(PET_KINDS);
- assert.equal(areas.length,7);
- assert.equal(new Set(areas.map(petSprite)).size,7);
+ assert.equal(areas.length,9);
+ assert.equal(new Set(areas.map(petSprite)).size,9);
  assert.equal(spriteFrame(-99),0);
  assert.equal(spriteFrame(99),13);
  assert.deepEqual(Array.from({length:14},(_,i)=>spriteFrame(i)),Array.from({length:14},(_,i)=>i));

@@ -17,13 +17,14 @@
  */
 import { ACTIVITIES, CARE, EVENTS, SCHOOL_EVENTS, STAGES, STAGE_GUIDES, AREAS } from '../data/catalog.js';
 import { learningSequence, masteredSteps, STEP_COUNT } from '../data/learning-sequences.js';
+import { AREA_ROUTES, branchOf, fieldChallenge } from '../data/area-routes.js';
 import type { GameSave, NeedsState } from './state.js';
 import { applyNeedChanges } from './engine-needs.js';
 import { difficultyOf, emptyRisk, passiveNeedChange, advanceAcademicRisk, easeRiskAfterCare, performanceFactor, studyBlocker, riskOf } from './engine-health.js';
 /** Resultado sin persistir. `next` debe guardarse junto al registro del comando. */
 export interface EngineOutcome { next:GameSave; changes:string[]; events:string[]; warnings:string[] }
 /** Vocabulario de operaciones que el motor implementa realmente (no el catálogo futuro). */
-export type ActionType = 'learning.answer'|'activity.execute'|'care.perform'|'career.confirmTransition'|'project.submit'|'event.resolve'|'automation.activate'|'automation.deactivate'|'time.processOffline'|'legacy.startGeneration'|'pet.rename'|'pet.changeArea'|'career.restartAfterDropout';
+export type ActionType = 'learning.answer'|'activity.execute'|'care.perform'|'career.confirmTransition'|'project.submit'|'event.resolve'|'automation.activate'|'automation.deactivate'|'time.processOffline'|'legacy.startGeneration'|'pet.rename'|'pet.changeArea'|'career.restartAfterDropout'|'career.chooseRoute'|'career.completeFieldMission';
 /** Limita números; usar especialmente en recursos y progreso para evitar valores fuera de rango. */
 export const clamp=(n:number,min:number,max:number)=>Math.max(min,Math.min(max,n));
 /** Evidencias lúdicas mínimas para transición; fórmula provisional, NO del DOF. */
@@ -46,7 +47,7 @@ export function newGame(name:string,areaId:string='biologia',difficultyId:string
  return {gameId:id(),schemaVersion:2,contentVersion:'2026.11-areas-stages',balanceVersion:'0.5-vitales-provisional',normativeVersionId:'unverified',revision:0,createdAt:now,lastProcessedSimTime:now,
  pet:{id:id(),name:name.trim().slice(0,28)||'Investigador',stageId:stage.id,appearanceId:areaId,
  needs:{energy:85,motivation:78,concentration:76,wellbeing:80,stress:12,curiosity:86,competence:58,socialization:70,scientificIntegrity:100}},
- areaId,difficultyId:difficultyOf(difficultyId).id,stageIndex:0,generation,ap:stage.maxAP,risk:emptyRisk(),credits:65,stageXp:0,totalXp:0,evidence:0,completedProjects:0,
+ areaId,areaPath:undefined,fieldMilestones:[],difficultyId:difficultyOf(difficultyId).id,stageIndex:0,generation,ap:stage.maxAP,risk:emptyRisk(),credits:65,stageXp:0,totalXp:0,evidence:0,completedProjects:0,
  projectProgress:0,projectName:STAGE_GUIDES[0].project,actions:0,lastActivity:'',streak:0,automation:false,event:null,eventCursor:0,
  achievements:[],history:['La aventura científica acaba de comenzar.'],records:[],careTimes:{},learningProgress:{},learningRewarded:[]};
 }
@@ -234,16 +235,59 @@ export function applyGameAction(save:GameSave,type:ActionType,payload:Record<str
   if(hours>=.05&&!riskOf(s).dropoutAt)log(s,`🕰️ Tiempo simulado ${hours.toFixed(1)} h (máx. 8 h): +${regen} PA; las necesidades se desgastan gradualmente.`);
   changes.push(`+${regen} PA por tiempo`);break;
  }
+ // Las dos ramas de cada área son decisiones de carrera ficticias, disponibles
+ // desde Universidad. Se elige una por generación para dar rejugabilidad.
+ case 'career.chooseRoute': {
+  if(s.stageIndex<4)fail('Las especializaciones se eligen a partir de Universidad.');
+  const id=typeof payload.branchId==='string'?payload.branchId:'';
+  const branch=branchOf(s.areaId,id);
+  if(!branch)fail('La especialización no pertenece al área elegida.');
+  if(s.areaPath)fail('La especialización ya fue elegida en esta generación.');
+  s.areaPath=id;
+  log(s,`🧭 Ruta académica elegida: ${branch.label}.`);
+  changes.push(`Nueva ruta: ${branch.label}`);break;
+ }
+ // Un único reto temático por etapa y generación; no usa PA, es opcional
+ // y no reemplaza los cinco retos propios de cada actividad.
+ case 'career.completeFieldMission': {
+  const answer=payload.answer;
+  const branch=s.stageIndex>=4?branchOf(s.areaId,s.areaPath):null;
+  if(s.stageIndex>=4&&!branch)fail('Elige primero una especialización para comenzar el reto de campo.');
+  const challenge=fieldChallenge(s.areaId,s.stageIndex,s.areaPath);
+  if(typeof answer!=='number'||!Number.isInteger(answer)||answer<0||answer>2)fail('Selecciona una respuesta válida.');
+  if(answer!==challenge.correct)fail('Esa respuesta todavía no resuelve el reto. Puedes volver a intentarlo gratis.');
+  s.fieldMilestones??=[];
+  if(s.fieldMilestones.includes(s.stageIndex)){changes.push('Reto de campo ya registrado');break;}
+  // La recompensa se marca por etapa, NO por área: cambiar de mascota
+  // durante la misma etapa no permite cobrar de nuevo el bono.
+  s.fieldMilestones.push(s.stageIndex);
+  const gained=addXp(s,Math.max(4,Math.min(45,Math.round(stage.target*.04))));
+  s.pet.needs=applyNeedChanges(s.pet.needs,{motivation:2,curiosity:2});
+  log(s,`🧭 Ruta ${AREA_ROUTES[s.areaId]?.title??'educativa'}: ${challenge.title} · +${gained} UPE`);
+  changes.push(`Reto de campo completo · +${gained} UPE · +2 motivación`);
+  if(s.stageIndex===13){
+   const ending=branch?.ending??'Una nueva generación encuentra sus descubrimientos.';
+   const trophy=`ruta-${s.areaId}-${s.areaPath??'general'}`;
+   if(!s.achievements.includes(trophy))s.achievements.push(trophy);
+   log(s,`🌟 Final de ruta: ${ending}`);
+   changes.push(`Final de ruta: ${ending}`);
+  }
+  break;
+ }
  // Personalización visual reversible: no reinicia edad, PA, créditos ni progreso.
  case 'pet.changeArea': {
   const nextArea=typeof payload.areaId==='string'?payload.areaId:'';
   if(!AREAS.some(([key])=>key===nextArea))fail('Esa área no está disponible.');
   if(s.areaId===nextArea)fail('La mascota ya pertenece a esa área.');
-  // Cambio exclusivamente cosmético: respeta PA, UPE, etapa, progreso y estadísticas.
-  // Se habilita para adaptar partidas anteriores al selector de siete especies.
-  s.areaId=nextArea;s.pet.appearanceId=nextArea;
+  // Los siete IDs anteriores no cambian. Si cambia de disciplina, se conserva
+  // toda la economía y el progreso, pero la elección de especialidad se reinicia:
+  // una rama ajena a la nueva área no puede aparecer como válida.
+  // La elección anterior puede quedar fuera del nuevo catálogo; invalidarla
+  // evita rutas fantasma. Los hitos completados siguen en el expediente
+  // porque los premios ya cobrados no se pueden repetir por cambiar de área.
+  s.areaId=nextArea;s.pet.appearanceId=nextArea;s.areaPath=undefined;
   log(s,`🎭 La mascota adoptó la apariencia de ${AREAS.find(([key])=>key===nextArea)?.[1]}`);
-  changes.push('Especie y área visual actualizadas; progreso intacto');break;
+  changes.push('Área y especie actualizadas, elige nueva especialización; progreso intacto');break;
  }
  case 'pet.rename': {
   const name=typeof payload.petName==='string'?payload.petName.trim():'';

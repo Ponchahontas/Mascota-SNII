@@ -1,40 +1,13 @@
-# Continuidad en Codex / ChatGPT Work — Mascota-SNII
+# Instrucciones de continuidad para Codex / ChatGPT Work — v0.10.0
 
-**Punto de partida actual: MVP v0.9.** No empezar desde cero ni tratar la documentación histórica como estado vigente.
+No empezar de cero. El repositorio tiene nueve mascotas, 14 etapas, 84 actividades con cinco retos, y nueve rutas temáticas de campo con dos especializaciones cada una.
 
-## Lectura obligatoria
+1. Leer [README.md](README.md), [docs/README.md](docs/README.md), [Estado actual](docs/01-proyecto/ESTADO_ACTUAL.md), [Rutas](docs/02-juego/AREAS_Y_RUTAS.md), [Arquitectura](docs/03-tecnica/ARQUITECTURA.md) y [CONTRIBUTING.md](CONTRIBUTING.md).
+2. Ejecutar `npm install`, `npm run typecheck`, `npm test`, `npm run build` y consultar GitHub Actions del commit actual.
+3. Mantener `schemaVersion: 2`, conservar los siete IDs previos de área y los nuevos `conducta`, `interdisciplinaria`. No alterar IDs de ramas/actividades/pasos sin migraciones.
+4. Tratar las áreas oficiales como categorías de referencia, no los puntos/rutas ficticios como criterios legales del SNII.
+5. Trabajar en cambios acotados, **bien comentados en español**, con pruebas de regresión y documentación del propósito y consecuencias de cada cambio.
+6. Priorizar experiencia visual en navegador, accesibilidad, balance de dificultad, revisión pedagógica y minijuegos táctiles. Revisar la [Hoja de ruta](docs/01-proyecto/HOJA_DE_RUTA.md).
+7. Para publicar en Netlify, usar rama `main`, `npm run build`, `dist`. Verificar de verdad la URL pública, la caché y los SVG nuevos; no asumir éxito por compilar.
 
-1. [README](README.md) y [índice de documentación](docs/README.md).
-2. [Estado actual](docs/01-proyecto/ESTADO_ACTUAL.md) y [hoja de ruta](docs/01-proyecto/HOJA_DE_RUTA.md).
-3. [Arquitectura](docs/03-tecnica/ARQUITECTURA.md), [contratos de guardado](docs/03-tecnica/PERSISTENCIA_Y_COMANDOS.md) y [pedagogía](docs/02-juego/PEDAGOGIA_Y_ESTACIONES.md).
-4. [CONTRIBUTING](CONTRIBUTING.md), [pruebas](docs/04-calidad/PRUEBAS_Y_ACEPTACION.md) y [CHANGELOG](CHANGELOG.md).
-5. El código TypeScript y los tests determinan lo que realmente existe.
-
-## Primera ejecución
-
-~~~bash
-npm install
-npm run typecheck
-npm test
-npm run build
-~~~
-
-No proclamar pruebas visuales, compatibilidad móvil u operación Netlify sin verificarlas.
-
-## Prioridades de trabajo
-
-- Comprobar que las seis estaciones de cada etapa abren sus cinco retos **propios** y conservan sus aciertos al recargar.
-- Pruebas reales de accesibilidad, móvil, PWA, guardado y actualización.
-- Revisión educativa del contenido y ampliación mediante minijuegos manipulativos.
-- Pruebas longitudinales de balance y recuperaciones para los tres modos.
-- Publicación y verificación real de Netlify, sin alterar otros sitios existentes sin autorización.
-
-## Reglas al modificar
-
-- Conservar `activity.id`, índices `0..4`, compatibilidad de partidas e idempotencia.
-- Documentar cada módulo y regla en español; comentarios útiles, no repetición obvia.
-- Añadir pruebas de regresión y registrar qué quedó pendiente.
-- Cambios incrementales, evitando reescrituras destructivas.
-- Abrir PR y trabajar en rama si existen otras contribuciones activas; no forzar `main`.
-
-**Importante:** el prompt maestro conserva aspiraciones de largo plazo. Estas instrucciones y las guías vigentes tienen prioridad sobre frases obsoletas del material antiguo.
+**Estado de salida:** edición de nueve áreas con historias educativas, 18 cierres narrativos, progreso compatible. Los seis juegos de preguntas por etapa son comunes a las áreas y pueden especializarse después sin romper el guardado.

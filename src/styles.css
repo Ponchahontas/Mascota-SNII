@@ -335,3 +335,32 @@
 .mastered-review summary{cursor:pointer;color:#e5f0ac;font-weight:800;line-height:1.6}
 .mastered-review ol{padding-left:22px}.mastered-review li{padding:8px 0;border-bottom:1px solid #4c6b72}
 .mastered-review p{font-size:11px;margin:5px 0;color:#c9dcd8}.mastered-review li p:first-of-type{color:#9ce9c5}
+
+/* Nueve áreas: las tarjetas y misiones usan color/acento sin comprometer contraste. */
+.area-story,.area-route-panel{background:linear-gradient(140deg,#263f48,#273251);border:1px solid #81cabb;border-radius:18px;padding:18px;margin:16px 0;color:#f0f5f8}
+.area-story>p,.area-route-panel>p{font-size:.9rem;line-height:1.65;color:#e0edf1}
+.area-story strong,.area-route-panel h3{color:#fff1c5}
+.area-focus-hint{max-width:530px;margin:7px auto 0;color:#e8ffc9;font-size:.84rem;line-height:1.5}
+.area-branch-list{display:grid;gap:12px;margin:15px 0}.area-branch-list h4{margin:4px 0}
+.area-branch-choice{padding:12px;border:1px solid #a2cad6;border-radius:12px;background:#27354c}
+.area-branch-choice p{margin:5px 0 12px;font-size:.86rem;color:#e1eaf3}
+.area-branch-confirmed{padding:12px;background:#304b47;border-radius:11px;border-left:4px solid #8ce3bd}
+.field-challenge{background:#1d2f3b;border-radius:14px;padding:15px;margin-top:13px;border:1px solid #729fb1}
+.field-challenge>p{font-size:.9rem;color:#f5f8fc}.field-options{display:grid;gap:9px;margin:12px 0}
+.field-options .game-btn{text-align:left;white-space:normal;overflow-wrap:anywhere;min-height:43px}
+.field-challenge small{color:#e3eaf1}.area-ending{border:1px solid #f6dd99;border-radius:10px;padding:13px;background:#45412b}
+@media (max-width:600px){.area-story,.area-route-panel{padding:12px}.area-focus-hint{font-size:.8rem}.field-options .game-btn{font-size:.82rem}}
+
+/* Ecosistema ambiental diferenciable por el área, además del paisaje de etapa.
+ * Solo cambia gradiente/ornamentos: conserva hotspots y controles por teclado. */
+.pet-scene.area-fisico{background:radial-gradient(ellipse at 40% 30%,#24577b,#1e304b 69%,#19213b)}
+.pet-scene.area-biologia{background:radial-gradient(ellipse at 40% 30%,#366c65,#264750 69%,#182b39)}
+.pet-scene.area-medicina{background:radial-gradient(ellipse at 40% 30%,#477574,#2c455f 69%,#222643)}
+.pet-scene.area-conducta{background:radial-gradient(ellipse at 40% 30%,#785977,#533b6f 69%,#24263e)}
+.pet-scene.area-humanidades{background:radial-gradient(ellipse at 40% 30%,#625f92,#35345d 69%,#242640)}
+.pet-scene.area-sociales{background:radial-gradient(ellipse at 40% 30%,#856a51,#4b4f5f 69%,#292c45)}
+.pet-scene.area-agro{background:radial-gradient(ellipse at 40% 30%,#39705b,#294f50 69%,#20363c)}
+.pet-scene.area-ingenieria{background:radial-gradient(ellipse at 40% 30%,#456c9a,#323e63 69%,#1d2840)}
+.pet-scene.area-interdisciplinaria{background:radial-gradient(ellipse at 40% 30%,#685f9d,#346c70 69%,#25284b)}
+.area-world-mark{position:absolute;bottom:31%;right:3%;font-size:10px;color:#fff1d6;background:#17243ecc;border:1px solid #adbbcb;padding:5px 7px;border-radius:6px;max-width:42%;z-index:2;pointer-events:none}
+@media(max-width:680px){.area-world-mark{font-size:8px;max-width:35%;bottom:32%}}

@@ -1,33 +1,19 @@
-# Pruebas, revisión y criterios de aceptación
+# Pruebas y criterios de aceptación
 
-## Automatización disponible
+## Automatizadas
 
-Comandos: `npm run typecheck`, `npm test` y `npm run build`. `npm test` construye el proyecto y ejecuta `node --test tests/*.test.mjs`. El workflow `.github/workflows/check.yml` realiza verificaciones en GitHub.
+`npm run typecheck`, `npm test`, `npm run build`. `npm test` compila y ejecuta los archivos Node de `tests/`. En v0.10.0 se comprobó localmente una batería de **71 pruebas** (recontar en GitHub Actions tras cada cambio).
 
-Archivos de pruebas existentes:
-- `tests/engine.test.mjs`: economía, cuidado y progresión.
-- `tests/health.test.mjs`: necesidades, deserción y dificultad.
-- `tests/pet-animation.test.mjs`: estados y reacciones.
-- `tests/learning-path.test.mjs`: contenidos iniciales.
-- `tests/learning-sequences.test.mjs`: cinco pasos, registro de aciertos y bonificaciones.
-- `tests/station-links.test.mjs`: vinculación entre 14 etapas, sus seis estaciones y aventuras.
+`tests/area-routes.test.mjs` cubre la nueva extensión: nueve especies/14 cuadros, 126 misiones, dos especializaciones por área, 18 finales de relato, una recompensa por etapa y compatibilidad con las siete áreas existentes. `tests/documentation.test.mjs` verifica enlaces de las guías actuales. Otras suites cubren motor, cuidado, salud, preguntas, escenas y animación.
 
-La documentación v0.9 informa **61 pruebas** pasadas en esa iteración. Recontarlas cada vez que cambien los tests. **No se realizaron aquí pruebas visuales completas**.
+## Pendiente de validación humana
 
-## Revisión manual obligatoria antes de afirmar que está listo
+1. Seleccionar nueve especies desde una partida nueva y verificar que ninguna se muestre como otra.
+2. Abrir seis estaciones por nivel, responder cinco preguntas y comprobar los aciertos tras recargar.
+3. Desde Universidad, elegir ambas rutas en partidas independientes y comprobar textos hasta Emérito.
+4. Cambiar área conservando la economía y descartando una ruta incompatible.
+5. Exportar/importar una partida de siete áreas, con una nueva de nueve y probar sesiones offline.
+6. Probar iOS/Android, escritorio, teclado, `prefers-reduced-motion` y lector de pantalla.
+7. Comprobar que Netlify sirva los dos SVG nuevos y que el service worker actualice cachés.
 
-1. Comenzar partida nueva en varias áreas; comprobar especie y cuadro de evolución.
-2. En cada una de las 14 etapas, pulsar las seis estaciones, alternarlas y verificar encabezado, icono, pregunta y progreso.
-3. Responder mal y bien; confirmar que solo aciertos se guardan, sin pérdida de PA por intentar.
-4. Completar 5/5; comprobar primera recompensa y repetición sin premio duplicado.
-5. Recargar, cerrar y volver; validar progreso y backup JSON.
-6. Simular pérdida de energía/estrés y probar tres dificultades y recuperación gratis.
-7. Revisar movimiento reducido, teclado, foco, lectores de pantalla, 320–375 px.
-8. Instalar la PWA, desconectar red y comprobar caché/guardado y actualización.
-9. Confirmar que la URL pública sirve correctamente `index.html` y no devuelve fallos 404.
-
-## Regla de aceptación
-
-Un cambio solo es **verificado automáticamente** cuando las pruebas corren con éxito para ese commit. Solo es **validado visualmente** tras probarse realmente en navegador. Conservar evidencia en PR/issue y señalar lo que queda pendiente.
-
-Volver al [índice](../README.md).
+**Una compilación correcta no equivale a aprobar las pruebas visuales, el balance ni una evaluación pedagógica externa.**

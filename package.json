@@ -1,9 +1,9 @@
 {
   "name": "tamagotchi-academico",
-  "version": "0.9.0",
+  "version": "0.10.0",
   "private": true,
   "type": "module",
-  "description": "Mascota-SNII: estaciones vinculadas por ID a aventuras propias de cada actividad en las 14 etapas",
+  "description": "Mascota-SNII: nueve áreas con especies, catorce evoluciones, misiones de campo y dos especializaciones por área",
   "scripts": {
     "dev": "npm run build && node scripts/serve.mjs",
     "build": "node scripts/build.mjs",

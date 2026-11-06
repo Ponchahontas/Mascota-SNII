@@ -18,13 +18,21 @@ KINDS={
  'fisico':('Ajolote astral','#91dedf','#50a8c4','#f0a0bd'),
  'biologia':('Zorro de laboratorio','#efb366','#c67f47','#8ec773'),
  'medicina':('Búho sanador','#c5a9da','#846fa5','#92d2d0'),
+ 'conducta':('Colibrí pedagogo','#f4a982','#cd718e','#83dfb6'),
  'humanidades':('Gato cronista','#b2a1ef','#7b65b5','#f2c477'),
  'sociales':('Capibara comunitaria','#dca277','#aa6b54','#f4cd99'),
  'agro':('Tortuga botánica','#9dd1a4','#5b9f7e','#ead07f'),
  'ingenieria':('Robot ingenioso','#a4bdd9','#5a82aa','#f9cc70'),
+ 'interdisciplinaria':('Quimera interdisciplinaria','#d6b2ed','#7b8bc6','#f5c373'),
 }
 
 def render(area,stage):
+ """Dibuja una especie y su etapa en 32x32 px, con fondo transparente.
+
+ La morfología corresponde al área; solo ropa, proporción y accesorios
+ cambian al avanzar de etapa. Mantener 14 cuadros por SVG es un contrato
+ del selector CSS (ver src/data/pet-visuals.ts).
+ """
  im=Image.new('RGBA',(32,32));d=ImageDraw.Draw(im)
  label,main,shadow,accent=KINDS[area]
  # El crecimiento cambia gradualmente la talla de la mascota sin confundir su especie.
@@ -65,6 +73,19 @@ def render(area,stage):
   d.ellipse((8,11,16,20),fill=WH);d.ellipse((16,11,24,20),fill=WH)
   d.polygon([(14,18),(18,18),(16,21)],fill=GOLD)
   d.polygon([(10,7),(8,4),(14,8)],fill=shadow);d.polygon([(22,7),(24,4),(18,8)],fill=shadow)
+ elif area=='conducta':
+  # Colibrí: dos alas angulares, cola bifurcada y un pico fino que sobresale.
+  # La silueta se diferencia claramente del búho y del zorro a 32 píxeles.
+  d.polygon([(8,15),(2,8),(4,18),(10,22)],fill=INK)
+  d.polygon([(9,16),(4,11),(6,18),(11,21)],fill=shadow)
+  d.polygon([(23,15),(30,7),(29,19),(23,22)],fill=INK)
+  d.polygon([(23,16),(28,11),(27,19),(22,21)],fill=accent)
+  d.polygon([(13,24),(11,31),(16,27),(21,31),(19,23)],fill=shadow)
+  d.ellipse((8,7,23,23),fill=INK)
+  d.ellipse((9,8,22,22),fill=main)
+  d.polygon([(20,13),(31,11),(21,17)],fill=INK)
+  d.polygon([(21,13),(29,12),(21,16)],fill=GOLD)
+  d.rectangle((10,11,12,12),fill=accent)
  elif area=='humanidades':
   d.polygon([(7,12),(7,4),(14,9)],fill=INK)
   d.polygon([(25,12),(25,4),(18,9)],fill=INK)
@@ -88,6 +109,19 @@ def render(area,stage):
   d.ellipse((11,5,16,9),fill=accent);d.ellipse((17,3,22,8),fill=accent)
   d.rounded_rectangle((9,12,23,23),radius=5,fill=INK)
   d.rounded_rectangle((10,13,22,22),radius=4,fill=main)
+ elif area=='interdisciplinaria':
+  # Quimera: una oreja de felino y un cuerno de ajolote, dos lados diferentes.
+  # La cola en espiral representa un encuentro de disciplinas.
+  d.polygon([(6,13),(6,4),(15,11)],fill=INK)
+  d.polygon([(8,11),(8,7),(12,11)],fill=accent)
+  d.polygon([(22,10),(25,4),(28,9),(25,14)],fill=INK)
+  d.polygon([(23,9),(25,6),(26,10)],fill=GOLD)
+  d.rounded_rectangle((6,10,25,23),radius=5,fill=INK)
+  d.rounded_rectangle((7,11,24,22),radius=4,fill=main)
+  d.rectangle((8,17,12,19),fill=shadow)
+  d.ellipse((22,22,31,30),outline=INK,width=2)
+  d.ellipse((25,24,29,27),outline=accent,width=2)
+  d.rectangle((15,7,17,9),fill=GOLD)
  elif area=='ingenieria':
   d.rectangle((5,12,8,18),fill=INK);d.rectangle((24,12,27,18),fill=INK)
   d.rectangle((12,5,20,8),fill=INK);d.rectangle((15,2,17,6),fill=INK);d.rectangle((15,2,17,3),fill=accent)
@@ -97,13 +131,23 @@ def render(area,stage):
  # Ojos propios de cada criatura; se mantienen durante su evolución.
  if area=='medicina':
   d.rectangle((12,15,13,17),fill=INK);d.rectangle((19,15,20,17),fill=INK)
+ elif area=='interdisciplinaria':
+  # Ojos deliberadamente distintos: refuerzan su identidad híbrida sin
+  # redibujar la cabeza y ocultar expresiones de las etapas posteriores.
+  d.rectangle((11,14,13,17),fill=INK)
+  d.rectangle((19,14,21,17),fill=INK)
+  d.point((12,14),fill=WH)
+  d.point((20,14),fill=WH)
+  d.rectangle((15,19,17,20),fill=shadow)
+ elif area=='conducta':
+  d.rectangle((14,13,16,16),fill=INK);d.point((15,13),fill=WH)
  elif area=='ingenieria':
   d.rectangle((11,15,14,18),fill=accent);d.rectangle((18,15,21,18),fill=accent)
   d.rectangle((13,20,19,21),fill=shadow)
  else:
   d.rectangle((11,14,13,17),fill=INK);d.rectangle((19,14,21,17),fill=INK)
   d.point((12,14),fill=WH);d.point((20,14),fill=WH)
-  if area not in ('agro','sociales'):d.rectangle((15,19,17,20),fill=shadow)
+  if area not in ('agro','sociales','interdisciplinaria'):d.rectangle((15,19,17,20),fill=shadow)
   if area=='sociales':d.point((16,19),fill=INK)
   if area=='agro':d.arc((13,17,19,21),start=0,end=180,fill=INK)
  # Uniforme y accesorios: 14 edades con iconografía y siluetas cambiantes.
@@ -152,7 +196,7 @@ def render(area,stage):
 
 
 def make():
- preview=Image.new('RGB',(14*70+120,7*78+65),'#20263b')
+ preview=Image.new('RGB',(14*70+155,len(KINDS)*78+65),'#20263b')
  draw=ImageDraw.Draw(preview)
  draw.text((120,8),'EVOLUCION DE MASCOTAS POR AREA / 14 ETAPAS',fill='white')
  for i in range(14):draw.text((120+i*70,35),f'{i+1}',fill='#b8c7ed')
@@ -183,8 +227,8 @@ def make():
   for color,subpaths in paths.items():svg.append(f'<path fill="{color}" d="{" ".join(subpaths)}"/>')
   svg.append('</svg>')
   (OUT/f'{area}.svg').write_text('\n'.join(svg),encoding='utf-8')
- preview.save(ROOT/'docs'/'preview-98-evoluciones.png')
- print('Especies:',len(KINDS),'· Animaciones de evolución:',len(KINDS)*14)
- print('Vista previa: docs/preview-98-evoluciones.png')
+ preview.save(ROOT/'docs'/'preview-126-evoluciones.png')
+ print('Especies:',len(KINDS),'· Variantes de evolución:',len(KINDS)*14)
+ print('Vista previa: docs/preview-126-evoluciones.png')
 
 if __name__=='__main__':make()

@@ -1,55 +1,76 @@
 # Mascota-SNII · Tamagotchi Académico
 
-**MVP v0.9** · Juego web educativo y satírico en español, centrado en acompañar a una mascota a través de una trayectoria ficticia desde Kínder hasta SNII Emérito. La persona jugadora cuida y toma decisiones; la mascota aprende, experimenta y realiza las actividades apropiadas para su etapa.
+**MVP v0.10.0** · Videojuego web educativo y satírico en español, instalable como PWA, con almacenamiento local. La mascota crece desde **Kínder hasta SNII Emérito** en un recorrido *ficticio* de catorce etapas. La persona jugadora acompaña y cuida; la mascota realiza actividades propias de su edad o etapa.
 
-> **Aviso:** juego independiente. Las etapas, las recompensas y los requisitos del juego **no son criterios oficiales** del Sistema Nacional de Investigadoras e Investigadores.
+> **Independencia y alcance.** Las nueve denominaciones de áreas se corresponden con los *Lineamientos para el funcionamiento del SNII* publicados por la Secihti en el DOF el **6 de febrero de 2026**. Las mascotas, puntajes, rutas, preguntas, recompensas y desenlaces son **creaciones del videojuego**, no criterios oficiales, equivalencias de evaluación ni afiliación institucional.
 
-## Qué incluye hoy
+## Estado actual
 
-- 14 etapas de crecimiento académico; 84 actividades (seis por etapa).
-- Cinco descubrimientos por actividad: 420 textos de pregunta, aciertos guardados y práctica repetible.
-- Un escenario por etapa con seis estaciones; estación, actividad y preguntas vinculadas por un identificador estable.
-- Siete mascotas visuales por área de conocimiento y 14 cuadros de evolución por especie.
-- Energía, motivación, concentración, bienestar y estrés; cuidados, tres dificultades y consecuencias lúdicas.
-- Progreso, proyectos, eventos, legado, respaldo JSON, guardado local mediante IndexedDB y PWA estática.
-- Interfaz y código documentados en español; pruebas automatizadas con GitHub Actions.
+- **9 áreas y 9 mascotas originales**: se añaden el *Colibrí pedagogo* (IV. Conducta y Educación) y la *Quimera interdisciplinaria* (IX). Las siete anteriores conservan sus IDs.
+- **126 cuadros de evolución**: 14 edades por mascota, generadas como nueve sprites SVG de catorce cuadros.
+- **9 recorridos educativos** con un tema de campo distinto por etapa (**126 misiones**), una por área y nivel.
+- **18 variantes narrativas de cierre**, dos especializaciones por área elegibles desde Universidad. No constituyen categorías ni títulos oficiales.
+- **84 aventuras educativas** de cinco retos cada una (420 preguntas), vinculadas a seis estaciones por etapa mediante `activity.id`.
+- Cinco medidores de bienestar, recursos, cuidado, dificultades, riesgos, logros, proyectos, guardado IndexedDB, exportación/importación JSON y limitación de progreso offline.
+- Las 9 áreas incluyen su mascota, un escenario temático de carrera y una ruta de aprendizaje. **El catálogo de seis actividades de cada etapa sigue siendo común entre áreas**: los nueve recorridos agregan misiones temáticas, no nueve juegos educativos totalmente independientes.
 
-**Estado de calidad:** las pruebas automáticas de la iteración v0.9 se registraron en el historial. Siguen pendientes la validación visual en navegadores/móviles, la revisión educativa experta y el balance longitudinal. No afirmar que el despliegue Netlify está verificado sin comprobar una URL pública.
+### Áreas y mascotas
 
-## Para ejecutar localmente
+| Área de conocimiento SNII 2026 | Mascota | ID compatible |
+|---|---|---|
+| I. Físico-Matemáticas y Ciencias de la Tierra | Ajolote astral | `fisico` |
+| II. Biología y Química | Zorro de laboratorio | `biologia` |
+| III. Medicina y Ciencias de la Salud | Búho sanador | `medicina` |
+| IV. Ciencias de la Conducta y la Educación | **Colibrí pedagogo** | `conducta` |
+| V. Humanidades | Gato cronista | `humanidades` |
+| VI. Ciencias Sociales | Capibara comunitaria | `sociales` |
+| VII. Ciencias de Agricultura, Agropecuarias, Forestales y de Ecosistemas | Tortuga botánica | `agro` |
+| VIII. Ingenierías y Desarrollo Tecnológico | Robot ingenioso | `ingenieria` |
+| IX. Interdisciplinaria | **Quimera interdisciplinaria** | `interdisciplinaria` |
 
-Requiere Node.js 20 o superior y npm.
+**[Ver las 126 evoluciones de mascotas](docs/assets/preview-126-evoluciones.png)** (vista previa de las nueve especies).
 
-~~~bash
+## Jugar o ejecutar localmente
+
+**Web:** https://sniipet2026.netlify.app/ (la versión disponible depende del último despliegue de Netlify; comprobarlo antes de dar por publicada v0.10.0).
+
+Requisitos: Node.js 20 o superior y npm. El proyecto utiliza TypeScript sin Vite ni servidor de aplicaciones.
+
+```bash
+git clone https://github.com/Ponchahontas/Mascota-SNII.git
+cd Mascota-SNII
 npm install
 npm run typecheck
 npm test
 npm run dev
-~~~
+```
 
-`npm run build` genera una distribución estática en `dist/`. Configuración para Netlify: comando `npm run build`, publicación `dist`.
+Servidor de desarrollo: `http://localhost:4173`. Compilación de publicación: `npm run build`, salida `dist/`. En Netlify: comando `npm run build` y carpeta `dist` (configurado en `netlify.toml`).
 
-## Documentación organizada
+## Guía para revisar el repositorio
 
-| Tema | Ir a |
-| --- | --- |
-| **Índice general** | [docs/README.md](docs/README.md) |
-| Estado actual y limitaciones | [Estado](docs/01-proyecto/ESTADO_ACTUAL.md) |
-| Próximos desarrollos | [Hoja de ruta](docs/01-proyecto/HOJA_DE_RUTA.md) |
-| Mecánicas y dificultad | [Balance](docs/02-juego/JUGABILIDAD_Y_BALANCE.md) |
-| Preguntas y estaciones educativas | [Pedagogía](docs/02-juego/PEDAGOGIA_Y_ESTACIONES.md) |
-| Mascotas, escenarios y animaciones | [Arte](docs/02-juego/AVATARES_Y_ESCENARIOS.md) |
-| Arquitectura y guardado | [Arquitectura](docs/03-tecnica/ARQUITECTURA.md) |
-| Pruebas y accesibilidad | [Calidad](docs/04-calidad/PRUEBAS_Y_ACEPTACION.md) |
-| Instalación y Netlify | [Publicación](docs/05-publicacion/INSTALACION_Y_NETLIFY.md) |
-| Instrucciones para colaborar | [CONTRIBUTING.md](CONTRIBUTING.md) |
-| Continuidad con Codex/Work | [CONTINUAR_EN_CODEX_O_WORK.md](CONTINUAR_EN_CODEX_O_WORK.md) |
-| Documentos de versiones anteriores | [Archivo histórico](docs/historico/README.md) |
+| Componente | Responsabilidad |
+|---|---|
+| `src/data/catalog.ts` y `stage-activities.ts` | Áreas, etapas, actividades, cuidados y balance ficticio |
+| `src/data/area-routes.ts` | **9 rutas**, 126 desafíos de campo, 18 especializaciones/desenlaces |
+| `src/data/learning-path.ts`, `learning-sequences.ts`, `activity-extras.ts` | 420 preguntas estructuradas por actividad |
+| `src/data/pet-visuals.ts`, `public/pets/` | Nueve especies y sus catorce evoluciones |
+| `src/data/scene-world.ts` | Escenarios y estaciones por nivel |
+| `src/core/engine-game.ts`, `engine-health.ts` | Reglas, bienestar, premios y final de generación |
+| `src/core/persistence.ts`, `state.ts`, `game-coordinator.ts` | Partidas locales, compatibilidad, comandos e idempotencia |
+| `src/ui/app.ts`, `pet-animation.ts`, `src/styles.css` | Interfaz, reacciones, movimiento y paneles de ruta |
+| `scripts/generate-pets.py` | Generación reproducible de los sprites con Pillow (solo para regenerar) |
+| `tests/` | Pruebas del motor, rutas, persistencia, actividades y assets |
 
-## Orientación del código
+Documentación: **[Índice general](docs/README.md)** · [Áreas y especializaciones](docs/02-juego/AREAS_Y_RUTAS.md) · [Estado real](docs/01-proyecto/ESTADO_ACTUAL.md) · [Pruebas](docs/04-calidad/PRUEBAS_Y_ACEPTACION.md) · [Colaborar](CONTRIBUTING.md) · [Historial](CHANGELOG.md) · [Instrucciones Codex/Work](CONTINUAR_EN_CODEX_O_WORK.md).
 
-`src/core/` contiene reglas, estado, comandos y persistencia. `src/data/` define etapas, preguntas, escenarios y especies. `src/ui/` contiene la interfaz y las animaciones. `tests/` cubre el motor y las asociaciones entre actividades y estaciones. Las funcionalidades deben mantenerse desacopladas y el código debe incluir **comentarios útiles en español**.
+## Verificaciones y límites
 
-## Licencia y contribuciones
+- El banco automático tiene **71 pruebas locales** en v0.10.0, incluidas dos comprobaciones documentales. Verificar resultados del *commit* correspondiente en GitHub Actions.
+- Hay compatibilidad con partidas antiguas de las **siete áreas**: no se renombra ninguno de sus identificadores, el esquema permanece en v2 y los campos de ruta son opcionales.
+- Pendiente: revisión pedagógica experta, pruebas visuales completas en navegador/móvil, balance longitudinal, minijuegos manipulativos y comprobación de PWA/offline en dispositivos reales.
+- Una especialización cambia la misión de campo y el final narrativo; **no reemplaza automáticamente las seis actividades base de cada etapa**.
 
-En el estado revisado no existe un archivo `LICENSE` en el repositorio: por ello **no se presume una licencia de código abierto**. Antes de reutilizar o distribuir el código fuera de los permisos explícitos del titular, aclarar la licencia y procedencia de los recursos. Consulta [CONTRIBUTING.md](CONTRIBUTING.md).
+## Licencia
+
+No se ha publicado un archivo `LICENSE`. **No se presume licencia de código abierto**: definirla expresamente antes de autorizar reutilización por terceros.

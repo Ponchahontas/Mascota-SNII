@@ -13,6 +13,7 @@ import { STEP_COUNT, learningSequence, masteredSteps } from '../data/learning-se
 import type { LearningStep } from '../data/learning-sequences.js';
 import type { Activity } from '../data/stage-activities.js';
 import { sceneForStage, stationIndex, stationsForStage, learningStation } from '../data/scene-world.js';
+import { AREA_ROUTES, areaRouteDescription, branchOf, fieldChallenge } from '../data/area-routes.js';
 import type { GameSave } from '../core/state.js';
 import { newGame, STAGE_GATE } from '../core/engine-game.js';
 import { DIFFICULTIES, difficultyOf, riskOf, vitalAlerts, criticalCount, studyBlocker, performanceFactor } from '../core/engine-health.js';
@@ -123,7 +124,7 @@ function avatar(){
 }
 /** Formulario de creación; cada área elige una especie pero ninguna ventaja de balance. */
 function creation(){
- return `<div class="startup"><div class="startup-art">🎓 <span>✦</span> 🔬</div><div class="startup-card"><div class="eyebrow">★ LABORATORIO DE LO IMPROBABLE · EDICIÓN EDUCATIVA 0.8</div>
+ return `<div class="startup"><div class="startup-art">🎓 <span>✦</span> 🔬</div><div class="startup-card"><div class="eyebrow">★ LABORATORIO DE LO IMPROBABLE · EDICIÓN EDUCATIVA 1.0</div>
  <h1>Tu carrera científica<br><em>empieza en Kínder.</em></h1><p>Elige la especie de tu futura investigadora o investigador. Cada área tiene una mascota diferente y 14 apariencias que evolucionan con sus aprendizajes.</p>
  <form id="create-form"><label for="pet-name">Nombre de la mascota</label><input id="pet-name" name="petName" maxlength="28" minlength="1" required value="Curiosín" autocomplete="off" />
  <fieldset class="area-fieldset"><legend>Elige un área y una especie</legend><div class="area-gallery">${AREAS.map(([id,label,icon])=>{
@@ -133,7 +134,7 @@ function creation(){
  }).join('')}</div></fieldset>
  <fieldset class="difficulty-fieldset"><legend>Elige la dificultad de cuidado</legend><div class="difficulty-gallery">${DIFFICULTIES.map(d=>`<label class="difficulty-choice"><input type="radio" name="difficulty" value="${d.id}" ${d.id==='normal'?'checked':''} required /><span><strong>${esc(d.label)}</strong><small>${esc(d.description)}</small></span></label>`).join('')}</div></fieldset>
  <button type="submit" class="primary huge" ${busy?'disabled':''}>Adoptar mascota científica <span>→</span></button></form>
- <div class="startup-foot">Cada especie tiene sus propias 14 evoluciones · Partida local · Criterios ficticios, no oficiales.</div></div></div>`;
+ <div class="startup-foot">9 mascotas y 126 evoluciones · Partida local · Criterios ficticios, no oficiales.</div></div></div>`;
 }
 /**
  * Muestra una experiencia pedagógica junto al catálogo académico.
@@ -184,6 +185,7 @@ function activityPanel(){
    <div class="learning-reality"><strong>🔎 ¿Dónde lo vemos en la vida real?</strong><p>${esc(chapter.realWorld)}</p></div>
    <p class="learning-motto">💡 ${esc(chapter.closing)}</p>
   </section>
+  <section class="area-story" aria-label="Ruta de conocimiento de esta etapa"><strong>🧭 Tu aventura en ${esc((AREA_ROUTES[s.areaId]??AREA_ROUTES.biologia).title)}</strong><p>${esc(areaRouteDescription(s.areaId,s.stageIndex,s.areaPath))}</p><p class="muted">Un reto de campo distinto en cada etapa, además de las seis estaciones. Puedes encontrarlo en la pestaña Carrera.</p>${button('tab','carrera','🧭 Explorar mi ruta',busy)}</section>
   <section class="chapter-collection" aria-label="Colección de descubrimientos de la etapa"><div><strong>📔 Álbum de descubrimientos</strong><span>🏅 ${badges}/6 aventuras dominadas · ${chapterSolved}/30 aciertos</span></div><div class="learning-step-track" role="progressbar" aria-label="Colección de etapa" aria-valuemin="0" aria-valuemax="30" aria-valuenow="${chapterSolved}"><i style="width:${percent(chapterSolved,30)}%"></i></div><p>${chapterSolved===30?'✨ ¡Completaste las seis aventuras de la etapa! Puedes seguir practicando o avanzar cuando cumplas los requisitos de carrera.':'Avanza a tu ritmo: puedes probar distintas aventuras y continuar después sin perder tus aciertos.'}</p></section>
   <div class="learning-heading"><div><h3>🗺️ Elige una aventura</h3><p>Cada actividad incluye cinco descubrimientos; al dominarlos podrás repetir la práctica. Tus respuestas se guardan.</p></div><span class="learning-no-cost">🎲 Descubrir es gratis</span></div>
   ${sequence.length===STEP_COUNT&&chosen?guidedLearningPanel(sequence,chosen,guidedCost,guidedUnavailable):''}
@@ -195,11 +197,40 @@ function activityPanel(){
    return `<article class="activity learning-activity ${chosen?.id===a.id?'learning-activity-selected':''}" data-station-id="${esc(a.id)}" aria-label="${esc(a.label)}${chosen?.id===a.id?' seleccionada':''}"><span class="action-icon" aria-hidden="true">${a.icon}</span><div class="action-body"><strong>${esc(a.label)}</strong><small>${esc(a.flavor)}</small><small>⭐ UPE base: ${a.pe} · 🪙 CR: ${a.credits>=0?'+':''}${a.credits} · ⚡ ${cost} PA</small><small class="activity-learning-progress">${mastered?'🏅 Dominada · Repetir disponible':`📖 ${learned}/${STEP_COUNT} preguntas acertadas`}</small></div><div class="learning-actions"><button class="game-btn learn-start" data-action="learn" data-id="${esc(a.id)}" ${busy||!ready?'disabled':''}>${mastered?'📘 Repasar aventura':`🎲 Aventura ${learned}/${STEP_COUNT}`}</button><button class="game-btn learn-fast" data-action="activity" data-id="${esc(a.id)}" ${unavailable||!mastered?'disabled':''} title="${mastered?'Practicar de nuevo gastando PA':'Desbloquea esta opción tras acertar las cinco preguntas'}" aria-label="Repetir ${esc(a.label)}, ${cost} PA">⚡ Repetir</button></div></article>`;
   }).join('')}</div><p class="muted">Las actividades de juego y los UPE son ficticios. Los mini retos enseñan ideas generales, no otorgan calificaciones reales ni representan criterios oficiales del SNII.</p>`;
 }
+/**
+ * Recorrido educativo por área: escenario temático desde Kínder y dos ramas
+ * elegibles desde Universidad. El motor confirma una única recompensa por etapa;
+ * estos botones no modifican directamente el guardado ni la economía.
+ */
+function areaCareerPanel():string {
+ const s=player(),data=AREA_ROUTES[s.areaId]??AREA_ROUTES.biologia;
+ const branch=branchOf(s.areaId,s.areaPath);
+ // El hito se consulta por índice de etapa y es transversal a cambios
+ // de área: la UI debe reflejar el mismo bloqueo que hace cumplir el motor.
+ const completed=(s.fieldMilestones??[]).includes(s.stageIndex);
+ const challenge=fieldChallenge(s.areaId,s.stageIndex,s.areaPath);
+ const specialization=s.stageIndex>=4&&!branch;
+ const chooser=s.stageIndex>=4?(branch?
+  `<p class="area-branch-confirmed">🧭 Especialización: <strong>${esc(branch.label)}</strong> · ${esc(branch.goal)}</p>`:
+  `<div class="area-branch-list"><h4>Elige una de dos rutas posibles</h4>${data.branches.map(item=>`<div class="area-branch-choice"><strong>${esc(item.label)}</strong><p>${esc(item.goal)}</p>${button('choose-route',item.id,'Elegir esta ruta',busy)}</div>`).join('')}</div>`):
+  `<p>La especialización se elige al llegar a Universidad. Por ahora explora las bases de tu disciplina.</p>`;
+ return `<section class="area-route-panel" aria-label="Ruta educativa por área">
+  <span class="eyebrow">${esc(data.emblem)} ÁREA ${esc(data.title.toUpperCase())}</span>
+  <h3>🌿 ${esc(challenge.title)}</h3>
+  <p>${esc(data.introduction)}</p><p><strong>Experiencia de ${esc(stage().label)}:</strong> ${esc(challenge.scene)}</p>
+  ${chooser}
+  <div class="field-challenge"><strong>🔎 Reto de campo · ${completed?'✅ completado':'pendiente'} · Etapa ${s.stageIndex+1}/14</strong>
+  ${completed?`<p>¡Este descubrimiento ya está registrado! Puedes seguir con las seis aventuras de tu etapa.</p>`:specialization?'<p>Elige una especialización para activar el reto de esta etapa.</p>':
+  `<p>${esc(challenge.question)}</p><details><summary>💡 Pista educativa</summary><p>${esc(challenge.hint)}</p></details><div class="field-options">${challenge.options.map((option,i)=>button('field-answer',String(i),`${String.fromCharCode(65+i)}. ${esc(option)}`,busy,'field-choice')).join('')}</div><small>No consume PA; un único bono de UPE por etapa. Las respuestas equivocadas permiten reintentar.</small>`}
+  </div>${s.stageIndex===13&&completed&&branch?`<p class="area-ending">🌟 ${esc(branch.ending)}</p>`:''}
+ </section>`;
+}
 /** Presenta requisitos lúdicos de transición; motor los vuelve a validar al confirmar. */
 function careerPanel(){
  const s=player(),st=stage(),target=STAGES[s.stageIndex+1];
  const needed=STAGE_GATE(s.stageIndex);const okay=s.stageXp>=st.target&&s.evidence>=needed&&s.pet.needs.competence>=50&&riskOf(s).criticalHours<9;
  return `<div class="panel-heading"><div><h2>Mapa de trayectoria</h2><p>14 etapas de juego; cada etapa requiere UPE y evidencias ficticias.</p></div><span class="tiny-pill">ETAPA ${s.stageIndex+1}/14</span></div>
+ ${areaCareerPanel()}
  <div class="timeline">${STAGES.map((item,i)=>`<div class="stage-node ${i===s.stageIndex?'current':i<s.stageIndex?'done':''}"><span class="stage-icon">${item.emblem}</span><div><strong>${esc(item.label)}</strong><small>${i===s.stageIndex?'Etapa actual':i<s.stageIndex?'Completada':'Por desbloquear'} · ${fmt(item.target)} UPE</small></div><span class="stage-status">${i===s.stageIndex?'●':i<s.stageIndex?'✓':'○'}</span></div>`).join('')}</div>
  <div class="transition"><h3>${target?`Siguiente etapa: ${esc(target.label)}`:'¡Alcanzaste Emérito!'}</h3><p>Progreso ${fmt(s.stageXp)} / ${fmt(st.target)} UPE · Evidencias ${s.evidence} / ${needed} · Competencia ${fmt(s.pet.needs.competence)} / 50</p>
  ${target?button('advance','', '🎓 Solicitar avance de etapa',!okay||busy,'primary'): '<p>Puedes continuar acumulando progreso o elegir iniciar una nueva generación en Legado.</p>'}</div>`;
@@ -222,7 +253,7 @@ function legacyPanel(){
 function archivePanel(){
  const s=player();return `<div class="panel-heading"><div><h2>Tu expediente personal</h2><p>Datos locales: controla tus copias. No hay cuenta ni sincronización en la nube.</p></div></div>
  <div class="archive-actions"><div><h3>📥 Exportar partida</h3><p>Guarda un archivo JSON para respaldar tu trayectoria.</p>${button('export','', 'Descargar respaldo',busy)}</div><div><h3>📤 Importar partida</h3><p>Reemplaza la partida actual después de confirmar. Compatible con formato v2.</p><label for="import-file" class="file-label">Elegir JSON…</label><input type="file" id="import-file" accept=".json,application/json" /></div></div>
- <div class="species-settings"><h3>🎨 Cambiar especie / área visual</h3><p>Las siete áreas tienen sprites distintos. Puedes probar otro tipo sin perder PA, UPE, etapa ni proyectos; cambia solo su identidad visual y su etiqueta de área.</p><div class="species-controls"><select id="species-choice" aria-label="Área visual de la mascota">${AREAS.map(([key,label])=>`<option value="${key}" ${s.areaId===key?'selected':''}>${esc(PET_KINDS[petArea(key)].name)} · ${esc(label)}</option>`).join('')}</select>${button('species','', 'Cambiar especie',busy)}</div></div>
+ <div class="species-settings"><h3>🎨 Cambiar especie / área visual</h3><p>Las nueve áreas tienen mascotas y rutas educativas distintas. Cambiar de área conserva PA, UPE, etapa y proyectos, pero reinicia la especialización elegida para esta generación.</p><div class="species-controls"><select id="species-choice" aria-label="Área visual de la mascota">${AREAS.map(([key,label])=>`<option value="${key}" ${s.areaId===key?'selected':''}>${esc(PET_KINDS[petArea(key)].name)} · ${esc(label)}</option>`).join('')}</select>${button('species','', 'Cambiar especie',busy)}</div></div>
  <div class="meta"><p><strong>ID de partida:</strong> <code>${esc(s.gameId)}</code></p><p><strong>Revisión:</strong> ${s.revision} · <strong>Esquema:</strong> ${s.schemaVersion} · <strong>Balance:</strong> ${esc(s.balanceVersion)}</p><p><strong>Guardado:</strong> IndexedDB en este dispositivo · <strong>Dificultad:</strong> ${esc(difficultyOf(s.difficultyId).label)}</p><p><strong>Normativa:</strong> Sin validación oficial — mecánica satírica y educativa</p></div>
  <div class="timeline-log"><h3>Últimos movimientos</h3>${s.history.map(h=>`<div class="log-item">${esc(h)}</div>`).join('')}</div>`;
 }
@@ -232,10 +263,10 @@ function eventModal(){const e=player().event;if(!e)return '';return `<div class=
  * Son puntos de navegación, no comandos; elegir un lugar nunca cobra recursos.
  */
 function sceneEnvironment():string {
- const s=player(),world=sceneForStage(s.stageIndex),stations=stationsForStage(s.stageIndex);
+ const s=player(),world=sceneForStage(s.stageIndex),stations=stationsForStage(s.stageIndex),area=AREA_ROUTES[s.areaId]??AREA_ROUTES.biologia;
  return `<div class="world-landscape" aria-hidden="true"><span class="world-cloud">☁️</span><span class="world-hill"></span><span class="world-landscape-item a">${esc(world.decoration[0])}</span><span class="world-landscape-item b">${esc(world.decoration[1])}</span><span class="world-landscape-item c">${esc(world.decoration[2])}</span></div>
- <div class="world-heading"><strong>🗺️ ${esc(world.title)}</strong><span>${esc(world.ambient)}</span></div>
- <div class="world-stations" aria-label="Lugares interactivos de aprendizaje">${stations.map(({activity:a,index:i})=>`<button class="world-station station-${i} ${guidedActivityId===a.id?'selected':''}" data-action="scene-go" data-id="${esc(a.id)}" aria-pressed="${guidedActivityId===a.id}" ${guidedActivityId===a.id?'aria-controls="guided-learning"':''} aria-label="Abrir aventura: ${esc(a.label)}" title="${esc(a.label)}"><span aria-hidden="true">${a.icon}</span><small>${esc(a.label)}</small></button>`).join('')}</div>`;
+ <div class="world-heading"><strong>🗺️ ${esc(world.title)}</strong><span>${esc(world.ambient)} · ${esc(area.emblem)} ${esc(area.setting)}</span></div>
+ <div class="area-world-mark" aria-hidden="true">${esc(area.emblem)} ${esc(area.mentor)}</div><div class="world-stations" aria-label="Lugares interactivos de aprendizaje">${stations.map(({activity:a,index:i})=>`<button class="world-station station-${i} ${guidedActivityId===a.id?'selected':''}" data-action="scene-go" data-id="${esc(a.id)}" aria-pressed="${guidedActivityId===a.id}" ${guidedActivityId===a.id?'aria-controls="guided-learning"':''} aria-label="Abrir aventura: ${esc(a.label)}" title="${esc(a.label)}"><span aria-hidden="true">${a.icon}</span><small>${esc(a.label)}</small></button>`).join('')}</div>`;
 }
 /** Distancias fijas para que el movimiento sea CSS, sin canvas ni física pesada. */
 function travelOffset():{x:number;y:number} {
@@ -245,15 +276,15 @@ function travelOffset():{x:number;y:number} {
  const [x,y]=offsets[idx]??[0,0];return {x,y};
 }
 function dashboard(){const s=player(),n=s.pet.needs,st=stage(),mood=moodForNeeds(n);
- return `<div class="app-frame ${animationsEnabled?'':'motion-paused'}"><header class="topbar"><div class="brand"><div class="brand-mark">🧪</div><div><span class="eyebrow">ESTACIÓN DE INVESTIGACIÓN 001</span><h1>Tamagotchi <em>Académico</em></h1></div></div><div class="top-right"><span class="online-dot"></span><span class="save-label">Guardado local</span><span class="version-tag">MVP 0.9</span></div></header>
+ return `<div class="app-frame ${animationsEnabled?'':'motion-paused'}"><header class="topbar"><div class="brand"><div class="brand-mark">🧪</div><div><span class="eyebrow">ESTACIÓN DE INVESTIGACIÓN 001</span><h1>Tamagotchi <em>Académico</em></h1></div></div><div class="top-right"><span class="online-dot"></span><span class="save-label">Guardado local</span><span class="version-tag">MVP 1.0</span></div></header>
  <div class="notice-banner">UN JUEGO SATÍRICO · Los puntajes y criterios son <strong>ficticios</strong>; no evalúan oficialmente el SNII.</div>
  <div class="workspace"><aside class="left-sidebar"><div class="panel sidebar-top"><div class="panel-title">ESTADO VITAL <span>✦</span></div>
  ${vitalMeter('energy','⚡ Energía','yellow')}${vitalMeter('motivation','💖 Motivación','pink')}${vitalMeter('concentration','🎯 Concentración','purple')}${vitalMeter('wellbeing','🌿 Bienestar','mint')}${vitalMeter('stress','🌡️ Estrés','red')}
  ${healthPanel()}<details class="other-needs"><summary>Otras capacidades ▾</summary>${meter('🔎 Curiosidad',n.curiosity,'purple')}${meter('🧠 Competencia',n.competence,'mint')}${meter('🤝 Socialización',n.socialization,'pink')}${meter('⚖️ Integridad',n.scientificIntegrity,'yellow')}</details></div>
  <div class="panel care-panel"><div class="panel-title">CUIDAR A ${esc(s.pet.name).toUpperCase()}</div><p class="mini-description">El cuidado no consume PA.</p><div class="care-grid">${CARE.map(c=>button('care',c.id,`${c.icon} <span>${esc(c.label)}</span>`,busy,'care-btn')).join('')}</div></div>
  <div class="panel automation-panel"><div class="panel-title">ASISTENTE ACADÉMICO <span>🤖</span></div><p>${s.stageIndex<4?'Disponible a partir de Universidad.':s.automation?'Apoya proyectos durante ausencias. Consume créditos de mantenimiento.':'Actívalo por 35 CR; su producción está limitada.'}</p>${s.stageIndex>=4?button(s.automation?'auto-off':'auto-on','',s.automation?'Desactivar asistente':'Activar asistente (35 CR)',busy):''}</div></aside>
- <main class="center"><div class="pet-scene world-${esc(sceneForStage(s.stageIndex).landscape)} mood-${mood.mood} ${studyBlocker(n)?'scene-crisis':vitalAlerts(n).length?'scene-warning':'scene-good'}"><div class="scene-top"><span class="scene-label">✧ ${esc(PET_KINDS[petArea(s.areaId)].name).toUpperCase()}</span><span class="scene-tools"><button class="motion-toggle" data-action="motion" aria-pressed="${animationsEnabled}" title="El sistema también respeta la preferencia de movimiento reducido del dispositivo">${animationsEnabled?'⏸ Pausar movimiento':'▶ Activar movimiento'}</button><span class="scene-time">GENERACIÓN ${s.generation}</span></span></div>${sceneEnvironment()}<div class="pet-travel ${sceneDestination&&stationIndex(s.stageIndex,sceneDestination)>=0?'at-station':''} ${sceneWalkPending?'is-walking':''}" style="--travel-x:${travelOffset().x}px;--travel-y:${travelOffset().y}px">${avatar()}</div>
- <div class="pet-caption"><span class="mood-tag">${mood.symbol} ${esc(mood.label)}</span><h2>${esc(s.pet.name)}</h2><p>${st.emblem} ${esc(st.label)} · Evolución ${s.stageIndex+1}/14</p><p class="pet-mood-hint">${esc(mood.hint)}</p><p class="pet-learning-hint">📖 ${esc(LEARNING_STAGES[s.stageIndex].hook)}</p>${mood.signals.length?`<div class="pet-vital-signals" aria-label="Necesidades que requieren atención">${mood.signals.map(signal=>`<span class="pet-signal ${signal.severe?'critical':'warning'}">${signal.icon} ${esc(signal.label)}${signal.severe?' · crítico':''}</span>`).join('')}</div>`:''}</div></div>
+ <main class="center"><div class="pet-scene world-${esc(sceneForStage(s.stageIndex).landscape)} area-${esc(s.areaId)} mood-${mood.mood} ${studyBlocker(n)?'scene-crisis':vitalAlerts(n).length?'scene-warning':'scene-good'}"><div class="scene-top"><span class="scene-label">✧ ${esc(PET_KINDS[petArea(s.areaId)].name).toUpperCase()}</span><span class="scene-tools"><button class="motion-toggle" data-action="motion" aria-pressed="${animationsEnabled}" title="El sistema también respeta la preferencia de movimiento reducido del dispositivo">${animationsEnabled?'⏸ Pausar movimiento':'▶ Activar movimiento'}</button><span class="scene-time">GENERACIÓN ${s.generation}</span></span></div>${sceneEnvironment()}<div class="pet-travel ${sceneDestination&&stationIndex(s.stageIndex,sceneDestination)>=0?'at-station':''} ${sceneWalkPending?'is-walking':''}" style="--travel-x:${travelOffset().x}px;--travel-y:${travelOffset().y}px">${avatar()}</div>
+ <div class="pet-caption"><span class="mood-tag">${mood.symbol} ${esc(mood.label)}</span><h2>${esc(s.pet.name)}</h2><p>${st.emblem} ${esc(st.label)} · Evolución ${s.stageIndex+1}/14</p><p class="pet-mood-hint">${esc(mood.hint)}</p><p class="pet-learning-hint">📖 ${esc(LEARNING_STAGES[s.stageIndex].hook)}</p><p class="area-focus-hint">${esc(areaRouteDescription(s.areaId,s.stageIndex,s.areaPath))}</p>${mood.signals.length?`<div class="pet-vital-signals" aria-label="Necesidades que requieren atención">${mood.signals.map(signal=>`<span class="pet-signal ${signal.severe?'critical':'warning'}">${signal.icon} ${esc(signal.label)}${signal.severe?' · crítico':''}</span>`).join('')}</div>`:''}</div></div>
  <div class="resource-cards"><div class="resource-card"><span>⚡ PUNTOS DE ACCIÓN</span><strong>${fmt(s.ap)} <small>/ ${st.maxAP}</small></strong><div class="micro-track"><i style="width:${percent(s.ap,st.maxAP)}%"></i></div><small>${s.ap>=st.maxAP?'PA completos':`+1 PA en aproximadamente ${Math.ceil((1-(s.apRegenRemainder??0))*60/st.apPerHour)} min`}</small></div><div class="resource-card"><span>🪙 CRÉDITOS</span><strong>${fmt(s.credits)}</strong><small>Fondos imaginarios</small></div><div class="resource-card"><span>⭐ UPE DE ETAPA</span><strong>${fmt(s.stageXp)} <small>/ ${fmt(st.target)}</small></strong><div class="micro-track violet"><i style="width:${percent(s.stageXp,st.target)}%"></i></div></div></div>
  <div class="panel stage-progress"><div class="progress-header"><div><span class="eyebrow">PROGRESO DE CARRERA</span><h3>${esc(st.label)} ${s.stageIndex<13?'→ '+esc(STAGES[s.stageIndex+1].short):'· Modo continuo'}</h3></div><span>${fmt(percent(s.stageXp,st.target))}%</span></div><div class="progress-track"><i style="width:${percent(s.stageXp,st.target)}%"></i></div><p>📄 Evidencias: ${s.evidence}/${STAGE_GATE(s.stageIndex)} · 🎯 Competencia: ${fmt(n.competence)}/50 · 🔁 Racha: ${s.streak+1} · ⚙️ Rendimiento vital: ${Math.round(performanceFactor(n)*100)} %</p></div>
  <div class="panel mini-log"><div class="panel-title">ÚLTIMA NOTA DE LABORATORIO <span>✎</span></div><p>${esc(s.history[0]||'¡Bienvenido al laboratorio!')}</p></div></main>
@@ -331,6 +362,17 @@ root.addEventListener('click',async(event)=>{
   await execute('activity.execute',{activityId:id,practiceMode:'repeat'});break;
  }
  case 'care':await execute('care.perform',{careActionId:id});break;
+ // Solo se envía el ID de rama. El motor valida pertenencia al área y etapa.
+ case 'choose-route':await execute('career.chooseRoute',{branchId:id});break;
+ // Los intentos incorrectos son gratuitos; solo una respuesta acertada
+ // emite un comando persistente, con su premio único por etapa.
+ case 'field-answer':{
+  const challenge=fieldChallenge(player().areaId,player().stageIndex,player().areaPath);
+  const option=Number(id);
+  if(option===challenge.correct)await execute('career.completeFieldMission',{answer:option});
+  else notify(`🌱 Sigue probando. ${challenge.hint} No pierdes PA.`,true);
+  break;
+ }
  case 'species':{const area=document.querySelector<HTMLSelectElement>('#species-choice')?.value; if(area)await execute('pet.changeArea',{areaId:area});break;}
  case 'advance':await execute('career.confirmTransition');break;
  case 'submit':await execute('project.submit');break;

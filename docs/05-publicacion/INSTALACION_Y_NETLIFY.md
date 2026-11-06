@@ -1,42 +1,32 @@
-# Instalar, desarrollar y publicar
+# Instalación, CI y Netlify
 
-## Requisitos
+## Desarrollo
 
-Node.js **20 o posterior** y npm. Para contribuir, usar un clon del repositorio `Ponchahontas/Mascota-SNII`.
+Se requiere **Node.js 20 o posterior** y npm.
 
-## Comandos
-
-~~~bash
-git clone https://github.com/Ponchahontas/Mascota-SNII.git
-cd Mascota-SNII
+```bash
 npm install
 npm run typecheck
 npm test
 npm run build
 npm run dev
-~~~
+```
 
-- `npm run build` genera `dist/` mediante `scripts/build.mjs`.
-- `npm run dev` compila y arranca el servidor local de `scripts/serve.mjs`.
-- `npm test` compila y ejecuta pruebas de Node.
-- No subir `dist/`, cachés o `node_modules/` como código fuente cuando se use despliegue desde repositorio.
+`npm run build` escribe `dist/`. El servidor local inicia en `http://localhost:4173`. `node_modules/` y `dist/` están excluidos del repositorio mediante `.gitignore`.
 
-## Netlify desde GitHub
+## Publicación desde GitHub
 
-1. En Netlify, crear un proyecto desde el repositorio de GitHub.
-2. Rama de producción: `main`.
-3. Build command: `npm run build`.
-4. Publish directory: `dist`.
-5. Node compatible con `>=20`, según `package.json`.
-6. Revisar los logs de build y abrir el enlace público.
-7. Probar manualmente las seis estaciones, recarga y funcionalidad offline antes de compartirlo.
+Conectar `Ponchahontas/Mascota-SNII` con Netlify, rama `main`, comando `npm run build`, directorio de publicación `dist`. El archivo `netlify.toml` contiene el contrato. Verificar el *commit SHA* asociado al despliegue; un despliegue en estado `ready` no confirma la usabilidad del juego.
 
-El repositorio ya incluye `netlify.toml`. Para Netlify Drop, subir **el contenido compilado de `dist/`**, no la carpeta de fuentes que necesita instalación y build.
+## Caché PWA
 
-## PWA
+`public/sw.js` mantiene la lista de recursos del shell, incluidos `src/data/area-routes.js` y **nueve SVG** en `public/pets/`. Con cada modificación incompatible, subir el sufijo de caché. No cambiar el nombre de la IndexedDB `tamagotchi-academico-v2` sin migración, porque allí viven las partidas.
 
-`public/sw.js` gestiona caché del shell; actualizar la versión de caché cuando cambien recursos y comprobar refresco en dispositivos que conservaron versiones antiguas. Una PWA declarada instalable no garantiza que haya sido probada en iOS/Android.
+## Verificaciones manuales
 
-**Estado al 4 de noviembre de 2026:** existe configuración de despliegue, pero este documento no certifica un sitio Netlify v0.9 publicado y verificado.
+- Probar nueve personajes y sus 14 cuadros en sitio público.
+- Tras actualizar, comprobar que se recargan todos los módulos y nuevas imágenes, incluso sin conexión.
+- Probar importar partida antigua, exportar JSON, responder misiones, elegir rama desde Universidad y ver cierre en Emérito.
+- Confirmar funcionamiento móvil, teclado y preferencias de movimiento reducido.
 
-Volver al [índice](../README.md).
+Para un lanzamiento manual usando Netlify Drop, subir **el contenido compilado de `dist/`**, no la carpeta de código fuente. Ver [Pruebas](../04-calidad/PRUEBAS_Y_ACEPTACION.md).

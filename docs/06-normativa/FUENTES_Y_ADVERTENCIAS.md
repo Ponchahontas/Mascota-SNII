@@ -1,22 +1,21 @@
-# Advertencias y verificación normativa
+# Fuentes normativas y límites de interpretación
 
-Mascota-SNII es **una obra lúdica y educativa independiente**. Ningún nivel, insignia, métrica, puntos, actividad o requisito dentro del juego constituye acreditación, evaluación ni consejo oficial sobre el Sistema Nacional de Investigadoras e Investigadores (SNII).
+Mascota-SNII es un juego independiente. Los niveles, puntajes, rangos de PA/CR/UPE, rutas, enseñanzas, evidencias y finales son **ficticios** y no acreditan requisitos reales ni otorgan reconocimiento de ninguna institución.
 
-## Fuentes para verificar antes de publicar afirmaciones normativas
+## Fuente primaria sobre la clasificación de nueve áreas
 
-- Marco legal y convocatorias oficiales de la Secretaría de Ciencia, Humanidades, Tecnología e Innovación (Secihti): https://www.secihti.mx/snii/marco-legal/
-- Diario Oficial de la Federación (DOF): https://www.dof.gob.mx/
+Secretaría de Ciencia, Humanidades, Tecnología e Innovación. **«Lineamientos para el funcionamiento del Sistema Nacional de Investigadoras e Investigadores»**, DOF, **6 de febrero de 2026**, anexo técnico, apartado «Lista de áreas de conocimiento»:
 
-La referencia [histórica de normativa](../historico/05_NORMATIVA_Y_FUENTES.md) reúne enlaces anteriores que **pueden no estar vigentes**; requiere comprobación de publicación, fecha, cambios, derogaciones, áreas del conocimiento y disposiciones transitorias.
+https://www.dof.gob.mx/nota_detalle.php?codigo=5779537&fecha=06/02/2026
 
-## Procedimiento
+Área I. Físico-Matemáticas y Ciencias de la Tierra; II. Biología y Química; III. Medicina y Ciencias de la Salud; IV. Ciencias de la Conducta y la Educación; V. Humanidades; VI. Ciencias Sociales; VII. Ciencias de Agricultura, Agropecuarias, Forestales y de Ecosistemas; VIII. Ingenierías y Desarrollo Tecnológico; IX. Interdisciplinaria.
 
-1. Definir la afirmación concreta (nivel, criterio, convocatoria o área) y su fecha de aplicación.
-2. Buscar fuente primaria oficial y registrar nombre, enlace, fecha de publicación, vigencia y fecha de consulta.
-3. Comparar anexos y transitorios; evitar inferir que un documento antiguo sigue vigente.
-4. Guardar una ficha de fuente separada de las fórmulas ficticias del motor.
-5. Revisar lenguaje para no presentar la sátira como descripción de obligaciones reales.
+Los **Criterios Específicos de Evaluación** se publicaron en el DOF el **22 de abril de 2026**; su contenido no se ha incorporado automáticamente como reglas del videojuego:
 
-**No se ha efectuado una auditoría jurídica/normativa integral de la versión v0.9.**
+https://www.dof.gob.mx/nota_detalle.php?codigo=5785593
 
-Volver al [índice](../README.md).
+El juego debe mantener separados los IDs de área, las descripciones educativas y la regulación oficial de productos/evaluación. **No** afirmar que las 126 misiones ni los desenlaces son criterios de evaluación oficiales.
+
+## Control de fuentes
+
+Antes de añadir afirmaciones sobre niveles SNII, verificar norma vigente, fecha, área, transitorios, anexos y publicación oficial. Guardar fuente, fecha de consulta y límite de interpretación. Las fichas históricas están en [Archivo](../historico/README.md).

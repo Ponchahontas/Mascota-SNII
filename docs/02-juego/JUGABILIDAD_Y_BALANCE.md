@@ -1,32 +1,17 @@
-# Jugabilidad, cuidado y balance
+# Jugabilidad y balance (MVP v0.10.0)
 
-## Bucle básico
+El usuario acompaña a una mascota ficticia por 14 etapas. En cada etapa puede visitar seis estaciones educativas (cinco preguntas por actividad), cumplir una misión de campo propia de su área, realizar prácticas con PA y cuidados sin PA, completar proyectos y solicitar avance cuando el motor valide los requisitos del juego.
 
-**Elegir etapa/área → explorar una estación → resolver cinco descubrimientos → confirmar práctica → obtener avance → cuidar a la mascota → cumplir requisitos de transición.** Las seis aventuras de cada etapa pueden alternarse; el progreso se identifica por actividad.
+**PA** se recupera a una tasa por etapa, con fracciones acumuladas y límites; **CR** es dinero ficticio; **UPE** es progreso lúdico, no un criterio SNII; evidencia, proyectos y logros son también ficticios. El motor es `src/core/engine-game.ts`, y la tabla de tasas está en `src/data/catalog.ts`.
 
-## Recursos
+## Cuidado y dificultad
 
-- **PA**: puntos de acción para prácticas; se recuperan con el tiempo hasta el máximo de la etapa. La tasa y máximo están en `STAGES` de `src/data/catalog.ts`. El paso del tiempo incluye acumulación compatible con fracciones.
-- **CR**: créditos ficticios para ciertas acciones y cuidados; prever rutas de recuperación gratuitas para evitar partidas bloqueadas.
-- **UPE**: unidades ficticias de progreso de etapa. La progresión requiere también las condiciones que valida el motor; alcanzar el objetivo numérico no garantiza por sí solo la transición.
-- **Proyectos/evidencias**: operaciones específicas del motor; el avance pasivo no crea automáticamente publicaciones ni reconocimientos.
+Energía, motivación, concentración y bienestar bajos reducen rendimiento. Estrés alto también perjudica. Crisis combinadas mantenidas durante tiempo simulado pueden terminar la generación en Equilibrado o Exigente; Tranquilo no impone deserción definitiva. Las simulaciones de ausencia se limitan a ocho horas por procesamiento. La actividad «Acompañar» permite recuperar un poco de motivación sin pagar créditos.
 
-## Necesidades y riesgo
+## Premio de misión de campo
 
-Cinco indicadores principales de 0 a 100: energía, motivación, concentración, bienestar y estrés (a diferencia de los demás, el estrés **perjudica cuando aumenta**). Valores extremos reducen el rendimiento o bloquean temporalmente el estudio. La deserción lúdica no surge por un clic aislado: depende de crisis combinadas sostenidas y de la dificultad.
+Cada una de las nueve áreas tiene un reto temático por etapa. Resolverlo por primera vez concede un bono modesto y `fieldMilestones` registra la etapa; la misma etapa no se puede recompensar otra vez cambiando de especie. No consume PA ni añade evidencia administrativa.
 
-Dificultades: `tranquilo`, `normal` (Equilibrado) y `exigente`. Los cálculos y umbrales actuales tienen su fuente única en `src/core/engine-health.ts`; no copiar números aislados a la interfaz ni asumir que ya están equilibrados.
+## Validez
 
-## Filosofía educativa
-
-- Respuestas incorrectas: explicación y posibilidad de reintentar, sin castigar con PA.
-- Cinco descubrimientos correctos: abren la práctica y el modo de repetición según el flujo vigente.
-- Repeticiones: no deben generar recompensas de primera vez otra vez.
-- Cuidados: no consumen PA; algunas acciones cuestan CR, y existe acompañamiento gratuito de recuperación.
-- El usuario elige y acompaña; no hace pasar el trabajo de la mascota por el suyo.
-
-## Para revisar reglas reales
-
-Consultar `src/core/engine-game.ts`, `src/core/engine-health.ts`, `src/core/engine-needs.ts` y `src/data/stage-activities.ts`. La [tabla antigua](../historico/01_TABLA_ETAPAS.md) y la [matriz antigua](../historico/02_ACTIVIDADES_Y_NEcesidades.md) son propuestas históricas, **no** parametrizaciones vigentes.
-
-Volver al [índice](../README.md).
+Las reglas de balance aún necesitan pruebas longitudinales; las referencias al SNII son contexto narrativo y no equivalen a parámetros de evaluación oficiales. Para las nueve áreas ver [Áreas y rutas](AREAS_Y_RUTAS.md).

@@ -1,14 +1,9 @@
-# Interfaz y animaciones — guía actual
+# Interfaz — guía para modificar pantallas
 
-La interfaz **está implementada** en `app.ts` y los estados de expresión se gestionan en `pet-animation.ts`. Los estilos y escenarios visuales se encuentran en `../styles.css`. La capa de UI representa los datos y despacha comandos; no modifica directamente la economía de la partida.
+`app.ts` presenta las acciones del usuario; `pet-animation.ts` representa necesidades. La capa visual NO entrega recompensas: solo presenta resultados de comandos confirmados.
 
-## Contratos esenciales
+La ruta de campo se consulta en `areaCareerPanel()`; `AREA_ROUTES`, `branchOf()` y `fieldChallenge()` generan título, ramas y opciones. `choose-route` y `field-answer` emiten comandos al motor. Respuestas equivocadas son gratuitas, no cambian la partida.
 
-- Vincular botones del entorno, aventura abierta y lista lateral **por `activity.id`**.
-- Mostrar el título, icono, etapa y progreso de los cinco pasos de la actividad correcta.
-- Guardar los aciertos por el motor/transacción; el estado transitorio del panel no equivale a un guardado.
-- Mantener señales de emoción accesibles: texto, contraste, foco, teclado y movimiento reducido.
-- No guardar animaciones pasajeras ni duplicar recompensas al renderizar.
-- Revisar el comportamiento móvil y PWA en navegador real: las pruebas unitarias no sustituyen la evaluación visual.
+El escenario de las seis estaciones de una etapa y sus preguntas se vincula por `activity.id`, **independientemente** de `areaId`. Esto permite añadir un recorrido temático por área sin romper los cinco pasos de cada aventura.
 
-Consulta [arte, escenas y accesibilidad](../../docs/02-juego/AVATARES_Y_ESCENARIOS.md), [arquitectura](../../docs/03-tecnica/ARQUITECTURA.md) y [pruebas](../../docs/04-calidad/PRUEBAS_Y_ACEPTACION.md).
+Comprobar diseño móvil, foco de teclado y preferencias de movimiento reducido. Documentos: [Áreas y rutas](../../docs/02-juego/AREAS_Y_RUTAS.md) · [Arquitectura](../../docs/03-tecnica/ARQUITECTURA.md).

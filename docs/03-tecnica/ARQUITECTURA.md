@@ -1,40 +1,25 @@
-# Arquitectura técnica vigente
+# Arquitectura técnica — v0.10.0
 
-## Resumen
+Aplicación estática local-first en TypeScript/HTML/CSS/SVG; transpilada a `dist/` por `scripts/build.mjs`. No usa backend para el progreso ordinario. Persistencia con IndexedDB, caché pública con Cache Storage y exportación/importación manual JSON.
 
-Aplicación web **estática, TypeScript y local-first**. `scripts/build.mjs` compila recursos para `dist/`. No se usa un backend para el juego principal. Netlify publica los archivos estáticos.
+## Flujo de una acción
 
-## Recorrido de una acción
+`src/ui/app.ts` → `src/core/game-coordinator.ts` → transacción `src/core/persistence.ts` → motor `src/core/engine-game.ts` (estado inmutable de salida) → confirmación y render. **La UI no adjudica UPE**; la capa de transacción evita que reintentar una orden duplique beneficios.
 
-1. `src/ui/app.ts` recibe la interacción y muestra una vista del estado.
-2. `src/core/game-coordinator.ts` prepara el comando.
-3. `src/core/persistence.ts` valida revisión/idempotencia y realiza la transacción IndexedDB.
-4. `src/core/engine-game.ts` y motores auxiliares calculan el siguiente estado sin tocar el DOM.
-5. Tras confirmarse la escritura, la UI vuelve a representar el estado persistido.
+## Módulos vigentes
 
-## Mapa actual
+- `src/core/`: estado, recursos, necesidad/salud, comandos, idempotencia y guardado.
+- `src/data/catalog.ts`: nueve áreas, 14 etapas, cuidado y eventos.
+- `src/data/stage-activities.ts`: 84 actividades por etapa.
+- `src/data/learning-path.ts`, `activity-extras.ts`, `learning-sequences.ts`: cinco pasos por actividad, con ID estable.
+- **`src/data/area-routes.ts`**: un foco de campo por área y etapa, dos ramas por área, validadores y finales de relato.
+- `src/data/scene-world.ts`: estaciones por etapa y relación por `activity.id`.
+- `src/data/pet-visuals.ts`, `public/pets/`, `scripts/generate-pets.py`: nueve sprites originales (14 cuadros por mascota).
+- `src/ui/app.ts`, `pet-animation.ts` y `src/styles.css`: interacción, movimiento, emociones y elección de rama.
+- `public/sw.js`, `netlify.toml`: PWA estática y despliegue.
 
-| Capa | Archivos |
-| --- | --- |
-| Entrada y pantalla | `src/main.ts`; `src/ui/app.ts` |
-| Animaciones | `src/ui/pet-animation.ts`; `src/styles.css` |
-| Contratos de órdenes | `src/core/commands.ts`; `src/core/game-coordinator.ts` |
-| Motor y necesidades | `src/core/engine-game.ts`; `src/core/engine-health.ts`; `src/core/engine-needs.ts` |
-| Partidas | `src/core/state.ts`; `src/core/persistence.ts` |
-| Etapas, actividades y cuidado | `src/data/catalog.ts`; `src/data/stage-activities.ts` |
-| Preguntas y escenarios | `src/data/learning-path.ts`; `src/data/learning-sequences.ts`; `src/data/activity-extras.ts`; `src/data/scene-world.ts` |
-| Especies y dibujos | `src/data/pet-visuals.ts`; `public/pets/` |
-| PWA / build | `public/sw.js`; `public/manifest.webmanifest`; `scripts/build.mjs`; `netlify.toml` |
-| Tests | `tests/*.test.mjs`; workflow de GitHub Actions |
+## Compatibilidad
 
-## Normas de cambio
+`schemaVersion` se mantiene en **2**. `areaPath` y `fieldMilestones` son opcionales, así se pueden importar partidas de siete áreas previas a v0.10.0. Cambiar IDs de área, ramas, actividades o índices de pasos requiere análisis de migración antes de publicar.
 
-- Mantener la UI como capa de presentación; no otorgar PA, UPE o evidencias desde un clic del DOM.
-- El motor produce resultados reproducibles; el guardado transaccional decide su confirmación.
-- Estabilizar IDs de las actividades, órdenes y pasos educativos; las partidas los contienen.
-- No guardar estados transitorios de animación como decisiones académicas.
-- Documentar con JSDoc/TSDoc las invariantes y los motivos de las decisiones no obvias.
-
-Comparar con [diagrama histórico propuesto](../historico/07_ESTRUCTURA_PROYECTADA.md), que incluye módulos **no implementados con esos nombres**.
-
-Volver al [índice](../README.md).
+Consultar [Persistencia](PERSISTENCIA_Y_COMANDOS.md), [Áreas](../02-juego/AREAS_Y_RUTAS.md) y [Contribuir](../../CONTRIBUTING.md).

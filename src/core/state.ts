@@ -23,6 +23,10 @@ export interface GameSave {
  gameId:string; schemaVersion:number; contentVersion:string; balanceVersion:string; normativeVersionId:string;
  revision:number; createdAt:string; lastProcessedSimTime:string;
  pet:PetState; areaId:string; difficultyId:string; stageIndex:number; generation:number;
+ /** Rama especializada opcional; se elige desde Universidad y se conserva hasta el legado. */
+ areaPath?:string;
+ /** Etapas que ya premiaron un reto de campo; claves numéricas 0..13, evita farmear cambiando el área. */
+ fieldMilestones?:number[];
  ap:number; apRegenRemainder?:number; risk?:AcademicRisk; credits:number; stageXp:number; totalXp:number; evidence:number; completedProjects:number;
  projectProgress:number; projectName:string; actions:number; lastActivity:string; streak:number;
  automation:boolean; event:GameEvent|null; eventCursor:number; achievements:string[];

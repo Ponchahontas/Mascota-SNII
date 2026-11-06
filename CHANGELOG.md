@@ -1,12 +1,23 @@
 # Historial de cambios · Mascota-SNII
 
-## Documentación · 4 de noviembre de 2026 (sin cambios al motor)
+## v0.10.0 — Nueve áreas, 126 evoluciones y rutas académicas
 
-- Se organiza la documentación vigente en proyecto, juego, técnica, calidad, publicación y normativa.
-- Se preservan 18 documentos previos en `docs/historico/` y se mantienen enlaces de compatibilidad en sus rutas originales.
-- Se actualizan README, CONTRIBUTING e instrucciones para Codex/Work según el MVP v0.9.
-- Se distingue contenido implementado, pruebas automatizadas y validación visual/educativa pendiente.
-- Sin cambio de versión de juego ni de reglas: `package.json` permanece en v0.9.
+- Nuevos personajes: **Colibrí pedagogo** (IV. Conducta y Educación) y **Quimera interdisciplinaria** (IX).
+- Mantiene los siete identificadores anteriores y añade nueve recorridos temáticos de 14 etapas.
+- **126 misiones de campo**, dos especializaciones por área desde Universidad y **18 cierres narrativos**.
+- Motor con una recompensa por etapa, registro de hitos y decisiones persistentes opcionales.
+- Regeneración documentada de SVG y corrección del rostro de Quimera.
+- Caché PWA v10 con nuevos sprites y módulo de rutas; borrado acotado por prefijo.
+- README, índice de documentación, guía de áreas, arquitectura y convenciones de comentarios actualizados.
+- **71 pruebas locales** aprobadas, incluidas validaciones de documentación. Pendiente prueba visual en navegador y revisión pedagógica profesional.
+
+## Documentación — 4 de noviembre de 2026
+
+- Reorganización temática de las guías técnicas y pedagógicas.
+- Conservación de 18 documentos antiguos en `docs/historico/` y enlaces de compatibilidad.
+- Actualización de las instrucciones de continuidad para Codex/Work y convenciones de contribución.
+
+
 ## v0.9.0 — Una estación, una actividad y sus cinco preguntas
 
 - Identidad visible de la estación elegida: icono, nombre, etapa, posición 1–6.

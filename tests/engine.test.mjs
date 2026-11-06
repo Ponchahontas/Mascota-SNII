@@ -91,9 +91,9 @@ test('progresar modifica el proyecto educativo, pero conserva la especie por ár
  assert.equal(next.areaId,'fisico');assert.equal(next.pet.appearanceId,'fisico');
  assert.match(next.projectName,/primaria/i);
 });
-test('las siete especies tienen catorce cuadros de SVG disponibles',()=>{
+test('las nueve especies tienen catorce cuadros de SVG disponibles',()=>{
  const areas=Object.keys(PET_KINDS);
- assert.equal(areas.length,7);
+ assert.equal(areas.length,9);
  for(const area of areas){
   assert.equal(petArea(area),area);
   const svg=readFileSync('dist'+petSprite(area).substring(1),'utf8');
