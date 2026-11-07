@@ -1,5 +1,13 @@
 # Historial de cambios
 
+## v0.12.0 — Casos aplicados para las nueve áreas
+
+- Se incorporan 90 casos con escenario, decisión, distractores plausibles, pista y retroalimentación; abarcan Universidad a Emérito en las nueve áreas.
+- El aprendizaje queda visible después de registrar el reto de campo. Se preservan preguntas escolares, seis estaciones por etapa, 420 descubrimientos, recompensas y guardados existentes.
+- Se amplían pruebas de cobertura y compatibilidad, actualizando la caché PWA y la documentación.
+- Pendiente: revisión pedagógica de especialistas y pruebas visuales con jugadores.
+
+
 ## v0.11.1 — Corrección editorial de redundancias (6 de noviembre de 2026)
 
 - Se elimina la introducción duplicada en la sección de Carrera de las nueve áreas y catorce etapas.

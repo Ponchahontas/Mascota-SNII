@@ -12,6 +12,7 @@
  * - La misión de campo no usa índices de preguntas ya almacenados (0..4).
  */
 import { STAGES } from './catalog.js';
+import { researchCaseFor } from './research-cases.js';
 
 export interface AreaBranch { id:string; label:string; goal:string; ending:string; }
 export interface AreaRoute {
@@ -181,16 +182,20 @@ export function fieldChallenge(areaId:string,stageIndex:number,branchId?:string|
  const i=Math.max(0,Math.min(13,Math.trunc(stageIndex)));
  const method=EDUCATIONAL_METHODS[i],theme=entry.themes[i];
  const [scene,ask,hint,explain]=STAGE_COPY[i];
+ // Casos específicos por área entre Universidad y Emérito. Se preservan los
+ // cuatro niveles escolares para no alterar su progresión ni sus guardados.
+ const applied=researchCaseFor(entry.id,i);
  const branch=entry.branches.find(item=>item.id===branchId);
- const starting=[method.correct,...method.wrong];
+ const starting=applied?[applied[2],applied[3],applied[4]]:[method.correct,...method.wrong];
  // Solución rotada de forma estable: no depende del azar ni de la pantalla.
  const rotated=(i+Object.keys(AREA_ROUTES).indexOf(entry.id))%3;
  const options:[string,string,string]=[starting[(3-rotated)%3],starting[(4-rotated)%3],starting[(5-rotated)%3]];
  return {
   stageIndex:i,title:theme,
-  scene:`${entry.emblem} ${entry.setting}. ${scene}${branch?` Sigue la ruta «${branch.label}».`:''}`,
-  question:ask.replace('{tema}',theme),options,correct:rotated as 0|1|2,
-  hint,explanation:`${explain.replace('{tema}',theme)} En esta etapa se practica ${method.purpose}.`
+  scene:`${entry.emblem} ${entry.setting}. ${applied?applied[0]:scene}${branch?` Sigue la ruta «${branch.label}».`:''}`,
+  question:applied?applied[1]:ask.replace('{tema}',theme),options,correct:rotated as 0|1|2,
+  hint:applied?applied[6]:hint,
+  explanation:applied?applied[5]:`${explain.replace('{tema}',theme)} En esta etapa se practica ${method.purpose}.`
  };
 }
 
@@ -215,7 +220,9 @@ export function validateAreaRoutes():string[] {
   if(entry.branches.length!==2||new Set(entry.branches.map(b=>b.id)).size!==2)errors.push(`${id}: ramas incorrectas`);
   for(let i=0;i<STAGES.length;i++){
    const q=fieldChallenge(id,i);
-   if(!q.title||!q.scene||new Set(q.options).size!==3||q.options[q.correct]!==EDUCATIONAL_METHODS[i].correct)errors.push(`${id}:${i}: reto inválido`);
+   const applied=researchCaseFor(id,i);
+   const expected=applied?applied[2]:EDUCATIONAL_METHODS[i].correct;
+   if(!q.title||!q.scene||new Set(q.options).size!==3||q.options[q.correct]!==expected)errors.push(`${id}:${i}: reto inválido`);
   }
  }
  return errors;

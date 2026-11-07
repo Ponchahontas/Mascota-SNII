@@ -1,6 +1,6 @@
 # Academic Pet · Una aventura de aprendizaje
 
-**MVP v0.11.1** · Videojuego web educativo y satírico en español, instalable como PWA, con almacenamiento local. La mascota crece desde **Kínder hasta SNII Emérito** en un recorrido *ficticio* de catorce etapas. La persona jugadora acompaña y cuida; la mascota realiza actividades propias de su edad o etapa.
+**MVP v0.12.0** · Videojuego web educativo y satírico en español, instalable como PWA, con almacenamiento local. La mascota crece desde **Kínder hasta SNII Emérito** en un recorrido *ficticio* de catorce etapas. La persona jugadora acompaña y cuida; la mascota realiza actividades propias de su edad o etapa.
 
 > **Independencia y alcance.** Las nueve denominaciones de áreas se corresponden con los *Lineamientos para el funcionamiento del SNII* publicados por la Secihti en el DOF el **6 de febrero de 2026**. Las mascotas, puntajes, rutas, preguntas, recompensas y desenlaces son **creaciones del videojuego**, no criterios oficiales, equivalencias de evaluación ni afiliación institucional.
 
@@ -8,7 +8,7 @@
 
 - **9 áreas y 9 mascotas originales**: se añaden el *Colibrí pedagogo* (IV. Conducta y Educación) y la *Quimera interdisciplinaria* (IX). Las siete anteriores conservan sus IDs.
 - **126 cuadros de evolución**: 14 edades por mascota, generadas como nueve sprites SVG de catorce cuadros.
-- **9 recorridos educativos** con un tema de campo distinto por etapa (**126 misiones**), una por área y nivel.
+- **9 recorridos educativos** y **126 misiones de campo**: 36 escolares y **90 casos aplicados**, originales para cada área y etapa desde Universidad hasta Emérito.
 - **18 variantes narrativas de cierre**, dos especializaciones por área elegibles desde Universidad. No constituyen categorías ni títulos oficiales.
 - **84 aventuras educativas** de cinco retos cada una (420 preguntas), vinculadas a seis estaciones por etapa mediante `activity.id`.
 - Cinco medidores de bienestar, recursos, cuidado, dificultades, riesgos, logros, proyectos, guardado IndexedDB, exportación/importación JSON y limitación de progreso offline.
@@ -52,7 +52,7 @@ Servidor de desarrollo: `http://localhost:4173`. Compilación de publicación: `
 | Componente | Responsabilidad |
 |---|---|
 | `src/data/catalog.ts` y `stage-activities.ts` | Áreas, etapas, actividades, cuidados y balance ficticio |
-| `src/data/area-routes.ts` | **9 rutas**, 126 desafíos de campo, 18 especializaciones/desenlaces |
+| `src/data/area-routes.ts`, `research-cases.ts` | **9 rutas**, 126 desafíos de campo, 18 especializaciones/desenlaces |
 | `src/data/learning-path.ts`, `learning-sequences.ts`, `activity-extras.ts` | 420 preguntas estructuradas por actividad |
 | `src/data/pet-visuals.ts`, `public/pets/` | Nueve especies y sus catorce evoluciones |
 | `src/data/scene-world.ts` | Escenarios y estaciones por nivel |
@@ -62,7 +62,7 @@ Servidor de desarrollo: `http://localhost:4173`. Compilación de publicación: `
 | `scripts/generate-pets.py` | Generación reproducible de los sprites con Pillow (solo para regenerar) |
 | `tests/` | Pruebas del motor, rutas, persistencia, actividades y assets |
 
-Documentación: **[Identidad y compatibilidad](docs/01-proyecto/IDENTIDAD_Y_COMPATIBILIDAD.md)** · **[Índice general](docs/README.md)** · **[Auditoría de cumplimiento](docs/01-proyecto/AUDITORIA_CUMPLIMIENTO_2026_11_06.md)** · [Guía para revisar el código](docs/03-tecnica/GUIA_DE_LECTURA_CODIGO.md) · [Áreas y especializaciones](docs/02-juego/AREAS_Y_RUTAS.md) · [Estado real](docs/01-proyecto/ESTADO_ACTUAL.md) · [Pruebas](docs/04-calidad/PRUEBAS_Y_ACEPTACION.md) · [Colaborar](CONTRIBUTING.md) · [Historial](CHANGELOG.md) · [Instrucciones Codex/Work](CONTINUAR_EN_CODEX_O_WORK.md).
+Documentación: **[Identidad y compatibilidad](docs/01-proyecto/IDENTIDAD_Y_COMPATIBILIDAD.md)** · **[Índice general](docs/README.md)** · **[Auditoría de cumplimiento](docs/01-proyecto/AUDITORIA_CUMPLIMIENTO_2026_11_06.md)** · [Guía para revisar el código](docs/03-tecnica/GUIA_DE_LECTURA_CODIGO.md) · [Áreas y especializaciones](docs/02-juego/AREAS_Y_RUTAS.md) · [Casos avanzados](docs/02-juego/CASOS_DE_INVESTIGACION.md) · [Estado real](docs/01-proyecto/ESTADO_ACTUAL.md) · [Pruebas](docs/04-calidad/PRUEBAS_Y_ACEPTACION.md) · [Colaborar](CONTRIBUTING.md) · [Historial](CHANGELOG.md) · [Instrucciones Codex/Work](CONTINUAR_EN_CODEX_O_WORK.md).
 
 ## Revisión editorial de las rutas y aventuras
 

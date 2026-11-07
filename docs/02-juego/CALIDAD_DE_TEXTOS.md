@@ -33,3 +33,7 @@ Las nueve mascotas, las catorce etapas, las 84 aventuras (420 preguntas) y las 1
 La prueba automatizada detecta repeticiones literales y patrones claros de presentación, **no garantiza que los 420 contenidos sean pedagógicamente perfectos**. La revisión didáctica, ortográfica y de pertinencia de los distractores por docentes sigue siendo necesaria.
 
 Para comprobar: `npm run typecheck && npm test && npm run build`. También verificar en navegador real la ficha de campo desde Kínder hasta Emérito y los cambios entre áreas.
+
+## Continuación v0.12.0
+
+Desde Universidad hasta Emérito, las misiones de campo utilizan 90 casos específicos por área en lugar de aplicar un mismo enunciado con otro tema. Consultar [Casos de investigación](CASOS_DE_INVESTIGACION.md). Las 84 aventuras principales de cinco pasos permanecen sin alterar y siguen pendientes de revisión pedagógica.

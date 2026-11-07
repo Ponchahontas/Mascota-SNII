@@ -220,7 +220,7 @@ function areaCareerPanel():string {
   <p>${esc(data.introduction)}</p><p class="field-setting"><strong>📍 Escenario de ${esc(stage().label)}:</strong> ${esc(challenge.scene)}</p>
   ${chooser}
   <div class="field-challenge"><strong>🔎 Reto de campo · ${completed?'✅ completado':'pendiente'} · Etapa ${s.stageIndex+1}/14</strong>
-  ${completed?`<p>¡Este descubrimiento ya está registrado! Puedes seguir con las seis aventuras de tu etapa.</p>`:specialization?'<p>Elige una especialización para activar el reto de esta etapa.</p>':
+  ${completed?`<p>¡Este descubrimiento ya está registrado! Puedes seguir con las seis aventuras de tu etapa.</p><p class="field-learning-result"><strong>📖 Lo que aprendiste:</strong> ${esc(challenge.explanation)}</p>`:specialization?'<p>Elige una especialización para activar el reto de esta etapa.</p>':
   `<p>${esc(challenge.question)}</p><details><summary>💡 Pista educativa</summary><p>${esc(challenge.hint)}</p></details><div class="field-options">${challenge.options.map((option,i)=>button('field-answer',String(i),`${String.fromCharCode(65+i)}. ${esc(option)}`,busy,'field-choice')).join('')}</div><small>No consume PA; un único bono de UPE por etapa. Las respuestas equivocadas permiten reintentar.</small>`}
   </div>${s.stageIndex===13&&completed&&branch?`<p class="area-ending">🌟 ${esc(branch.ending)}</p>`:''}
  </section>`;

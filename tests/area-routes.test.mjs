@@ -36,7 +36,9 @@ test('cada una de las 126 misiones tiene un título, pregunta, opciones y soluci
  for(const [id] of AREAS)for(let i=0;i<STAGES.length;i++){
   const q=fieldChallenge(id,i);
   assert.equal(q.stageIndex,i);
-  assert.ok(q.question.includes(q.title));
+  // Las misiones aplicadas ya no repiten el título en su enunciado: el
+  // contexto se muestra en la escena y la pregunta exige una decisión.
+  assert.ok(i>=4?q.question.length>=25:q.question.includes(q.title));
   assert.equal(q.options.length,3);
   assert.ok(q.options[q.correct].length>20);
   assert.ok(q.hint&&q.explanation);

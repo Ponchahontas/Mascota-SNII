@@ -4,6 +4,7 @@
 |---|---|
 | `catalog.ts` | Nueve áreas, 14 etapas, balance y cuidados |
 | `pet-visuals.ts` | Nueve tipos de mascota, paletas y SVG |
+| `research-cases.ts` | 90 casos originales de las nueve áreas desde Universidad hasta Emérito |
 | `area-routes.ts` | Temas 9 × 14, dos especializaciones por área y misión de campo |
 | `stage-activities.ts` | Seis actividades por etapa |
 | `learning-path.ts`, `activity-extras.ts`, `learning-sequences.ts` | Cinco retos por actividad |

@@ -1,8 +1,9 @@
-# Academic Pet · Documentación (v0.11.1)
+# Academic Pet · Documentación (v0.12.0)
 
 Empieza por este índice. Las especificaciones históricas se preservan en [`historico/`](historico/README.md), pero **no sustituyen al código actual**. Si hay discrepancias, verificar los módulos y actualizar la documentación en el mismo cambio.
 
 | Objetivo | Documento |
+| Explorar casos avanzados basados en decisiones | [90 casos de investigación](02-juego/CASOS_DE_INVESTIGACION.md) |
 |---|---|
 | Consultar identidad, nombre y compatibilidad | [Marca y migración segura](01-proyecto/IDENTIDAD_Y_COMPATIBILIDAD.md) |
 | Entender qué existe y qué falta | [Estado actual](01-proyecto/ESTADO_ACTUAL.md) |
