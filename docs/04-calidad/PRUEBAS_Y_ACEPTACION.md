@@ -2,7 +2,7 @@
 
 ## Automatizadas
 
-`npm run typecheck`, `npm test`, `npm run build`. `npm test` compila y ejecuta los archivos Node de `tests/`. La auditoría de v0.11.0 cerró con **80 pruebas**; **recontar en GitHub Actions tras cada cambio** y distinguir pruebas automáticas de pruebas reales en navegador.
+`npm run typecheck`, `npm test`, `npm run build`. `npm test` compila y ejecuta los archivos Node de `tests/`. La versión v0.12.0 pasó **84 pruebas automatizadas** en GitHub Actions; **recontar tras cada cambio** y distinguir pruebas automáticas de pruebas reales en navegador.
 
 `tests/area-routes.test.mjs` cubre la nueva extensión: nueve especies/14 cuadros, 126 misiones, dos especializaciones por área, 18 finales de relato, una recompensa por etapa y compatibilidad con las siete áreas existentes. `tests/documentation.test.mjs` verifica enlaces de las guías actuales. Otras suites cubren motor, cuidado, salud, preguntas, escenas y animación.
 
@@ -19,3 +19,7 @@ La suite `tests/text-quality.test.mjs` incorpora comprobaciones de duplicaciones
 7. Comprobar que Netlify sirva los dos SVG nuevos y que el service worker actualice cachés.
 
 **Una compilación correcta no equivale a aprobar las pruebas visuales, el balance ni una evaluación pedagógica externa.**
+
+### Casos de investigación (v0.12.0)
+
+`tests/research-cases.test.mjs` valida 90 casos distintos, soluciones inequívocas, conservación de preguntas escolares, premios por etapa sin duplicación y estabilidad de identificadores. Se requieren además revisiones pedagógicas por expertos y sesiones de uso observadas.

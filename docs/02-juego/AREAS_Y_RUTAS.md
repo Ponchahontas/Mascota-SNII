@@ -1,4 +1,4 @@
-# Nueve áreas, especies y rutas educativas — MVP v0.11.1
+# Nueve áreas, especies y rutas educativas — MVP v0.12.0
 
 ## Fuente y alcance
 
@@ -44,3 +44,7 @@ El desafío de campo es **adicional** a las seis aventuras base de cada nivel, c
 ## Verificación
 
 `npm run typecheck && npm test && npm run build`. La prueba `tests/area-routes.test.mjs` verifica nueve áreas, 126 misiones, compatibilidad con partidas anteriores, ramas y 18 cierres narrativos. Validar además las imágenes, teclado y cambios de área en un navegador real.
+
+## Casos avanzados incorporados en v0.12.0
+
+A partir de Universidad, las nueve áreas cuentan con 90 situaciones particulares para aprender a decidir con evidencia. Su fuente es `src/data/research-cases.ts`; [guía editorial y de integración](CASOS_DE_INVESTIGACION.md). Es una mejora de las **misiones de campo**, no una diferenciación completa de las seis actividades comunes por etapa.

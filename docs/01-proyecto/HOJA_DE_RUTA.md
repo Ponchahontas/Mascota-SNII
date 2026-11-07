@@ -1,4 +1,4 @@
-# Hoja de ruta de Academic Pet desde v0.11.0
+# Hoja de ruta de Academic Pet desde v0.12.0
 
 | Prioridad | Trabajo | Aceptación |
 |---|---|---|
@@ -13,3 +13,7 @@
 | P2 | Revisión periódica de fuentes oficiales | Separación clara de norma y ficción |
 
 Trabajar en cambios pequeños con pruebas, comentarios y documentación sincronizados. Ver [Estado](ESTADO_ACTUAL.md).
+
+## Realizado en v0.12.0
+
+Las 90 misiones avanzadas pasaron a casos por disciplina con pistas y conclusiones propias. Queda pendiente contextualizar las seis aventuras compartidas de cada etapa y probar el material con especialistas y estudiantes. Ver [Casos de investigación](../02-juego/CASOS_DE_INVESTIGACION.md).
