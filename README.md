@@ -1,6 +1,6 @@
 # Academic Pet · Una aventura de aprendizaje
 
-**MVP v0.11.0** · Videojuego web educativo y satírico en español, instalable como PWA, con almacenamiento local. La mascota crece desde **Kínder hasta SNII Emérito** en un recorrido *ficticio* de catorce etapas. La persona jugadora acompaña y cuida; la mascota realiza actividades propias de su edad o etapa.
+**MVP v0.11.1** · Videojuego web educativo y satírico en español, instalable como PWA, con almacenamiento local. La mascota crece desde **Kínder hasta SNII Emérito** en un recorrido *ficticio* de catorce etapas. La persona jugadora acompaña y cuida; la mascota realiza actividades propias de su edad o etapa.
 
 > **Independencia y alcance.** Las nueve denominaciones de áreas se corresponden con los *Lineamientos para el funcionamiento del SNII* publicados por la Secihti en el DOF el **6 de febrero de 2026**. Las mascotas, puntajes, rutas, preguntas, recompensas y desenlaces son **creaciones del videojuego**, no criterios oficiales, equivalencias de evaluación ni afiliación institucional.
 
@@ -63,6 +63,10 @@ Servidor de desarrollo: `http://localhost:4173`. Compilación de publicación: `
 | `tests/` | Pruebas del motor, rutas, persistencia, actividades y assets |
 
 Documentación: **[Identidad y compatibilidad](docs/01-proyecto/IDENTIDAD_Y_COMPATIBILIDAD.md)** · **[Índice general](docs/README.md)** · **[Auditoría de cumplimiento](docs/01-proyecto/AUDITORIA_CUMPLIMIENTO_2026_11_06.md)** · [Guía para revisar el código](docs/03-tecnica/GUIA_DE_LECTURA_CODIGO.md) · [Áreas y especializaciones](docs/02-juego/AREAS_Y_RUTAS.md) · [Estado real](docs/01-proyecto/ESTADO_ACTUAL.md) · [Pruebas](docs/04-calidad/PRUEBAS_Y_ACEPTACION.md) · [Colaborar](CONTRIBUTING.md) · [Historial](CHANGELOG.md) · [Instrucciones Codex/Work](CONTINUAR_EN_CODEX_O_WORK.md).
+
+## Revisión editorial de las rutas y aventuras
+
+**v0.11.1:** la ficha de Carrera deja de copiar dos veces la introducción de cada área. Las 126 misiones de campo tienen 14 guiones de etapa y las preguntas complementarias de las 78 aventuras posteriores a Kínder alternan redacción y posición de respuesta. Se conservan preguntas, aciertos, guardados, recursos y premios. La revisión educativa externa continúa pendiente. Más información: [calidad de textos](docs/02-juego/CALIDAD_DE_TEXTOS.md).
 
 ## Verificaciones y límites
 

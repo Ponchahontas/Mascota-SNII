@@ -11,7 +11,7 @@ const CACHE_PREFIX = 'academic-pet-shell-';
 // Solo se elimina el prefijo que usaba la versión anterior de ESTA PWA.
 // No tocar caches de otros proyectos hospedados en el mismo origen.
 const LEGACY_CACHE_PREFIX = 'tama-academico-shell-';
-const CACHE = `${CACHE_PREFIX}v11`;
+const CACHE = `${CACHE_PREFIX}v11-1`;
 const SHELL = ['./','./index.html','./src/main.js','./src/ui/app.js','./src/ui/pet-animation.js','./src/styles.css','./src/core/commands.js','./src/core/state.js','./src/core/errors.js','./src/core/engine-needs.js','./src/core/engine-health.js','./src/core/game-coordinator.js','./src/core/engine-game.js','./src/core/persistence.js','./src/data/catalog.js','./src/data/stage-activities.js','./src/data/learning-path.js','./src/data/learning-sequences.js','./src/data/scene-world.js','./src/data/activity-extras.js','./src/data/pet-visuals.js','./src/data/area-routes.js','./pets/fisico.svg','./pets/biologia.svg','./pets/medicina.svg','./pets/humanidades.svg','./pets/sociales.svg','./pets/agro.svg','./pets/ingenieria.svg','./pets/conducta.svg','./pets/interdisciplinaria.svg','./manifest.webmanifest','./icons/icon.svg','./icons/icon-192.png','./icons/icon-512.png'];
 // Precache de shell para abrir la interfaz tras una primera visita exitosa.
 self.addEventListener('install', event => {

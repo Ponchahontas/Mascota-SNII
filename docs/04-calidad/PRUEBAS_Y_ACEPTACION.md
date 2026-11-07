@@ -2,9 +2,11 @@
 
 ## Automatizadas
 
-`npm run typecheck`, `npm test`, `npm run build`. `npm test` compila y ejecuta los archivos Node de `tests/`. La auditoría de v0.11.0 ejecutó **77 pruebas** antes de añadir nuevas comprobaciones de integridad; **recontar en GitHub Actions tras cada cambio** y distinguir pruebas automáticas de pruebas reales en navegador.
+`npm run typecheck`, `npm test`, `npm run build`. `npm test` compila y ejecuta los archivos Node de `tests/`. La auditoría de v0.11.0 cerró con **80 pruebas**; **recontar en GitHub Actions tras cada cambio** y distinguir pruebas automáticas de pruebas reales en navegador.
 
 `tests/area-routes.test.mjs` cubre la nueva extensión: nueve especies/14 cuadros, 126 misiones, dos especializaciones por área, 18 finales de relato, una recompensa por etapa y compatibilidad con las siete áreas existentes. `tests/documentation.test.mjs` verifica enlaces de las guías actuales. Otras suites cubren motor, cuidado, salud, preguntas, escenas y animación.
+
+La suite `tests/text-quality.test.mjs` incorpora comprobaciones de duplicaciones y variación textual en las nueve áreas y las actividades de Primaria a Emérito. No equivale a una evaluación editorial humana.
 
 ## Pendiente de validación humana
 

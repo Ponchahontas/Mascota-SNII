@@ -1,4 +1,4 @@
-# Nueve áreas, especies y rutas educativas — MVP v0.11.0
+# Nueve áreas, especies y rutas educativas — MVP v0.11.1
 
 ## Fuente y alcance
 
@@ -24,7 +24,7 @@ Las historias y ramas de las mascotas **no equivalen a los criterios, actividade
 5. La primera respuesta correcta de la etapa registra su índice en `fieldMilestones` y concede un **bono único de UPE** y motivación.
 6. En **Emérito**, completar el reto con una especialización concede un logro y un cierre de relato propio de esa combinación: **9 × 2 = 18 variantes**.
 
-El desafío de campo es **adicional** a las seis aventuras base de cada nivel, cada una con cinco preguntas. No se debe describir la ruta de campo como si fuera otra colección de 420 × 9 preguntas. Los temas cambian por área; los procedimientos didácticos de los retos de campo comparten una plantilla de habilidad por etapa.
+El desafío de campo es **adicional** a las seis aventuras base de cada nivel, cada una con cinco preguntas. No se debe describir la ruta de campo como si fuera otra colección de 420 × 9 preguntas. Los temas cambian por área; las catorce etapas emplean narraciones, pistas y preguntas distintas, conservando propósitos de aprendizaje compartidos. La introducción del área se presenta una sola vez por ficha, antes de la escena.
 
 ## Compatibilidad y protección del progreso
 

@@ -57,7 +57,7 @@ test('Se actualiza la caché sin alterar el ámbito de otros sitios',()=>{
 test('Metadatos del proyecto y documentos principales usan el nombre correcto',()=>{
  const pkg=JSON.parse(read('package.json'));
  assert.equal(pkg.name,'academic-pet');
- assert.equal(pkg.version,'0.11.0');
+ assert.equal(pkg.version,'0.11.1');
  for(const file of ['README.md','PROMPT_MAESTRO_ASTRA.md','docs/README.md']){
   assert.match(read(file),/Academic Pet/i,'Falta identidad en '+file);
   assert.doesNotMatch(read(file),/tamagotchi/i,'Nombre ajeno en '+file);

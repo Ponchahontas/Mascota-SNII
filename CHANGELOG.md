@@ -1,5 +1,14 @@
 # Historial de cambios
 
+## v0.11.1 — Corrección editorial de redundancias (6 de noviembre de 2026)
+
+- Se elimina la introducción duplicada en la sección de Carrera de las nueve áreas y catorce etapas.
+- Las 126 misiones reciben escenas, preguntas, pistas y explicaciones diferenciadas por etapa.
+- Se diversifica el lenguaje de las cuatro preguntas complementarias de 78 actividades y se distribuye la posición correcta.
+- Ayuda sobre especializaciones desplegable antes de Universidad; leyenda de mascota condensada.
+- Pruebas de calidad textual, documentación y versión nueva de caché PWA. No cambian aciertos, guardados, recursos ni recompensas.
+
+
 ## Auditoría documental y de calidad — 6 de noviembre de 2026 (sin cambios a reglas del juego)
 
 - Matriz de solicitudes históricas: implementado, parcial y pendiente. Se señala que **no existe el mínimo de 24 horas por etapa**.

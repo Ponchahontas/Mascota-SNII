@@ -20,3 +20,7 @@ Los aciertos de aventuras no consumen PA y las respuestas incorrectas permiten r
 - Comprobar que la elección de área no mezcle preguntas ni recompensas entre estaciones.
 
 Ver [Áreas y rutas](AREAS_Y_RUTAS.md) y [Estado](../01-proyecto/ESTADO_ACTUAL.md).
+
+## Textos y variedad narrativa (v0.11.1)
+
+Ver [calidad de los textos](CALIDAD_DE_TEXTOS.md): se eliminaron introducciones duplicadas, se redactaron catorce guiones de etapa y se variaron preguntas y posición correcta en las aventuras avanzadas. Se conservan los IDs y el progreso guardado.

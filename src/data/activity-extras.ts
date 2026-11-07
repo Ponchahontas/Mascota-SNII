@@ -119,17 +119,104 @@ export const ACTIVITY_MOMENTS:Readonly<Record<string,ActivityMoments>>=Object.fr
  * Los distractores son acciones posibles en otra fase, pero NO responden a la
  * fase solicitada. Evita elegir al azar preguntas de otra actividad/etapa.
  */
+/**
+ * Seis maneras de formular cada una de cuatro fases. Los perfiles de
+ * actividad siguen siendo únicos: estas frases no sustituyen el contenido.
+ */
+const QUESTION_VARIANTS:readonly (readonly (readonly string[])[])[]=[
+ [
+  [
+   "¿Qué conviene organizar primero?",
+   "¿Con qué decisión debería comenzar?",
+   "¿Cuál es un buen punto de partida?",
+   "¿Qué preparativo da claridad a la tarea?",
+   "Antes de practicar, ¿qué debería tener listo?",
+   "¿Qué ayuda a iniciar con orden?"
+  ],
+  [
+   "¿Qué debería hacer durante la práctica?",
+   "¿Cuál es la acción principal ahora?",
+   "¿Qué paso corresponde a la ejecución?",
+   "¿Cómo pasaría de la idea a la acción?",
+   "¿Qué haría la mascota en este momento?",
+   "¿Qué actividad pone a prueba el plan?"
+  ],
+  [
+   "¿Qué permitiría verificar lo ocurrido?",
+   "¿Cómo se puede revisar el resultado?",
+   "¿Con qué acción se comprueba lo aprendido?",
+   "¿Cómo detectarías un posible error?",
+   "¿Qué corresponde a la fase de revisión?",
+   "¿Qué haría falta para contrastar los hallazgos?"
+  ],
+  [
+   "¿Qué compartiría al finalizar?",
+   "¿Cómo explicaría el proceso a su grupo?",
+   "¿Qué puede comunicar con claridad?",
+   "¿Cómo haría llegar los hallazgos a otros?",
+   "¿Qué acción permite contar lo aprendido?",
+   "¿Cuál sería el mejor cierre explicativo?"
+  ]
+ ],
+ [
+  [
+   "Antes de resolver el reto, ¿qué debe elegir?",
+   "¿Qué se revisa antes del primer intento?",
+   "¿Cuál es la mejor preparación?",
+   "¿Qué organizaría para trabajar con cuidado?",
+   "¿Cómo conviene iniciar esta investigación?",
+   "¿Qué paso pertenece a la planeación?"
+  ],
+  [
+   "¿Qué haría para desarrollar la actividad?",
+   "¿Cuál de estas acciones supone practicar?",
+   "¿Qué opción permite poner en marcha el trabajo?",
+   "¿Cómo llevaría adelante la actividad?",
+   "¿Qué sucede durante el ejercicio?",
+   "¿Qué acción ejecuta el plan?"
+  ],
+  [
+   "¿Qué evidencia conviene revisar ahora?",
+   "¿Cómo comprobaría que funcionó?",
+   "¿Qué permite comparar el resultado con el objetivo?",
+   "¿Qué paso corresponde a verificar?",
+   "¿Cómo reconocería una conclusión apresurada?",
+   "¿Qué revisión necesita el trabajo?"
+  ],
+  [
+   "¿Cómo presentaría el aprendizaje?",
+   "¿Qué contaría al terminar?",
+   "¿Qué información compartiría con otras personas?",
+   "¿Cómo explicaría su hallazgo?",
+   "¿Qué opción comunica el resultado?",
+   "¿Qué entrega permitiría comprender el trabajo?"
+  ]
+ ]
+];
+
+/** Genera las preguntas 2–5 con orden de soluciones variado y estable. */
 export function activityContextSteps(activity:Activity):readonly {
  scene:string;question:string;options:readonly [string,string,string];correct:0|1|2;explanation:string;hint:string;
 }[] {
  const moments=ACTIVITY_MOMENTS[activity.id];
  if(!moments)return [];
  const [prepare,perform,verify,communicate]=moments;
- const context=activity.label.toLocaleLowerCase('es-MX');
- return [
-  {scene:`Antes de ${context}, ${activity.flavor}`,question:`¿Qué prepararías ANTES de «${activity.label}»?`,options:[perform,prepare,communicate],correct:1,explanation:`Antes de comenzar conviene ${prepare.charAt(0).toLowerCase()+prepare.slice(1)}. La preparación ayuda a aprender con seguridad.`,hint:'Piensa en lo que debe organizarse antes de comenzar.'},
-  {scene:`${activity.icon} ${activity.label}: ¡manos a la obra!`,question:`¿Qué haría tu mascota MIENTRAS realiza «${activity.label}»?`,options:[perform,verify,prepare],correct:0,explanation:`Durante esta actividad es importante ${perform.charAt(0).toLowerCase()+perform.slice(1)}.`,hint:'Distingue una acción práctica de la preparación o revisión.'},
-  {scene:`La mascota se pregunta cómo saber si realmente aprendió al ${context}.`,question:`¿Cómo COMPROBARÍAS los resultados de «${activity.label}»?`,options:[communicate,perform,verify],correct:2,explanation:`Comprobar significa ${verify.charAt(0).toLowerCase()+verify.slice(1)}, en vez de dar por hecho el resultado.`,hint:'Busca la opción que revisa resultados, no solo los produce.'},
-  {scene:`Llegó el momento de compartir lo aprendido sobre ${context}.`,question:`¿Cómo COMUNICARÍAS lo aprendido en «${activity.label}»?`,options:[prepare,communicate,verify],correct:1,explanation:`Compartir responsablemente implica ${communicate.charAt(0).toLowerCase()+communicate.slice(1)}.`,hint:'Piensa en quien no estuvo presente: ¿qué necesita entender?'},
+ const seed=Array.from(activity.id).reduce((sum,ch)=>sum+ch.charCodeAt(0),0);
+ const variant=QUESTION_VARIANTS[activity.minStage%QUESTION_VARIANTS.length];
+ const phraseIndex=(seed+(activity.id.split('-').at(-1)?.length??0))%6;
+ const suffixes=[` para «${activity.label}»?`,` en «${activity.label}»?`,` en «${activity.label}»?`,` sobre «${activity.label}»?`];
+ const ask=(phase:number)=>variant[phase][phraseIndex].replace(/\?$/,suffixes[phase]);
+ // No se modifica el paso persistido (0..4). La rotación fija hace que las
+ // soluciones no aparezcan siempre en la misma letra a lo largo de la aventura.
+ const rotate=(options:readonly [string,string,string],correct:0|1|2,phase:number)=>{
+  const shift=(seed+[2,1,0,2][phase])%3;
+  return {options:[options[(3-shift)%3],options[(4-shift)%3],options[(5-shift)%3]] as [string,string,string],correct:((correct+shift)%3) as 0|1|2};
+ };
+ const steps=[
+  {scene:activity.flavor,question:ask(0),answers:[perform,prepare,communicate] as [string,string,string],correct:1 as const,explanation:prepare,hint:'Antes de empezar, piensa en lo que hará posible una práctica bien organizada.'},
+  {scene:`${activity.icon} La mascota pone en práctica lo que preparó.`,question:ask(1),answers:[perform,verify,prepare] as [string,string,string],correct:0 as const,explanation:perform,hint:'Distingue una acción que se ejecuta de otra que solo sirve para planear.'},
+  {scene:'Llegó el momento de revisar los resultados obtenidos.',question:ask(2),answers:[communicate,perform,verify] as [string,string,string],correct:2 as const,explanation:verify,hint:'Lo que parece funcionar aún puede necesitar una comprobación.'},
+  {scene:'El equipo quiere conocer los aprendizajes de la mascota.',question:ask(3),answers:[prepare,communicate,verify] as [string,string,string],correct:1 as const,explanation:communicate,hint:'Imagina qué necesita entender alguien que no participó.'}
  ];
+ return steps.map((step,i)=>({...step,...rotate(step.answers,step.correct,i),explanation:`${step.explanation}.`}));
 }

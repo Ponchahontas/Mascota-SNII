@@ -42,3 +42,7 @@ npm run build
 Para cambios de UI son obligatorias comprobaciones manuales de móvil, escritorio, teclado, pantalla pequeña y PWA; si no se hicieron, **dejarlo registrado como pendiente**. En el PR describir el motivo, archivos, casos comprobados, compatibilidad y riesgos.
 
 **Licencia:** no hay LICENSE publicado. No reutilizar recursos externos sin confirmar sus derechos.
+
+## Calidad de textos al contribuir
+
+Los títulos, explicaciones, escenas y preguntas se muestran juntos en la UI: evitar copiar el mismo párrafo en campos diferentes. Verificar los enunciados de las nueve áreas a lo largo de las catorce etapas y ejecutar `tests/text-quality.test.mjs`. La rotación de opciones es determinista; no cambiar IDs ni índices de pasos sin revisar la persistencia. Consultar [guía editorial](docs/02-juego/CALIDAD_DE_TEXTOS.md).

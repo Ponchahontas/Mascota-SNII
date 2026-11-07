@@ -1,4 +1,4 @@
-# Academic Pet · Documentación (v0.11.0)
+# Academic Pet · Documentación (v0.11.1)
 
 Empieza por este índice. Las especificaciones históricas se preservan en [`historico/`](historico/README.md), pero **no sustituyen al código actual**. Si hay discrepancias, verificar los módulos y actualizar la documentación en el mismo cambio.
 
@@ -8,6 +8,7 @@ Empieza por este índice. Las especificaciones históricas se preservan en [`his
 | Entender qué existe y qué falta | [Estado actual](01-proyecto/ESTADO_ACTUAL.md) |
 | **Comprobar todos los requisitos solicitados** | **[Auditoría y pendientes (06/11/2026)](01-proyecto/AUDITORIA_CUMPLIMIENTO_2026_11_06.md)** |
 | Priorizar próximos desarrollos | [Hoja de ruta](01-proyecto/HOJA_DE_RUTA.md) |
+| Revisar repeticiones y estilo de preguntas | [Calidad de los textos](02-juego/CALIDAD_DE_TEXTOS.md) |
 | Consultar las nueve áreas y sus 18 rutas | **[Áreas, mascotas y especializaciones](02-juego/AREAS_Y_RUTAS.md)** |
 | Entender las reglas y medidores | [Jugabilidad y balance](02-juego/JUGABILIDAD_Y_BALANCE.md) |
 | Crear nuevas preguntas y estaciones | [Pedagogía y estaciones](02-juego/PEDAGOGIA_Y_ESTACIONES.md) |

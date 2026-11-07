@@ -78,27 +78,119 @@ const EDUCATIONAL_METHODS = [
  {verb:'preservar y compartir',purpose:'legado científico',correct:'Conservar métodos, historias y aprendizajes para otras generaciones',wrong:['Destruir registros sin evaluación','Ocultar las contribuciones de otros equipos']},
 ] as const;
 
+/**
+ * Guion variable por etapa: escena, pregunta, pista y explicación.
+ * El tema del área se inserta en {tema}. No insertar otra vez la introducción
+ * en la escena: la pestaña Carrera ya la presenta antes del reto.
+ */
+const STAGE_COPY:readonly (readonly [string,string,string,string])[]=[
+ [
+  "La mesa de juegos está preparada para descubrir detalles del entorno.",
+  "La mascota juega a descubrir «{tema}». ¿Qué acción le ayudaría a aprender?",
+  "Piensa en algo que puedas explorar sin saberlo todo de antemano.",
+  "Explorar «{tema}» permite aprender a partir de la curiosidad y el juego."
+ ],
+ [
+  "Los cuadernos reúnen dibujos, descripciones y hallazgos de la clase.",
+  "En Primaria quieren comparar «{tema}». ¿Qué decisión les permitiría encontrar semejanzas?",
+  "Imagina cómo explicarías lo observado a quien no estuvo presente.",
+  "Comparar aspectos de «{tema}» ayuda a distinguir sus características."
+ ],
+ [
+  "Un grupo escolar debate qué sabe y qué necesita averiguar.",
+  "El grupo investiga «{tema}». ¿Cómo iniciaría una búsqueda que pueda revisarse después?",
+  "No todas las ideas iniciales son certezas; considera cómo registrarlas.",
+  "Las preguntas sobre «{tema}» ganan valor al registrar observaciones."
+ ],
+ [
+  "El taller escolar revisa herramientas y acuerdos de seguridad.",
+  "Antes de experimentar con «{tema}», ¿qué conviene hacer para trabajar de forma segura?",
+  "Considera qué podría revisarse si el primer intento no sale como se esperaba.",
+  "Una prueba segura sobre «{tema}» necesita planeación y registro de lo ocurrido."
+ ],
+ [
+  "En el campus se consultan fuentes y se preparan primeras evidencias.",
+  "Una materia universitaria propone estudiar «{tema}». ¿Qué práctica ayuda a fundamentar el análisis?",
+  "Piensa en cómo diferenciar una afirmación de la evidencia que la sostiene.",
+  "Estudiar «{tema}» con fuentes contrastables evita confundir opiniones con resultados."
+ ],
+ [
+  "Una sesión supervisada analiza posibilidades y límites de una práctica.",
+  "Ante un caso especializado sobre «{tema}», ¿qué debería valorar la mascota antes de decidir?",
+  "Las decisiones profesionales también requieren reconocer lo que aún se desconoce.",
+  "Aplicar conocimientos sobre «{tema}» exige considerar riesgos, supervisión y límites."
+ ],
+ [
+  "El seminario de tesis transforma una inquietud amplia en un proyecto posible.",
+  "Para investigar «{tema}» en una tesis, ¿cómo formularía una pregunta viable?",
+  "Una pregunta útil debe poder abordarse con tiempo, herramientas y datos disponibles.",
+  "Delimitar «{tema}» permite escoger métodos coherentes con la pregunta."
+ ],
+ [
+  "La investigación doctoral prepara controles y posibles explicaciones.",
+  "Si una hipótesis sobre «{tema}» parece convincente, ¿cómo podría ponerse a prueba?",
+  "Piensa en resultados que también podrían cuestionar tu idea inicial.",
+  "Investigar «{tema}» implica contrastar hipótesis sin ocultar resultados inesperados."
+ ],
+ [
+  "Dos equipos comparan métodos antes de unir sus resultados.",
+  "Otros laboratorios desean revisar hallazgos sobre «{tema}». ¿Qué facilitaría esa colaboración?",
+  "Recuerda que una persona externa necesita conocer las condiciones de la práctica.",
+  "Los hallazgos sobre «{tema}» son más útiles cuando otros pueden evaluar el proceso."
+ ],
+ [
+  "La bitácora de trayectoria reúne aportaciones con sus fuentes originales.",
+  "Para documentar trabajo sobre «{tema}», ¿qué es preferible incluir en el expediente ficticio?",
+  "Una buena síntesis permite distinguir aportaciones reales y expectativas.",
+  "Registrar «{tema}» con atribuciones y límites protege la integridad académica."
+ ],
+ [
+  "Una nueva generación presenta dudas y resultados al equipo.",
+  "Al orientar a alguien que empieza a estudiar «{tema}», ¿cómo apoyaría su autonomía?",
+  "Orientar no significa sustituir las decisiones o el trabajo de otras personas.",
+  "La mentoría en «{tema}» combina diálogo, reconocimiento y evidencias."
+ ],
+ [
+  "Las instituciones acuerdan objetivos y responsabilidades compartidas.",
+  "Varios equipos coordinan un proyecto sobre «{tema}». ¿Qué favorecería el trabajo conjunto?",
+  "Piensa en cómo documentar acuerdos cuando participan distintas instituciones.",
+  "Coordinar «{tema}» requiere reglas claras y reconocimiento de cada equipo."
+ ],
+ [
+  "El comité revisa impactos y escucha voces que no siempre coinciden.",
+  "Un proyecto amplio sobre «{tema}» llega a evaluación. ¿Qué criterio debería importar?",
+  "Un resultado puede tener beneficios, costes y efectos imprevistos.",
+  "La evaluación de «{tema}» debe considerar ética, riesgos y acceso al conocimiento."
+ ],
+ [
+  "La biblioteca reúne registros para quienes investigarán después.",
+  "Al compartir el legado de «{tema}», ¿qué acción ayudaría a las siguientes generaciones?",
+  "El legado incluye métodos, desacuerdos, errores y autorías, no solo triunfos.",
+  "Preservar «{tema}» significa mantener disponible su historia con atribución responsable."
+ ]
+];
+
 export interface FieldChallenge {stageIndex:number;title:string;scene:string;question:string;options:readonly [string,string,string];correct:0|1|2;hint:string;explanation:string;}
 
-/** Una misión original por combinación área x etapa; no modifica los 5 pasos de las aventuras. */
+/**
+ * Produce una misión de campo para área x etapa. Mantiene tema, opciones,
+ * índices y premios; solo cambia la narración. Los IDs del guardado permanecen.
+ */
 export function fieldChallenge(areaId:string,stageIndex:number,branchId?:string|null):FieldChallenge {
- const entry=AREA_ROUTES[areaId]??AREA_ROUTES.biologia, i=Math.max(0,Math.min(13,Math.trunc(stageIndex)));
+ const entry=AREA_ROUTES[areaId]??AREA_ROUTES.biologia;
+ const i=Math.max(0,Math.min(13,Math.trunc(stageIndex)));
  const method=EDUCATIONAL_METHODS[i],theme=entry.themes[i];
+ const [scene,ask,hint,explain]=STAGE_COPY[i];
  const branch=entry.branches.find(item=>item.id===branchId);
  const starting=[method.correct,...method.wrong];
- // Repartir la posición correcta evita que las respuestas se vuelvan
- // predecibles: rotar sin usar azar conserva la misma clave tras recargar.
+ // Solución rotada de forma estable: no depende del azar ni de la pantalla.
  const rotated=(i+Object.keys(AREA_ROUTES).indexOf(entry.id))%3;
- // `correct` es el índice ya rotado, NO el índice de la respuesta
- // original en EDUCATIONAL_METHODS; las pruebas validan las 126 rutas.
- const options: [string,string,string] = [starting[(3-rotated)%3],starting[(4-rotated)%3],starting[(5-rotated)%3]] as [string,string,string];
+ const options:[string,string,string]=[starting[(3-rotated)%3],starting[(4-rotated)%3],starting[(5-rotated)%3]];
  return {
   stageIndex:i,title:theme,
-  scene:`${entry.emblem} ${entry.setting}: ${theme}. ${branch?`Ruta elegida: ${branch.label}.`:entry.introduction}`,
-  question:`¿Cómo puede ${'la mascota'} ${method.verb} «${theme}» de manera responsable?`,
-  options,correct:rotated as 0|1|2,
-  hint:`Piensa en el propósito de esta etapa: ${method.purpose}. Busca una forma de aprender que permita revisar lo realizado.`,
-  explanation:`En ${STAGES[i].label}, la habilidad es ${method.purpose}. «${theme}» permite practicarla con curiosidad, evidencia y respeto; no representa criterios SNII oficiales.`
+  scene:`${entry.emblem} ${entry.setting}. ${scene}${branch?` Sigue la ruta «${branch.label}».`:''}`,
+  question:ask.replace('{tema}',theme),options,correct:rotated as 0|1|2,
+  hint,explanation:`${explain.replace('{tema}',theme)} En esta etapa se practica ${method.purpose}.`
  };
 }
 
